@@ -1,0 +1,65 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Security Scan
+
+on:
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  trivy-kubernetes:
+    name: Security - Kubernetes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        with:
+          scan-type: "config"
+          scan-ref: "kubernetes/"
+          exit-code: "1"
+          severity: "CRITICAL"
+          format: "table"
+          trivyignores: ".trivyignore"
+
+  trivy-terraform:
+    name: Security - Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
+        with:
+          scan-type: "config"
+          scan-ref: "terraform/"
+          exit-code: "1"
+          severity: "CRITICAL"
+          format: "table"
+          trivyignores: ".trivyignore"
+
+  success:
+    if: ${{ !cancelled() }}
+    needs: ["trivy-kubernetes", "trivy-terraform"]
+    name: Security - Success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All security scans passed" && echo "${{ toJSON(needs.*.result) }}"

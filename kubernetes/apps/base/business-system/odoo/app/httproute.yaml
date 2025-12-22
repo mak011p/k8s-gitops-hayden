@@ -6,6 +6,7 @@ metadata:
   name: odoo
   namespace: business-system
   annotations:
+    external-dns.alpha.kubernetes.io/target: '${CLOUDFLARED_INGRESS_DOMAIN}'
     external-dns.alpha.kubernetes.io/external: 'true'
 spec:
   parentRefs:
@@ -50,6 +51,7 @@ metadata:
   name: odoo-webhook
   namespace: business-system
   annotations:
+    external-dns.alpha.kubernetes.io/target: '${CLOUDFLARED_INGRESS_DOMAIN}'
     external-dns.alpha.kubernetes.io/external: 'true'
 spec:
   parentRefs:
@@ -59,7 +61,35 @@ spec:
   hostnames:
     - 'odoo-webhook.${CLUSTER_DOMAIN}'
   rules:
-    - backendRefs:
+    # Magento2 integration webhooks
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /magento2/integration/
+        - path:
+            type: PathPrefix
+            value: /integration/magento2/
+      timeouts:
+        request: 60s
+      backendRefs:
+        - name: odoo
+          port: 8071
+          weight: 100
+    # External order webhooks
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /integration/
+      timeouts:
+        request: 60s
+      backendRefs:
+        - name: odoo
+          port: 8071
+          weight: 100
+    # Catch-all for other webhooks
+    - timeouts:
+        request: 60s
+      backendRefs:
         - name: odoo
           port: 8071
           weight: 100

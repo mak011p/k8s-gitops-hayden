@@ -129,7 +129,7 @@ instance:
             decryption:
               provider: sops
               secretRef:
-                name: sops-age-secret
+                name: sops-gpg
             postBuild:
               substitute: {}
               substituteFrom:

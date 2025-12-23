@@ -23,7 +23,7 @@ spec:
   dependsOn:
     - name: cnpg
       namespace: database-system
-    - name: istiod
-      namespace: istio-system
+    - name: cilium-gateway-api
+      namespace: kube-system
     - name: onepassword
       namespace: external-secrets

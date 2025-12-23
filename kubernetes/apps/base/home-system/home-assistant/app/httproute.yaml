@@ -6,6 +6,7 @@ metadata:
   name: home-assistant
   namespace: home-system
   annotations:
+    external-dns.alpha.kubernetes.io/target: 'external.${CLUSTER_DOMAIN}'
     external-dns.alpha.kubernetes.io/external: 'true'
 spec:
   parentRefs:

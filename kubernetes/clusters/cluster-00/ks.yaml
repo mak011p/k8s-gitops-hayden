@@ -8,7 +8,7 @@ metadata:
 spec:
   interval: 10m
   timeout: 30m
-  path: ./apps/overlays/cluster-00
+  path: ./apps/overlays/cluster-00-local
   prune: true
   wait: false
   sourceRef:
@@ -17,7 +17,7 @@ spec:
   decryption:
     provider: sops
     secretRef:
-      name: sops-gpg
+      name: sops-age-secret
   postBuild:
     substitute: {}
     substituteFrom:

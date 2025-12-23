@@ -10,7 +10,7 @@ bpf:
   preallocateMaps: true
   tproxy: true
   enableIPv4BIGTCP: true
-  enableIPv6BIGTCP: false
+  enableIPv6BIGTCP: false # intentional deviation from upstream: IPv6 disabled in cluster
 cgroup:
   autoMount:
     enabled: false
@@ -73,7 +73,7 @@ ipv4:
   enabled: true
 ipv4NativeRoutingCIDR: 10.244.0.0/16
 ipv6:
-  enabled: false
+  enabled: false # intentional deviation from upstream: no IPv6 pod CIDR
 # ipv6NativeRoutingCIDR: fd00:10:244::/48
 k8sServiceHost: 127.0.0.1
 k8sServicePort: 7445

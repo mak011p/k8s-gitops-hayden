@@ -81,7 +81,7 @@ spec:
               limits:
                 memory: 256Mi
     defaultPodOptions:
-      hostNetwork: true
+      hostNetwork: true # intentional deviation from upstream: required for production gateway access
       dnsPolicy: ClusterFirstWithHostNet
       securityContext:
         runAsNonRoot: true

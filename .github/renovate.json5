@@ -1,14 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   forkProcessing: "enabled",
-  hostRules: [
-    {
-      // PAT with read:packages scope for hayden-agencies org
-      matchHost: "ghcr.io",
-      username: "mak011p",
-      password: "{{ secrets.GHCR_PAT }}",
-    },
-  ],
   extends: [
     "config:recommended",
     // TODO: Consider using best-practices once OCI sha256 digests are supported
@@ -36,20 +28,6 @@
     enabled: true,
   },
   ignorePaths: ["**/*.enc.*", "**/resources/**"],
-  packageRules: [
-    {
-      // Custom versioning for Odoo with date-based tags (18.0.YYYYMMDD-sha)
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>.+)$",
-    },
-    {
-      // Custom versioning for CNPG PostgreSQL images (17.7-202512080807-system-bookworm)
-      matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<patch>\\d+)-system-bookworm$",
-    },
-  ],
   flux: {
     managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
   },

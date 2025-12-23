@@ -45,5 +45,7 @@ spec:
     substituteFrom:
       - kind: ConfigMap
         name: cluster-config
+        namespace: flux-system
       - kind: Secret
         name: cluster-secrets
+        namespace: flux-system

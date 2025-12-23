@@ -2,6 +2,7 @@ provider:
   name: cloudflare
 domainFilters:
   - "${CLUSTER_DOMAIN}"
+  - "${PERSONAL_DOMAIN}"
 env:
   - name: CF_API_TOKEN
     valueFrom:

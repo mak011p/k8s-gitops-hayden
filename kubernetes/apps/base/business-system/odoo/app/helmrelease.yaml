@@ -77,6 +77,8 @@ spec:
               - --db_user=$$(POSTGRES_USER)
               - --db_password=$$(POSTGRES_PASSWORD)
               - --db-filter=^$$(POSTGRES_DB)$$
+              - -u
+              - product_extended
             probes:
               liveness:
                 enabled: true

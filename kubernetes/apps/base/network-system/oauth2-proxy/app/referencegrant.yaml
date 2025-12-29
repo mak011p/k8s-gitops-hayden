@@ -1,0 +1,24 @@
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-oauth2-proxy-backend-refs
+  namespace: network-system
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: business-system
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: business-system-staging
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: home-system
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: ai-system
+  to:
+    - group: ""
+      kind: Service
+      name: oauth2-proxy

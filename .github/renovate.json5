@@ -5,6 +5,7 @@
     {
       // PAT with read:packages scope for hayden-agencies org
       matchHost: "ghcr.io",
+      hostType: "docker",
       username: "mak011p",
       password: "{{ process.env.RENOVATE_GHCR_PAT }}",
     },

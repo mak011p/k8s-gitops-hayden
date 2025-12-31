@@ -113,6 +113,13 @@ spec:
     defaultPodOptions:
       labels:
         app.kubernetes.io/name: odoo
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: odoo
       annotations:
         # Velero backup hooks
         backup.velero.io/backup-volumes: filestore

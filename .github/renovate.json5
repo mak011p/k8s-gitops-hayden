@@ -36,6 +36,12 @@
       matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
       versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<build>.+)$",
     },
+    {
+      // Custom versioning for label-generator with date-based tags (YYYYMMDD-sha)
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/mak011p/label-generator"],
+      versioning: "regex:^(?<major>\\d{8})-(?<build>.+)$",
+    },
   ],
   flux: {
     managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],

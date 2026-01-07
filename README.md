@@ -61,6 +61,20 @@ This repository leverages a range of cutting-edge open-source tools and platform
 | NAS                                                                                    | Storage             | 1        | 8 Cores  | 16GB  | 48TB                              | AMD64        | [TrueNAS](https://www.truenas.com/)   |                                     |
 | [JetKVM](https://jetkvm.com/)                                                         | Remote KVM          | 3        | -        | -     | -                                 | -            | -                                    |                                     |
 
+### TrueNAS iSCSI Storage
+
+The NAS provides iSCSI block storage to the cluster via [democratic-csi](https://github.com/democratic-csi/democratic-csi).
+
+**Configuration notes for TrueNAS 25.x:**
+- Use `next` image tag (TrueNAS 25.x changed version string format)
+- Omit `zvolDedup` from driver config (Pydantic v2 strict validation rejects it)
+- Include `targetGroups` array in iSCSI config
+
+**Storage layout:**
+- Pool: `tank` (RAIDZ2, 4x 8TB)
+- SLOG: Micron 7450 960GB NVMe (write acceleration)
+- Datasets: `tank/k8s/iscsi/v` (volumes), `tank/k8s/iscsi/s` (snapshots)
+
 <details>
 <summary>Decommissioned Hardware</summary>
 

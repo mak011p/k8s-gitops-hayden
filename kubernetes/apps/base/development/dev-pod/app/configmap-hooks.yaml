@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-pod-claude-hooks
+  namespace: development
+data:
+  settings.json: |
+    {
+      "hooks": {
+        "PreToolUse": [
+          {
+            "matcher": "AskUserQuestion",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/home/dev/.claude/hooks/notify-hook.sh",
+                "timeout": 10
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+  notify-hook.sh: |
+    #!/bin/bash
+    # Claude Code PreToolUse hook for AskUserQuestion notifications
+    # Sends webhook notification when Claude needs user input
+
+    # Read the tool input from stdin
+    INPUT=$(cat)
+
+    # Extract the question being asked (if available)
+    QUESTION=$(echo "$INPUT" | jq -r '.tool_input.question // .tool_input // "Claude needs your input"' 2>/dev/null)
+
+    # Get webhook URL from environment
+    WEBHOOK_URL="${WEBHOOK_URL:-}"
+
+    if [ -z "$WEBHOOK_URL" ]; then
+      # No webhook configured, just log and allow
+      echo "No WEBHOOK_URL configured, skipping notification" >&2
+      exit 0
+    fi
+
+    # Current timestamp
+    TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    # Hostname for identification
+    HOSTNAME="${HOSTNAME:-dev-pod}"
+
+    # Build JSON payload
+    PAYLOAD=$(jq -n \
+      --arg ts "$TIMESTAMP" \
+      --arg host "$HOSTNAME" \
+      --arg question "$QUESTION" \
+      '{
+        "timestamp": $ts,
+        "source": $host,
+        "event": "claude_needs_input",
+        "message": "Claude Code is waiting for your input",
+        "details": {
+          "question": $question
+        }
+      }')
+
+    # Send webhook (fire and forget, don't block on failure)
+    curl -s -X POST \
+      -H "Content-Type: application/json" \
+      -d "$PAYLOAD" \
+      --max-time 5 \
+      "$WEBHOOK_URL" >/dev/null 2>&1 &
+
+    # Always allow the tool to proceed
+    exit 0

@@ -42,6 +42,12 @@
       matchPackageNames: ["ghcr.io/mak011p/label-generator"],
       versioning: "regex:^(?<major>\\d{8})-(?<build>.+)$",
     },
+    {
+      // Custom versioning for claude-remote-dev-pod with date-based tags (YYYYMMDD-sha)
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/mak011p/claude-remote-dev-pod"],
+      versioning: "regex:^(?<major>\\d{8})-(?<build>.+)$",
+    },
   ],
   flux: {
     managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],

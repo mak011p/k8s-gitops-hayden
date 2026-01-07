@@ -414,3 +414,28 @@ This repository includes Cursor rules for troubleshooting Flux resources using t
 
 ### Comparing Resources Across Clusters
 Use `get_kubernetes_contexts` and `set_kubernetes_context` to switch between clusters, then compare resource specs and status.
+
+## Replacing a Talos Worker Node (with Rook Ceph OSD)
+
+### Steps
+1. **Cordon & drain**: `kubectl cordon worker1 && kubectl drain worker1 --ignore-daemonsets --delete-emptydir-data --force`
+2. **Remove OSD from Ceph**: `ceph osd out <id> && ceph osd down <id> && ceph osd purge <id> --yes-i-really-mean-it`
+3. **Delete OSD deployment**: `kubectl delete deploy rook-ceph-osd-<id> -n rook-ceph`
+4. **Update network patch**: Edit `talos/patches/worker<N>-network.yaml` with new NIC interface and disk selector
+5. **Apply config**: `sops exec-file talos/generated/node.enc.yaml 'talosctl apply-config --insecure -n <NEW_IP> --config-patch @talos/patches/worker<N>-network.yaml --file {}'`
+6. **Uncordon**: `kubectl uncordon worker1`
+
+### Common Roadblocks
+
+| Issue | Fix |
+|-------|-----|
+| Rook stuck in "Draining Failure Domain" | Delete configmap: `kubectl delete cm rook-ceph-pdbstatemap -n rook-ceph` |
+| Old mon crashing on new node | Remove mon: `ceph mon remove <id>` then delete deployment |
+| OSD prepare job not created | Cluster must finish "Configuring Ceph Mons" before OSD provisioning starts |
+| Cluster stuck on mon config | Ensure 3 healthy mons in quorum before OSDs will provision |
+
+### Verify Success
+```bash
+ceph osd tree    # New OSD should be up
+ceph -s          # PGs should be active+clean, 3 OSDs in cluster
+```

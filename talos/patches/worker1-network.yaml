@@ -1,30 +1,14 @@
-# Worker 1 - Network Configuration with NIC Bonding
+# Worker 1 - Network Configuration (New Hardware)
 machine:
   install:
     image: ghcr.io/siderolabs/installer:v1.11.5
     wipe: true
     diskSelector:
-      size: "<= 600GB"
+      size: "<= 500GB"
   network:
     hostname: worker1
     interfaces:
-      # 10Gbps NIC - bonded (no direct IP)
-      - interface: enp10s0f1
-        addresses: []
-      # 1Gbps NIC - bonded (no direct IP)
-      - interface: enp7s0
-        addresses: []
-      # Bond interface with failover
-      - interface: bond0
-        bond:
-          mode: active-backup
-          primary: enp10s0f1
-          interfaces:
-            - enp10s0f1  # 10Gbps - primary
-            - enp7s0     # 1Gbps - backup
-          miimon: 100
-          updelay: 200
-          downdelay: 200
+      - interface: enp1s0f1
         addresses:
           - 192.168.50.21/24
         routes:

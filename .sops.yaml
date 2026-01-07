@@ -19,7 +19,7 @@ creation_rules:
     gcp_kms: projects/hayden-agencies-infra/locations/global/keyRings/sops/cryptoKeys/sops-key
     mac_only_encrypted: true
   # Kubernetes secret files using SOPS (Age + PGP dual encryption)
-  - path_regex: kubernetes/.*/*.enc.ya?ml
+  - path_regex: kubernetes/.*\.enc\.ya?ml$
     encrypted_regex: ^(data|stringData)$
     unencrypted-regex: ^(description|metadata)$
     age: age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h

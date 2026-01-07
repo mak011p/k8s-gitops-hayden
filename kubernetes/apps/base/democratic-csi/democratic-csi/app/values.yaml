@@ -1,12 +1,18 @@
 controller:
   priorityClassName: platform-cluster-critical
   driver:
-    image: docker.io/democraticcsi/democratic-csi:next
+    image:
+      registry: docker.io
+      repository: democraticcsi/democratic-csi
+      tag: next
 csiDriver:
   name: "org.democratic-csi.iscsi"
 node:
   driver:
-    image: docker.io/democraticcsi/democratic-csi:next
+    image:
+      registry: docker.io
+      repository: democraticcsi/democratic-csi
+      tag: next
     extraEnv:
     - name: ISCSIADM_HOST_STRATEGY
       value: nsenter

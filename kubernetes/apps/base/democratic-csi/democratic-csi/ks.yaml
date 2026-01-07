@@ -18,4 +18,3 @@ spec:
     provider: sops
     secretRef:
       name: sops-age-secret
-      namespace: flux-system

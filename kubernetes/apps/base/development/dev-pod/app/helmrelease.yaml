@@ -61,14 +61,12 @@ spec:
               repository: ghcr.io/mak011p/claude-remote-dev-pod
               tag: latest  # Will be updated by Renovate after first build
             env:
-              - name: TZ
-                value: "Australia/Melbourne"
-              - name: WEBHOOK_URL
+              TZ: "Australia/Melbourne"
+              WEBHOOK_URL:
                 valueFrom:
                   secretKeyRef:
                     name: dev-pod-secrets
                     key: webhook-url
-                    optional: true
             probes:
               liveness:
                 enabled: true
@@ -107,19 +105,15 @@ spec:
               repository: tailscale/tailscale
               tag: v1.76.6
             env:
-              - name: TS_AUTHKEY
+              TS_AUTHKEY:
                 valueFrom:
                   secretKeyRef:
                     name: dev-pod-secrets
                     key: tailscale-authkey
-              - name: TS_HOSTNAME
-                value: "dev-pod"
-              - name: TS_STATE_DIR
-                value: "/var/lib/tailscale"
-              - name: TS_USERSPACE
-                value: "true"
-              - name: TS_ACCEPT_DNS
-                value: "true"
+              TS_HOSTNAME: "dev-pod"
+              TS_STATE_DIR: "/var/lib/tailscale"
+              TS_USERSPACE: "true"
+              TS_ACCEPT_DNS: "true"
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000

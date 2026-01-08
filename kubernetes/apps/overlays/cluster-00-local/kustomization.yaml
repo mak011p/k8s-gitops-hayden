@@ -19,6 +19,8 @@ resources:
   - ../../base/business-system/label-generator/ks.yaml
   - ../../base/democratic-csi
   - ../../base/democratic-csi/democratic-csi/ks.yaml
+  - ../../base/development
+  - ../../base/development/dev-pod/ks.yaml
   - ../../base/game-servers
   - ../../base/game-servers/minecraft/ks.yaml
   - ../../base/game-servers/minecraft-bedrock/ks.yaml

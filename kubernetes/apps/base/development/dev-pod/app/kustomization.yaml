@@ -8,4 +8,4 @@ resources:
   - helmrelease.yaml
   - ocirepository.yaml
   - pvc.yaml
-  - secret.enc.yaml
+  - secret.enc.age.yaml

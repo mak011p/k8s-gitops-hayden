@@ -19,7 +19,7 @@ spec:
   decryption:
     provider: sops
     secretRef:
-      name: sops-gpg
+      name: sops-age-secret
   postBuild:
     substituteFrom:
     - kind: ConfigMap

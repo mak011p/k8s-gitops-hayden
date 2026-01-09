@@ -7,9 +7,9 @@ resources:
   - configmap.yaml
   - externalsecret-ghcr.yaml
   - externalsecret-backup.yaml
-  - secret-odoo-app.enc.yaml
-  - secret-odoo-pg-superuser.enc.yaml
-  - secret-odoo-pg-app.enc.yaml
+  - secret-odoo-app.enc.age.yaml
+  - secret-odoo-pg-superuser.enc.age.yaml
+  - secret-odoo-pg-app.enc.age.yaml
   - helmrelease.yaml
   - ocirepository.yaml
   - postgres-cluster.yaml

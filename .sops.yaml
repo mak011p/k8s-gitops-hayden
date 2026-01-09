@@ -7,34 +7,30 @@ creation_rules:
     unencrypted-regex: ^(description|metadata)$
     gcp_kms: projects/hayden-agencies-infra/locations/global/keyRings/sops/cryptoKeys/sops-key
     mac_only_encrypted: true
-  # Helm values files using SOPS (Age + PGP dual encryption)
-  - path_regex: kubernetes/.*/values.enc.ya?ml
-    age: age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h
-    pgp: 67AF5B5A73800481D8E41667C87721FBF6BBF30C
-    mac_only_encrypted: true
   # Age key file - encrypted with GCP KMS only (so Age private key can be stored in Git)
   - path_regex: kubernetes/clusters/.*/secrets/sops-age.encrypted.ya?ml
     encrypted_regex: ^(data|stringData)$
     unencrypted-regex: ^(description|metadata)$
     gcp_kms: projects/hayden-agencies-infra/locations/global/keyRings/sops/cryptoKeys/sops-key
     mac_only_encrypted: true
-  # Kubernetes secret files using SOPS (Age + PGP dual encryption)
-  - path_regex: kubernetes/.*\.enc\.ya?ml$
+
+  # ============================================
+  # Age-only encryption rules (.enc.age.yaml)
+  # ============================================
+  # Kubernetes secret files - Age only
+  - path_regex: kubernetes/.*\.enc\.age\.ya?ml$
     encrypted_regex: ^(data|stringData)$
     unencrypted-regex: ^(description|metadata)$
     age: age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h
-    pgp: 67AF5B5A73800481D8E41667C87721FBF6BBF30C
     mac_only_encrypted: true
-  # Talos secret files using SOPS (Age + PGP dual encryption)
-  - path_regex: talos/.*/.*.enc.ya?ml
+  # Talos secret files - Age only
+  - path_regex: talos/.*/.*\.enc\.age\.ya?ml$
     age: age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h
-    pgp: 67AF5B5A73800481D8E41667C87721FBF6BBF30C
     encrypted_regex: '((?i)(pass|secret($|[^N])|ca|crt|key|token|^data$|^stringData$))'
     mac_only_encrypted: true
-  # Terraform secret files using SOPS (Age + PGP dual encryption)
-  - path_regex: terraform/.*/*.enc.ya?ml
+  # Terraform secret files - Age only
+  - path_regex: terraform/.*/.*\.enc\.age\.ya?ml$
     age: age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h
-    pgp: 67AF5B5A73800481D8E41667C87721FBF6BBF30C
     mac_only_encrypted: true
 
 stores:

@@ -174,7 +174,7 @@ machine:
   # Used to provide instructions for installations.
   install:
     # Allows for supplying the image used to perform the installation.
-    image: ghcr.io/siderolabs/installer:v1.11.5
+    image: factory.talos.dev/installer/c9078f9419961640c712a8bf2bb9174933dfcf1da383fd8ea2b7dc21493f8bac:v1.11.5
     # Indicates if the installation disk should be wiped at installation time.
     wipe: true
     # # Look up disk using disk attributes like model, size, serial and others.

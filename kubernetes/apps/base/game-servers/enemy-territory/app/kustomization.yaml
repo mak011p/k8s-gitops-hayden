@@ -7,5 +7,5 @@ resources:
   # - dnsendpoint.yaml
   - helmrelease.yaml
   # - ingress.yaml
-  - secret.enc.age.yaml
+  # - secret.enc.age.yaml  # TODO: Re-encrypt with local Age key
   - pvc.yaml

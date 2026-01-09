@@ -14,12 +14,5 @@ configMapGenerator:
     files:
       - values.yaml=./values.yaml
 
-# TODO: Re-encrypt values.enc.age.yaml with local AGE key
-# secretGenerator:
-#   - name: n8n-values-secret
-#     namespace: ai-system
-#     files:
-#       - values.yaml=values.enc.age.yaml
-
 configurations:
   - kustomizeconfig.yaml

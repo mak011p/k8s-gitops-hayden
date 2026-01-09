@@ -17,12 +17,6 @@ configMapGenerator:
     files:
       - config.yml=./config/geysermc.yaml
 
-secretGenerator:
-  - name: mincraft-ketting-secret-values
-    namespace: game-servers
-    files:
-      - values.yaml=values.enc.age.yaml
-
 generatorOptions:
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled

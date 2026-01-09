@@ -230,6 +230,12 @@ kubectl get nodes
 talosctl -n 192.168.50.11 kubeconfig --force
 ```
 
+### TrueNAS Access
+```bash
+ssh truenas_admin@192.168.50.17
+```
+Uses `~/.ssh/rog_laptop_key` (configured globally in SSH config).
+
 ### Making Changes to Applications
 1. **Edit base configuration** in `kubernetes/apps/base/[system-name]/[app-name]/`
 2. **Use overlays** for cluster-specific customization in `kubernetes/apps/overlays/cluster-00/`

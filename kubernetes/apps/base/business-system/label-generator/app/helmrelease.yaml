@@ -44,7 +44,7 @@ spec:
           app:
             image:
               repository: ghcr.io/mak011p/label-generator
-              tag: 20260106-9f7e55a@sha256:154700d1c619e681c856ad6a96742fe703273c1c83f40ce24d6efe69d15b25ef
+              tag: 20260111-fcc898d@sha256:28be51bf5deda6fb968e2a8008caa84e22b1f57515d482879073032ef2be3d32
             env:
               - name: PYTHONUNBUFFERED
                 value: "1"

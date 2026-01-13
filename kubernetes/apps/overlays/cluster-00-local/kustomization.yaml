@@ -21,23 +21,8 @@ resources:
   - ../../base/democratic-csi/democratic-csi/ks.yaml
   # development namespace already included via cluster-00 base
   - ../../base/development/dev-pod/ks.yaml
-  - ../../base/game-servers
-  - ../../base/game-servers/minecraft/ks.yaml
-  - ../../base/game-servers/minecraft-bedrock/ks.yaml
   - ../../base/home-system
-  - ../../base/home-system/autobrr/ks.yaml
-  - ../../base/home-system/cross-seed/ks.yaml
-  # - ../../base/home-system/emqx/ks.yaml
   - ../../base/home-system/home-assistant/ks.yaml
-  - ../../base/home-system/jellyseerr/ks.yaml
   - ../../base/home-system/mosquitto/ks.yaml
-  - ../../base/home-system/prowlarr/ks.yaml
-  - ../../base/home-system/qbittorrent/ks.yaml
-  - ../../base/home-system/qui/ks.yaml
-  - ../../base/home-system/radarr/ks.yaml
-  - ../../base/home-system/recyclarr/ks.yaml
-  - ../../base/home-system/sabnzbd/ks.yaml
-  - ../../base/home-system/sonarr/ks.yaml
-  - ../../base/home-system/tautulli/ks.yaml
-  # - ../../base/home-system/zigbee2mqtt/ks.yaml
+  - ../../base/home-system/zigbee2mqtt/ks.yaml
   - ../../base/security-system/kyverno/ks.yaml

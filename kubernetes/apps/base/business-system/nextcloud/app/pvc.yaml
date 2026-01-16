@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: onlyoffice-data
-  namespace: home-system
+  name: nextcloud-data
+  namespace: business-system
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
-  storageClassName: ceph-block
+      storage: 500Gi
+  storageClassName: truenas-iscsi-csi

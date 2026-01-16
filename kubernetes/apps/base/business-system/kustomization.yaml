@@ -9,3 +9,5 @@ components:
 
 resources:
   - namespace.yaml
+  - nextcloud/ks.yaml
+  - onlyoffice/ks.yaml

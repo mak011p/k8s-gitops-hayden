@@ -3,13 +3,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: nextcloud
-  namespace: home-system
+  name: onlyoffice
+  namespace: business-system
 spec:
   interval: 30m
   retryInterval: 1m
   timeout: 10m
-  path: "./apps/base/home-system/nextcloud/app"
+  path: "./apps/base/business-system/onlyoffice/app"
   prune: true
   wait: false
   sourceRef:
@@ -17,15 +17,13 @@ spec:
     name: flux-system
     namespace: flux-system
   dependsOn:
-    - name: democratic-csi
-      namespace: democratic-csi
     - name: rook-ceph-cluster
       namespace: rook-ceph
-  targetNamespace: home-system
+  targetNamespace: business-system
   decryption:
     provider: sops
     secretRef:
-      name: sops-age
+      name: sops-age-secret
   postBuild:
     substituteFrom:
       - kind: ConfigMap

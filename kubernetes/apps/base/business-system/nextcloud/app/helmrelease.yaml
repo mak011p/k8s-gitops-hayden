@@ -4,7 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app nextcloud
-  namespace: home-system
+  namespace: business-system
 spec:
   interval: 1h
   chartRef:
@@ -107,8 +107,8 @@ spec:
           $CONFIG = array (
             'onlyoffice' => array (
               'DocumentServerUrl' => 'https://onlyoffice.${CLUSTER_DOMAIN}/',
-              'DocumentServerInternalUrl' => 'http://onlyoffice-app.home-system.svc.cluster.local/',
-              'StorageUrl' => 'http://nextcloud.home-system.svc.cluster.local/',
+              'DocumentServerInternalUrl' => 'http://onlyoffice-app.business-system.svc.cluster.local/',
+              'StorageUrl' => 'http://nextcloud.business-system.svc.cluster.local/',
               'jwt_secret' => getenv('ONLYOFFICE_JWT_SECRET'),
             ),
           );

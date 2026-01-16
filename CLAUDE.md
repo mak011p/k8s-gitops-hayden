@@ -108,6 +108,9 @@ sops path/to/file.enc.yaml
 
 # Decrypt for viewing only
 sops -d path/to/file.enc.yaml
+
+# Encrypt new secrets (must use .enc.age.yaml extension for creation rules to match)
+mv secret.yaml secret.enc.age.yaml && sops -e -i secret.enc.age.yaml
 ```
 
 **SOPS Configuration:**
@@ -115,6 +118,7 @@ sops -d path/to/file.enc.yaml
 - **Age Key**: `age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h`
 - **GCP KMS**: `projects/hayden-agencies-infra/locations/global/keyRings/sops/cryptoKeys/sops-key`
 - Encrypted files use `.enc.yaml` or `.enc.age.yaml` suffix
+- Creation rules in `.sops.yaml` only match `*.enc.age.yaml` for kubernetes paths
 
 ## Key Technologies & Patterns
 

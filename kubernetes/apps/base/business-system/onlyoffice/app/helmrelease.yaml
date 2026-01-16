@@ -82,6 +82,15 @@ spec:
                   timeoutSeconds: 10
                   failureThreshold: 6
     defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - worker3
       securityContext:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch

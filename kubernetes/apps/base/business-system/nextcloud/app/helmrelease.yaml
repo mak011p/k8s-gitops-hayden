@@ -44,7 +44,7 @@ spec:
 
     image:
       repository: nextcloud
-      tag: 30.0.17-apache
+      tag: 32.0.5-apache
       pullPolicy: IfNotPresent
 
     nextcloud:

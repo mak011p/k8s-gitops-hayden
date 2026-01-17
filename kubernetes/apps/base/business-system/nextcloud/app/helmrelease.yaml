@@ -55,6 +55,9 @@ spec:
         usernameKey: admin-username
         passwordKey: admin-password
 
+      defaultApps:
+        - onlyoffice
+
       extraEnv:
         - name: TZ
           value: Australia/Melbourne
@@ -107,7 +110,7 @@ spec:
           $CONFIG = array (
             'onlyoffice' => array (
               'DocumentServerUrl' => 'https://onlyoffice.${CLUSTER_DOMAIN}/',
-              'DocumentServerInternalUrl' => 'http://onlyoffice-app.business-system.svc.cluster.local/',
+              'DocumentServerInternalUrl' => 'http://onlyoffice.business-system.svc.cluster.local/',
               'StorageUrl' => 'http://nextcloud.business-system.svc.cluster.local/',
               'jwt_secret' => getenv('ONLYOFFICE_JWT_SECRET'),
             ),

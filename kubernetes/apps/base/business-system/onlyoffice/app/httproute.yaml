@@ -17,6 +17,6 @@ spec:
     - 'onlyoffice.${CLUSTER_DOMAIN}'
   rules:
     - backendRefs:
-        - name: onlyoffice-app
+        - name: onlyoffice
           port: 80
           weight: 100

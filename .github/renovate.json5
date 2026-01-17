@@ -31,6 +31,14 @@
   ignorePaths: ["**/*.enc.*", "**/resources/**"],
   packageRules: [
     {
+      // Always create PRs for container/helm updates (no dashboard approval needed)
+      // Minor/patch will auto-merge, major will create PR for manual approval
+      description: "Auto-create PRs for all docker/helm updates",
+      matchDatasources: ["docker", "helm"],
+      dependencyDashboardApproval: false,
+      prCreation: "immediate",
+    },
+    {
       // Custom versioning for Odoo with date+time tags (18.0.YYYYMMDD.HHMM-sha)
       // patch=date, prerelease=time ensures proper sorting for same-day builds
       matchDatasources: ["docker"],

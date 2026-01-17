@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a Kubernetes GitOps repository for a personal homelab cluster managed with FluxCD and Talos Linux. The cluster follows enterprise-grade security and observability practices, showcasing CNCF ecosystem tools.
+This is a Kubernetes GitOps repository for SME cluster managed with FluxCD and Talos Linux. The cluster aims to follow enterprise-grade security and observability practices, showcasing CNCF ecosystem tools.
 
 ## Architecture
 
@@ -12,7 +12,7 @@ This is a Kubernetes GitOps repository for a personal homelab cluster managed wi
 - **GitOps**: FluxCD with Flux Operator for declarative cluster management
 - **Container Runtime**: containerd
 - **Networking**: Cilium CNI with Istio service mesh
-- **Storage**: Rook-Ceph, OpenEBS, democratic-csi for container-attached storage
+- **Storage**: Rook-Ceph, OpenEBS, democratic-csi for container-attached storage, UNRAID (for less critical storage)
 - **Monitoring**: Prometheus, Grafana, Loki, Jaeger, Thanos for observability
 - **Security**: Kyverno, OPA Gatekeeper for policy management, Falco & Tetragon for runtime security
 - **Load Balancing**: MetalLB for bare metal load balancing
@@ -149,6 +149,7 @@ Each application follows this structure:
    - `istio-system` & `istio-ingress`: Service mesh
    - `home-system`: Home automation & media
    - `rook-ceph`: Storage
+   - `business-system`: Business logic like odoo, nextcloud, magento
 
 ### HelmRelease Global Defaults
 All HelmReleases are patched with these defaults via Kustomization:

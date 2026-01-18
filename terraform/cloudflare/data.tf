@@ -19,6 +19,6 @@ data "cloudflare_zone" "dropdrape" {
 }
 
 data "sops_file" "secrets" {
-  source_file = "secret.enc.yaml"
+  source_file = "secret.enc.age.yaml"
 }
 

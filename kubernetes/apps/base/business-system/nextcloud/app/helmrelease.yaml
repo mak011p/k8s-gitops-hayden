@@ -57,14 +57,11 @@ spec:
 
       defaultApps:
         - onlyoffice
+        - mail
 
       extraEnv:
         - name: TZ
           value: Australia/Melbourne
-        - name: REDIS_HOST
-          value: nextcloud-redis
-        - name: REDIS_HOST_PORT
-          value: "6379"
         - name: OVERWRITEPROTOCOL
           value: https
         - name: ONLYOFFICE_JWT_SECRET

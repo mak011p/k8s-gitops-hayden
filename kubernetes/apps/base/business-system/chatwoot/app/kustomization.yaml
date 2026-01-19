@@ -5,7 +5,7 @@ kind: Kustomization
 
 resources:
   - externalsecret-backup.yaml
-  - secret-chatwoot.enc.age.yaml
+  - secret-chatwoot-env.enc.age.yaml
   - secret-chatwoot-pg-app.enc.age.yaml
   - secret-chatwoot-pg-superuser.enc.age.yaml
   - postgres-cluster.yaml

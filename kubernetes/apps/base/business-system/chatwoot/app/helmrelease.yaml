@@ -40,15 +40,14 @@ spec:
   driftDetection:
     mode: enabled
   maxHistory: 3
-  valuesFrom:
-    - kind: Secret
-      name: chatwoot-secret
-      valuesKey: values.yaml
   values:
     image:
       repository: chatwoot/chatwoot
       tag: v4.0.0
       pullPolicy: IfNotPresent
+
+    # Reference existing secret for sensitive env vars
+    existingEnvSecret: chatwoot-env
 
     # Disable bundled PostgreSQL - using CNPG
     postgresql:
@@ -57,8 +56,6 @@ spec:
     # Disable bundled Redis - using separate Bitnami Redis
     redis:
       enabled: false
-
-    # All env vars provided via valuesFrom secret to avoid merge conflicts
 
     # Web deployment
     web:

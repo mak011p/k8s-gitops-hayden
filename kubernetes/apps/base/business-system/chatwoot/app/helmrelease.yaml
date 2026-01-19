@@ -58,20 +58,14 @@ spec:
     redis:
       enabled: false
 
-    # External PostgreSQL (CNPG)
+    # Environment variables
+    # POSTGRES_*, REDIS_URL, SECRET_KEY_BASE, FRONTEND_URL provided via valuesFrom secret
     env:
-      POSTGRES_HOST: chatwoot-pg-rw
-      POSTGRES_PORT: "5432"
-      POSTGRES_DATABASE: chatwoot_production
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "true"
       LOG_LEVEL: info
-      # Redis
-      REDIS_URL: redis://chatwoot-redis-master:6379
-      # Frontend URL - will be set via secret
-      # SECRET_KEY_BASE - will be set via secret
 
-    # Reference existing secret for sensitive values
+    # Reference existing secret for sensitive env vars (POSTGRES_USERNAME, POSTGRES_PASSWORD, etc.)
     existingEnvSecret: chatwoot-secret
 
     # Web deployment

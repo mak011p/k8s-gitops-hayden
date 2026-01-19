@@ -9,4 +9,4 @@ components:
 
 resources:
   - namespace.yaml
-  - mariadb-operator
+  # mariadb-operator is included directly in overlays/cluster-00

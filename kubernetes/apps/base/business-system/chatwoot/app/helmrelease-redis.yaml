@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: chatwoot-redis
+  namespace: business-system
+spec:
+  interval: 15m
+  chartRef:
+    kind: OCIRepository
+    name: bitnami-redis-chatwoot
+    namespace: business-system
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: false
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  values:
+    image:
+      registry: docker.io
+      repository: bitnami/redis
+      tag: 7.2.6
+
+    architecture: standalone
+
+    auth:
+      enabled: false
+
+    master:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+      persistence:
+        enabled: true
+        storageClass: ceph-block
+        size: 5Gi
+
+    service:
+      type: ClusterIP
+      ports:
+        redis: 6379
+
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: business-system
+        interval: 30s

@@ -1,0 +1,114 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: chatwoot
+  namespace: business-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: chatwoot
+      version: "2.0.9"
+      sourceRef:
+        kind: HelmRepository
+        name: chatwoot
+        namespace: business-system
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: false
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  valuesFrom:
+    - kind: Secret
+      name: chatwoot-secret
+      valuesKey: values.yaml
+  values:
+    image:
+      repository: chatwoot/chatwoot
+      tag: v4.0.0
+      pullPolicy: IfNotPresent
+
+    # Disable bundled PostgreSQL - using CNPG
+    postgresql:
+      enabled: false
+
+    # Disable bundled Redis - using separate Bitnami Redis
+    redis:
+      enabled: false
+
+    # External PostgreSQL (CNPG)
+    env:
+      POSTGRES_HOST: chatwoot-pg-rw
+      POSTGRES_PORT: "5432"
+      POSTGRES_DATABASE: chatwoot_production
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: "true"
+      LOG_LEVEL: info
+      # Redis
+      REDIS_URL: redis://chatwoot-redis-master:6379
+      # Frontend URL - will be set via secret
+      # SECRET_KEY_BASE - will be set via secret
+
+    # Reference existing secret for sensitive values
+    existingEnvSecret: chatwoot-secret
+
+    # Web deployment
+    web:
+      replicaCount: 2
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      hpa:
+        enabled: false
+
+    # Worker deployment (Sidekiq)
+    worker:
+      replicaCount: 2
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      hpa:
+        enabled: false
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 3000
+
+    # Ingress disabled - using Gateway API HTTPRoute
+    ingress:
+      enabled: false
+
+    # Persistence for uploads
+    persistence:
+      enabled: true
+      storageClassName: ceph-block
+      size: 20Gi

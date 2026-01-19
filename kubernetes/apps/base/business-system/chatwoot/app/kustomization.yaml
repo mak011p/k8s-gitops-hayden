@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - externalsecret-backup.yaml
+  - secret-chatwoot.enc.age.yaml
+  - secret-chatwoot-pg-app.enc.age.yaml
+  - secret-chatwoot-pg-superuser.enc.age.yaml
+  - postgres-cluster.yaml
+  - ocirepository-redis.yaml
+  - helmrelease-redis.yaml
+  - helmrepository.yaml
+  - helmrelease.yaml
+  - httproute.yaml

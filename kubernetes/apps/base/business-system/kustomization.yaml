@@ -14,3 +14,4 @@ resources:
   - auntalma-elasticsearch/ks.yaml
   - auntalma-rabbitmq/ks.yaml
   - auntalma/ks.yaml
+  - chatwoot/ks.yaml

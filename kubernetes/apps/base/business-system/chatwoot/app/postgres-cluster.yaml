@@ -1,0 +1,64 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: chatwoot-pg
+  namespace: business-system
+spec:
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: required
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.7-202512080807-system-bookworm
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: chatwoot-pg-superuser
+  monitoring:
+    enablePodMonitor: true
+  bootstrap:
+    initdb:
+      database: chatwoot_production
+      owner: chatwoot
+      secret:
+        name: chatwoot-pg-app
+  storage:
+    size: 50Gi
+    storageClass: ceph-block
+  walStorage:
+    size: 20Gi
+    storageClass: ceph-block
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      memory: 4Gi
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: 256MB
+      effective_cache_size: 1GB
+      maintenance_work_mem: 128MB
+      checkpoint_completion_target: "0.9"
+      wal_buffers: 16MB
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      work_mem: 2MB
+      min_wal_size: 512MB
+      max_wal_size: 2GB
+  backup:
+    retentionPolicy: "7d"
+    barmanObjectStore:
+      destinationPath: gs://hayden-chatwoot-backups/base
+      googleCredentials:
+        applicationCredentials:
+          name: chatwoot-objstore
+          key: serviceAccount
+      wal:
+        compression: gzip
+        maxParallel: 4
+      data:
+        compression: gzip

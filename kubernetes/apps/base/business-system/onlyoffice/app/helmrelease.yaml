@@ -42,7 +42,7 @@ spec:
           app:
             image:
               repository: onlyoffice/documentserver
-              tag: 8.3.3
+              tag: 9.2.1
             env:
               TZ: Australia/Melbourne
               JWT_ENABLED: "true"

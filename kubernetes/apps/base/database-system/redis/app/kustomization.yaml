@@ -3,11 +3,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: database-system
-
-components:
-  - ../../../components/common
-
 resources:
-  - namespace.yaml
-  - redis/ks.yaml
-  # mariadb-operator is included directly in overlays/cluster-00
+  - ocirepository.yaml
+  - helmrelease.yaml

@@ -19,6 +19,8 @@ spec:
   dependsOn:
     - name: cnpg
       namespace: database-system
+    - name: redis
+      namespace: database-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
     - name: cilium-gateway-api

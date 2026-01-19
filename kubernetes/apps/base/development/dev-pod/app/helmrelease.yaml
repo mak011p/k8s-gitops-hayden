@@ -103,7 +103,7 @@ spec:
           tailscale:
             image:
               repository: tailscale/tailscale
-              tag: v1.76.6
+              tag: v1.92.5
             env:
               TS_AUTHKEY:
                 valueFrom:

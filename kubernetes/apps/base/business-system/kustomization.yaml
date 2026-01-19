@@ -11,3 +11,6 @@ resources:
   - namespace.yaml
   - nextcloud/ks.yaml
   - onlyoffice/ks.yaml
+  - auntalma-elasticsearch/ks.yaml
+  - auntalma-rabbitmq/ks.yaml
+  - auntalma/ks.yaml

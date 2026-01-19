@@ -207,3 +207,27 @@ resource "cloudflare_record" "auntalma_pop3s" {
     target   = "pop.migadu.com"
   }
 }
+
+# ==============================================
+# DNS Records - Web Traffic (Kubernetes Cluster)
+# ==============================================
+
+# Root domain - Magento store via Cloudflare Tunnel
+resource "cloudflare_record" "auntalma_web" {
+  zone_id = local.auntalma_zone_id
+  name    = "@"
+  content = "external.haydenagencies.com.au"
+  type    = "CNAME"
+  proxied = true
+  comment = "Magento store via K8s cluster"
+}
+
+# WWW redirect
+resource "cloudflare_record" "auntalma_www" {
+  zone_id = local.auntalma_zone_id
+  name    = "www"
+  content = "external.haydenagencies.com.au"
+  type    = "CNAME"
+  proxied = true
+  comment = "Magento store www redirect"
+}

@@ -1,0 +1,93 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: auntalma-rabbitmq
+  namespace: business-system
+spec:
+  interval: 15m
+  chartRef:
+    kind: OCIRepository
+    name: bitnami-rabbitmq
+    namespace: business-system
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: false
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  values:
+    # RabbitMQ 3.13 for Magento message queues
+    image:
+      registry: docker.io
+      repository: bitnami/rabbitmq
+      tag: 3.13.7
+
+    # Authentication from secret
+    auth:
+      username: magento
+      existingPasswordSecret: auntalma-rabbitmq-secret
+      existingSecretPasswordKey: rabbitmq-password
+      existingErlangSecret: auntalma-rabbitmq-secret
+      existingSecretErlangKey: rabbitmq-erlang-cookie
+
+    # Resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+
+    # Persistence
+    persistence:
+      enabled: true
+      storageClass: ceph-block
+      size: 10Gi
+
+    # Single replica for dev
+    replicaCount: 1
+    clustering:
+      enabled: false
+
+    # Service
+    service:
+      type: ClusterIP
+      ports:
+        amqp: 5672
+        dist: 25672
+        manager: 15672
+        metrics: 9419
+
+    # Metrics
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: business-system
+        interval: 30s
+
+    # Plugins for Magento
+    plugins: "rabbitmq_management rabbitmq_peer_discovery_k8s"
+    communityPlugins: ""
+    extraPlugins: ""

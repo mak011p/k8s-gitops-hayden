@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s.mariadb.com/backup_v1alpha1.json
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Backup
+metadata:
+  name: auntalma-mariadb-weekly
+  namespace: business-system
+spec:
+  mariaDbRef:
+    name: auntalma-mariadb
+  # Weekly backup: Sunday at 04:00 Melbourne time (AEDT)
+  # 04:00 AEDT = 17:00 UTC Saturday (UTC+11 in summer)
+  schedule:
+    cron: "0 17 * * SAT"
+    suspend: false
+  # Maximum number of backups to retain
+  maxRetention: 4
+  # Storage configuration
+  storage:
+    # Use S3-compatible storage (GCS)
+    s3:
+      bucket: hayden-agencies-auntalma-backups
+      prefix: mariadb
+      endpoint: storage.googleapis.com
+      region: australia-southeast1
+      accessKeyIdSecretKeyRef:
+        name: auntalma-objstore
+        key: accessKeyId
+      secretAccessKeySecretKeyRef:
+        name: auntalma-objstore
+        key: secretAccessKey
+  # Resources for backup job
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi

@@ -24,6 +24,8 @@ resources:
   - ../../base/business-system/odoo/ks.yaml
   # - ../../base/crossplane-system/crossplane/ks.yaml
   - ../../base/database-system/cnpg/ks.yaml
+  - ../../base/database-system/mariadb-operator/crds/ks.yaml
+  - ../../base/database-system/mariadb-operator/app/ks.yaml
   # - ../../base/development/backstage/ks.yaml
   - ../../base/external-secrets/external-secrets/ks.yaml
   - ../../base/external-secrets/onepassword/ks.yaml

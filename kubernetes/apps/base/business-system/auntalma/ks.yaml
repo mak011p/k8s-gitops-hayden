@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: auntalma
+  namespace: business-system
+spec:
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/auntalma/app"
+  prune: true
+  wait: false
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  dependsOn:
+    - name: mariadb-operator
+      namespace: database-system
+    - name: auntalma-elasticsearch
+      namespace: business-system
+    - name: auntalma-rabbitmq
+      namespace: business-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: cilium-gateway-api
+      namespace: kube-system
+    - name: onepassword
+      namespace: external-secrets
+  targetNamespace: business-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age-secret

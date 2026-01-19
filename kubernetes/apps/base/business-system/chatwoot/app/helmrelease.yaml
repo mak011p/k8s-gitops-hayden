@@ -43,7 +43,7 @@ spec:
   values:
     image:
       repository: chatwoot/chatwoot
-      tag: v4.0.0
+      tag: v4.10.0
       pullPolicy: IfNotPresent
 
     # Reference existing secret for sensitive env vars

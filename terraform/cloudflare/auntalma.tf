@@ -53,3 +53,157 @@ resource "cloudflare_zone_settings_override" "auntalma" {
     zero_rtt            = "off"
   }
 }
+
+# ==============================================
+# DNS Records - Migadu Email
+# ==============================================
+
+# Domain verification
+resource "cloudflare_record" "auntalma_migadu_verify" {
+  zone_id = local.auntalma_zone_id
+  name    = "@"
+  content = "hosted-email-verify=w91tu70e"
+  type    = "TXT"
+  ttl     = 3000
+  comment = "Migadu domain verification"
+}
+
+# MX Records
+resource "cloudflare_record" "auntalma_mx_primary" {
+  zone_id  = local.auntalma_zone_id
+  name     = "@"
+  content  = "aspmx1.migadu.com"
+  type     = "MX"
+  priority = 10
+  ttl      = 3000
+  comment  = "Migadu primary MX"
+}
+
+resource "cloudflare_record" "auntalma_mx_secondary" {
+  zone_id  = local.auntalma_zone_id
+  name     = "@"
+  content  = "aspmx2.migadu.com"
+  type     = "MX"
+  priority = 20
+  ttl      = 3000
+  comment  = "Migadu secondary MX"
+}
+
+# SPF Record
+resource "cloudflare_record" "auntalma_spf" {
+  zone_id = local.auntalma_zone_id
+  name    = "@"
+  content = "v=spf1 include:spf.migadu.com -all"
+  type    = "TXT"
+  ttl     = 3000
+  comment = "Migadu SPF"
+}
+
+# DKIM Records
+resource "cloudflare_record" "auntalma_dkim_key1" {
+  zone_id = local.auntalma_zone_id
+  name    = "key1._domainkey"
+  content = "key1.auntalma.com.au._domainkey.migadu.com"
+  type    = "CNAME"
+  ttl     = 3000
+  proxied = false
+  comment = "Migadu DKIM key1"
+}
+
+resource "cloudflare_record" "auntalma_dkim_key2" {
+  zone_id = local.auntalma_zone_id
+  name    = "key2._domainkey"
+  content = "key2.auntalma.com.au._domainkey.migadu.com"
+  type    = "CNAME"
+  ttl     = 3000
+  proxied = false
+  comment = "Migadu DKIM key2"
+}
+
+resource "cloudflare_record" "auntalma_dkim_key3" {
+  zone_id = local.auntalma_zone_id
+  name    = "key3._domainkey"
+  content = "key3.auntalma.com.au._domainkey.migadu.com"
+  type    = "CNAME"
+  ttl     = 3000
+  proxied = false
+  comment = "Migadu DKIM key3"
+}
+
+# DMARC Record
+resource "cloudflare_record" "auntalma_dmarc" {
+  zone_id = local.auntalma_zone_id
+  name    = "_dmarc"
+  content = "v=DMARC1; p=quarantine;"
+  type    = "TXT"
+  ttl     = 3000
+  comment = "Migadu DMARC policy"
+}
+
+# Autoconfig for mail clients
+resource "cloudflare_record" "auntalma_autoconfig" {
+  zone_id = local.auntalma_zone_id
+  name    = "autoconfig"
+  content = "autoconfig.migadu.com"
+  type    = "CNAME"
+  ttl     = 3000
+  proxied = false
+  comment = "Migadu autoconfig for Thunderbird/etc"
+}
+
+# SRV Records for mail client autodiscovery
+resource "cloudflare_record" "auntalma_autodiscover" {
+  zone_id = local.auntalma_zone_id
+  name    = "_autodiscover._tcp"
+  type    = "SRV"
+  ttl     = 3000
+  comment = "Migadu autodiscover for Outlook"
+  data {
+    priority = 0
+    weight   = 1
+    port     = 443
+    target   = "autodiscover.migadu.com"
+  }
+}
+
+resource "cloudflare_record" "auntalma_submissions" {
+  zone_id = local.auntalma_zone_id
+  name    = "_submissions._tcp"
+  type    = "SRV"
+  ttl     = 3000
+  comment = "Migadu SMTP submission"
+  data {
+    priority = 0
+    weight   = 1
+    port     = 465
+    target   = "smtp.migadu.com"
+  }
+}
+
+resource "cloudflare_record" "auntalma_imaps" {
+  zone_id = local.auntalma_zone_id
+  name    = "_imaps._tcp"
+  type    = "SRV"
+  ttl     = 3000
+  comment = "Migadu IMAP"
+  data {
+    priority = 0
+    weight   = 1
+    port     = 993
+    target   = "imap.migadu.com"
+  }
+}
+
+resource "cloudflare_record" "auntalma_pop3s" {
+  zone_id = local.auntalma_zone_id
+  name    = "_pop3s._tcp"
+  type    = "SRV"
+  ttl     = 3000
+  comment = "Migadu POP3"
+  data {
+    priority = 0
+    weight   = 1
+    port     = 995
+    target   = "pop.migadu.com"
+  }
+}

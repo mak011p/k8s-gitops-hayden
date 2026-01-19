@@ -65,9 +65,6 @@ spec:
       RAILS_LOG_TO_STDOUT: "true"
       LOG_LEVEL: info
 
-    # Reference existing secret for sensitive env vars (POSTGRES_USERNAME, POSTGRES_PASSWORD, etc.)
-    existingEnvSecret: chatwoot-secret
-
     # Web deployment
     web:
       replicaCount: 2

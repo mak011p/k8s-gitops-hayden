@@ -7,7 +7,7 @@ metadata:
   namespace: business-system
 spec:
   # MariaDB 10.6 for Magento 2.4.7 compatibility
-  image: mariadb:10.6
+  image: mariadb:10.11
 
   # Root password from secret
   rootPasswordSecretKeyRef:

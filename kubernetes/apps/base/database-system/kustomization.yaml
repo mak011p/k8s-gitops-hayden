@@ -9,4 +9,4 @@ components:
 
 resources:
   - namespace.yaml
-  - mariadb-operator/kustomization.yaml
+  - mariadb-operator

@@ -55,9 +55,11 @@ spec:
       postgresqlHost: chatwoot-pg-rw
       postgresqlPort: 5432
 
-    # Disable bundled Redis - using separate Bitnami Redis
+    # Disable bundled Redis - using shared Redis in database-system
     redis:
       enabled: false
+      host: redis.database-system.svc.cluster.local
+      port: 6379
 
     # Web deployment
     web:

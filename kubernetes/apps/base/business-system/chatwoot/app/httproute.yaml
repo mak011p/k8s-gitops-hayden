@@ -16,6 +16,16 @@ spec:
   hostnames:
     - 'chat.${CLUSTER_DOMAIN}'
   rules:
+    # OAuth2 proxy callback routes
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     # WebSocket routes for real-time messaging
     - matches:
         - path:

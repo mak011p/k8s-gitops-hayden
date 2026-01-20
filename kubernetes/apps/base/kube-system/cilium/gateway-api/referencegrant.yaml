@@ -1,0 +1,16 @@
+---
+# Allow Envoy Gateway in network-system to reference the TLS certificate secret
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-envoy-gateway-tls
+  namespace: kube-system
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      namespace: network-system
+  to:
+    - group: ""
+      kind: Secret
+      name: cluster-wildcard-le

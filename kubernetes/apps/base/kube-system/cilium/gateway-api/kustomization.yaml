@@ -7,3 +7,4 @@ namespace: kube-system
 resources:
   - certificates.yaml
   - gateway.yaml
+  - referencegrant.yaml

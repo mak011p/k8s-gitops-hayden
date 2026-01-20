@@ -1,40 +1,9 @@
-<div align="center">
-
-<img src="./docs/assets/banner.png" alt="Raspbernetes">
-
-My _Personal_ Homelab Repository
-
-_... managed with Flux, Renovate and GitHub Actions_
-
-</div>
-
-<div align="center">
-
-[![Discord](https://img.shields.io/discord/673534664354430999?style=for-the-badge&label=discord&logo=discord&logoColor=white&color=blue)](https://discord.gg/home-operations)&nbsp;&nbsp;
-[![Kubernetes](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fkubernetes_version&style=for-the-badge&logo=kubernetes&logoColor=white&color=blue)](https://kubernetes.io/)&nbsp;&nbsp;
-[![Talos](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Ftalos_version&style=for-the-badge&logo=talos&logoColor=white&color=blue)](https://talos.dev)&nbsp;&nbsp;
-[![FluxCD](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fflux_version&style=for-the-badge&logo=flux&logoColor=white&color=blue)](https://fluxcd.io/)&nbsp;&nbsp;
-
-</div>
-
-<div align="center">
-
-[![Age-Days](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_age_days&style=flat-square&label=Age)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-[![Uptime-Days](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_uptime_days&style=flat-square&label=Uptime)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-[![Node-Count](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_node_count&style=flat-square&label=Nodes)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-[![Pod-Count](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_pod_count&style=flat-square&label=Pods)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-[![CPU-Usage](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_cpu_usage&style=flat-square&label=CPU)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-[![Memory-Usage](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.haydenagencies.com.au%2Fcluster_memory_usage&style=flat-square&label=Memory)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
-
-</div>
-
 # 🍼 Overview
+Repository showcases a declarative implementation of a Kubernetes cluster, following GitOps principles.
 
-This educational project is designed to provide a hands-on learning experience for mastering Kubernetes cluster configurations and best practices. The repository showcases a declarative implementation of a Kubernetes cluster, following GitOps principles that can be utilized with a variety of tools and workflows.
+Demonstrates best practices for implementing enterprise-grade security, observability, and comprehensive cluster configuration management using GitOps in a Kubernetes environment.
 
-The main goal of this project is to demonstrate best practices for implementing enterprise-grade security, observability, and comprehensive cluster configuration management using GitOps in a Kubernetes environment, while fostering learning and growth in the Kubernetes community.
-
-This repository leverages a range of cutting-edge open-source tools and platforms, forming a comprehensive technology stack that demonstrates the power of the [CNCF ecosystem](https://landscape.cncf.io/).
+Should demonstrate the power of the [CNCF ecosystem](https://landscape.cncf.io/).
 
 ## 📖 Table of contents
 
@@ -52,14 +21,7 @@ This repository leverages a range of cutting-edge open-source tools and platform
 
 ## 🔧 Hardware
 
-| Device                                                                                 | Description         | Quantity | CPU      | RAM   | Storage                            | Architecture | Operating System                      | Notes                               |
-| -------------------------------------------------------------------------------------- | ------------------- | -------- | -------- | ----- | ---------------------------------- | ------------ | ------------------------------------- | ----------------------------------- |
-| [Ubiquiti UDM-Pro-Max](https://ui.com/us/en/cloud-gateways/dream-machine-pro-max)     | Router/Gateway      | 1        | -        | -     | 8TB                               | -            | UniFi OS                              |                                     |
-| [Ubiquiti USW-Pro-Max-48-PoE](https://ui.com/switching/pro-max-48-poe)                | Network Switch      | 1        | -        | -     | -                                 | -            | UniFi OS                              | 48-port PoE                         |
-| [Asus NUC 14 Pro](https://www.asus.com/displays-desktops/nucs/nuc-mini-pcs/asus-nuc-14-pro/) | Control Plane Nodes | 3        | 14 Cores | 48GB  | 1TB NVMe (boot)                   | AMD64        | [Talos Linux](https://www.talos.dev/) | Ultra 5-125H; control plane only     |
-| [Asus NUC 14 Pro](https://www.asus.com/displays-desktops/nucs/nuc-mini-pcs/asus-nuc-14-pro/) | Worker Nodes        | 3        | 14 Cores | 48GB  | 1TB NVMe (+ data disk for Ceph)   | AMD64        | [Talos Linux](https://www.talos.dev/) | Ultra 5-125H; workloads + storage    |
-| NAS                                                                                    | Storage             | 1        | 8 Cores  | 16GB  | 48TB                              | AMD64        | [TrueNAS](https://www.truenas.com/)   |                                     |
-| [JetKVM](https://jetkvm.com/)                                                         | Remote KVM          | 3        | -        | -     | -                                 | -            | -                                    |                                     |
+| to do
 
 ### TrueNAS iSCSI Storage
 
@@ -76,17 +38,6 @@ The NAS provides iSCSI block storage to the cluster via [democratic-csi](https:/
 - Datasets: `tank/k8s/iscsi/v` (volumes), `tank/k8s/iscsi/s` (snapshots)
 
 <details>
-<summary>Decommissioned Hardware</summary>
-
-| Device                                                                                 | Description        | Quantity | CPU      | RAM   | Storage | Architecture | Operating System                      |
-| -------------------------------------------------------------------------------------- | ------------------ | -------- | -------- | ----- | ------- | ------------ | ------------------------------------- |
-| [Protectli FW6E](https://protectli.com/product/fw6e/)                                  | Router             | 1        | 4 Cores  | 16GB  | -       | AMD64        | [VyOs](https://vyos.io/)              |
-| [Protectli VP2410](https://protectli.com/product/vp2410/)                             | Kubernetes Node(s) | 3        | 4 Cores  | 8GB   | -       | AMD64        | [Talos Linux](https://www.talos.dev/) |
-| [Protectli FW2B](https://protectli.com/product/fw2b/)                                  | Kubernetes Node(s) | 3        | 2 Cores  | 8GB   | -       | AMD64        | [Talos Linux](https://www.talos.dev/) |
-| [Raspberry Pi 4 Model B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) | Kubernetes Node(s) | 4        | 4 Cores  | 8GB   | -       | ARM64        | [Talos Linux](https://www.talos.dev/) |
-| [Rock Pi 4 Model C](https://rockpi.org/rockpi4#)                                       | Kubernetes Node(s) | 6        | 4 Cores  | 4GB   | -       | ARM64        | [Talos Linux](https://www.talos.dev/) |
-
-</details>
 
 ## ☁️ Cloud Services
 
@@ -137,28 +88,6 @@ The Cloud Native Computing Foundation (CNCF) has played a crucial role in the de
 ## 🤖 Automation
 
 This repository is automatically managed by [Renovate](https://renovatebot.com/). Renovate will keep all of the container images within this repository up to date automatically. It can also be configured to keep Helm chart dependencies up to date as well.
-
-## 🤝 Acknowledgments
-
-A special thank you to everyone in the [Home Operation Discord](https://discord.com/invite/home-operations) community for their valuable contributions and time. Much of the inspiration for my cluster comes from fellow enthusiasts who have shared their own clusters under the k8s-at-home GitHub topic.
-
-Also I extend heartfelt thanks to all CNCF contributors for their dedication and expertise, as their collective efforts have been vital in driving innovation and success within the cloud-native ecosystem.
-
-For more ideas on deploying applications or discovering new possibilities, be sure to explore the [kubesearch.dev](https://kubesearch.dev/) search.
-
-## 👥 Contributing
-
-Our project welcomes contributions from any member of our community. To get started contributing, please see our [Contributor Guide](.github/CONTRIBUTING.md).
-
-### 🚫 Code of Conduct
-
-By participating in this project, you are expected to uphold the project's [**Code of Conduct**](.github/CODE_OF_CONDUCT.md). Please report any unacceptable behavior to the repository maintainer.
-
-### 💡 Reporting Issues and Requesting Features
-
-If you encounter any issues or would like to request new features, please create an issue on the repository's issue tracker. When reporting issues, include as much information as possible, such as error messages, logs, and steps to reproduce the issue.
-
-Thank you for your interest in contributing to this project! Your contributions help make it better for everyone.
 
 ## 📄 License
 

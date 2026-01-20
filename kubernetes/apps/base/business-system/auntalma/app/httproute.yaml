@@ -6,8 +6,8 @@ metadata:
   namespace: business-system
 spec:
   parentRefs:
-    - name: cilium-gateway
-      namespace: kube-system
+    - name: envoy-external
+      namespace: network-system
       sectionName: https
   hostnames:
     - "auntalma.haydenagencies.com.au"

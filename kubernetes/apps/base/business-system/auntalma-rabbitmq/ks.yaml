@@ -20,7 +20,8 @@ spec:
     - name: rook-ceph-cluster
       namespace: rook-ceph
   targetNamespace: business-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age-secret
+  # Decryption no longer needed - operator manages secrets
+  # decryption:
+  #   provider: sops
+  #   secretRef:
+  #     name: sops-age-secret

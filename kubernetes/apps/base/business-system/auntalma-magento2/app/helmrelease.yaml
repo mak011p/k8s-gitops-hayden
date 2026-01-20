@@ -82,23 +82,26 @@ spec:
                 value: "6379"
               - name: MAGENTO_PAGE_CACHE_REDIS_DB
                 value: "1"
-              # Elasticsearch
+              # Elasticsearch (ECK operator)
               - name: MAGENTO_ES_HOST
-                value: auntalma-elasticsearch.business-system.svc.cluster.local
+                value: auntalma-elasticsearch-es-http.business-system.svc.cluster.local
               - name: MAGENTO_ES_PORT
                 value: "9200"
-              # RabbitMQ
+              # RabbitMQ (RabbitMQ Cluster Operator)
               - name: MAGENTO_AMQP_HOST
                 value: auntalma-rabbitmq.business-system.svc.cluster.local
               - name: MAGENTO_AMQP_PORT
                 value: "5672"
               - name: MAGENTO_AMQP_USER
-                value: magento
+                valueFrom:
+                  secretKeyRef:
+                    name: auntalma-rabbitmq-default-user
+                    key: username
               - name: MAGENTO_AMQP_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: auntalma-rabbitmq-secret
-                    key: rabbitmq-password
+                    name: auntalma-rabbitmq-default-user
+                    key: password
               # Magento config
               - name: MAGENTO_MODE
                 value: production

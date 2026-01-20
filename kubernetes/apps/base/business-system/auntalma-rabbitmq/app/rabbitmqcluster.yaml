@@ -1,0 +1,23 @@
+---
+# RabbitMQ Cluster Operator CR for Magento message queues
+# Replaces Bitnami HelmRelease (deprecated images)
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: auntalma-rabbitmq
+  namespace: business-system
+spec:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  persistence:
+    storageClassName: ceph-block
+    storage: 10Gi
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_management
+      - rabbitmq_peer_discovery_k8s

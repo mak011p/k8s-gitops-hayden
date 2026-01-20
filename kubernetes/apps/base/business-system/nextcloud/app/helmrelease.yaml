@@ -44,7 +44,7 @@ spec:
 
     image:
       repository: nextcloud
-      tag: 32.0.5-apache
+      tag: 31.0.13-apache  # Step 1: upgrade 30→31 first, then 31→32
       pullPolicy: IfNotPresent
 
     nextcloud:

@@ -31,3 +31,20 @@ spec:
       recordType: CNAME
       targets:
         - "${CLOUDFLARED_TUNNEL_ID}.cfargotunnel.com"
+---
+# This resource defines a DNSEndpoint for Chatwoot pointing directly to the Cloudflare Argo tunnel.
+# Required because Chatwoot uses Envoy Gateway, and tunnel DNS routes don't follow CNAME chains.
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: cloudflared-chat
+  namespace: networking
+  annotations:
+    external-dns.alpha.kubernetes.io/target: "chat.${CLUSTER_DOMAIN}"
+    external-dns.alpha.kubernetes.io/external: 'true'
+spec:
+  endpoints:
+    - dnsName: "chat.${CLUSTER_DOMAIN}"
+      recordType: CNAME
+      targets:
+        - "${CLOUDFLARED_TUNNEL_ID}.cfargotunnel.com"

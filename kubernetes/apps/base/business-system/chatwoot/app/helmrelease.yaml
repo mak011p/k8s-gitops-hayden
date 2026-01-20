@@ -54,6 +54,12 @@ spec:
       enabled: false
       postgresqlHost: chatwoot-pg-rw
       postgresqlPort: 5432
+      auth:
+        username: chatwoot
+        database: chatwoot_production
+        existingSecret: chatwoot-env
+        secretKeys:
+          adminPasswordKey: POSTGRES_PASSWORD
 
     # Disable bundled Redis - using shared Redis in database-system
     redis:

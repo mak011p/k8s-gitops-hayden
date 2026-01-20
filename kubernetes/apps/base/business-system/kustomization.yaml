@@ -13,5 +13,5 @@ resources:
   - onlyoffice/ks.yaml
   - auntalma-elasticsearch/ks.yaml
   - auntalma-rabbitmq/ks.yaml
-  - auntalma/ks.yaml
+  - auntalma-magento2/ks.yaml
   - chatwoot/ks.yaml

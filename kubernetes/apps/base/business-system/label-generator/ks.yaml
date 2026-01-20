@@ -17,5 +17,5 @@ spec:
     name: flux-system
     namespace: flux-system
   dependsOn:
-    - name: cilium-gateway-api
-      namespace: kube-system
+    - name: envoy-gateway-gateway-api
+      namespace: network-system

@@ -23,8 +23,8 @@ spec:
       namespace: database-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: cilium-gateway-api
-      namespace: kube-system
+    - name: envoy-gateway-gateway-api
+      namespace: network-system
     - name: onepassword
       namespace: external-secrets
   targetNamespace: business-system

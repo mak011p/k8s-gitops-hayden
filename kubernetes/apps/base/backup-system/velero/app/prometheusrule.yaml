@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  groups:
+    - name: velero
+      rules:
+        - alert: VeleroBackupFailed
+          expr: increase(velero_backup_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero backup failed"
+            description: "Velero backup {{ $labels.schedule }} has failed. Check velero logs for details."
+        - alert: VeleroBackupPartiallyFailed
+          expr: increase(velero_backup_partial_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Velero backup partially failed"
+            description: "Velero backup {{ $labels.schedule }} partially failed - some items may not be backed up"
+        - alert: VeleroRestoreFailed
+          expr: increase(velero_restore_failed_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero restore failed"
+            description: "Velero restore operation failed. Check velero logs for details."
+        - alert: VeleroBackupNotRunRecently
+          expr: time() - velero_backup_last_successful_timestamp{schedule!=""} > 86400 * 2
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Velero backup not run in 48 hours"
+            description: "Scheduled backup {{ $labels.schedule }} has not completed successfully in over 48 hours"
+        - alert: VeleroBackupStorageLocationUnavailable
+          expr: velero_backup_storage_location_available == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero backup storage location unavailable"
+            description: "Backup storage location {{ $labels.name }} is unavailable - backups will fail"

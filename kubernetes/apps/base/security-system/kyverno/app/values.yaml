@@ -1,0 +1,31 @@
+---
+# Kyverno Helm values
+# https://kyverno.io/docs/installation/methods/#install-kyverno-using-helm
+
+admissionController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  metricsService:
+    create: true
+
+backgroundController:
+  replicas: 2
+  serviceMonitor:
+    enabled: true
+  metricsService:
+    create: true
+
+cleanupController:
+  replicas: 1
+  serviceMonitor:
+    enabled: true
+  metricsService:
+    create: true
+
+reportsController:
+  replicas: 1
+  serviceMonitor:
+    enabled: true
+  metricsService:
+    create: true

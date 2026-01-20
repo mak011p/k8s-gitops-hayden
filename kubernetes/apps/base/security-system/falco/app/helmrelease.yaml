@@ -37,7 +37,21 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
-    ebpf:
+    driver:
+      kind: modern_ebpf
+    collectors:
+      kubernetes:
+        enabled: true
+    falco:
+      grpc:
+        enabled: true
+      grpc_output:
+        enabled: true
+    falcosidekick:
+      enabled: false
+    metrics:
+      enabled: true
+    serviceMonitor:
       enabled: true
     affinity:
       nodeAffinity:

@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: falco
+  namespace: security-system
+spec:
+  groups:
+    - name: falco
+      rules:
+        - alert: FalcoCriticalAlert
+          expr: increase(falco_events{priority="Critical"}[5m]) > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Falco detected critical security event"
+            description: "Falco has detected {{ $value }} critical priority events in the last 5 minutes on {{ $labels.instance }}"
+        - alert: FalcoHighPriorityAlert
+          expr: increase(falco_events{priority="High"}[5m]) > 5
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Falco detected multiple high priority events"
+            description: "Falco has detected {{ $value }} high priority events in the last 5 minutes on {{ $labels.instance }}"
+        - alert: FalcoWarningSpike
+          expr: increase(falco_events{priority="Warning"}[10m]) > 50
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Spike in Falco warning events"
+            description: "Falco has detected {{ $value }} warning events in the last 10 minutes, which may indicate suspicious activity"
+        - alert: FalcoNotRunning
+          expr: absent(up{job=~".*falco.*"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Falco is not running"
+            description: "Falco security monitoring is not available - runtime security compromised"

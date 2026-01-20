@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: redis
+  namespace: database-system
+spec:
+  groups:
+    - name: redis
+      rules:
+        - alert: RedisDown
+          expr: redis_up == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Redis is down"
+            description: "Redis instance {{ $labels.instance }} is not responding"
+        - alert: RedisMemoryHigh
+          expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Redis memory usage high"
+            description: "Redis instance {{ $labels.instance }} is using {{ $value | humanizePercentage }} of max memory"
+        - alert: RedisTooManyConnections
+          expr: redis_connected_clients > 100
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Redis has too many connections"
+            description: "Redis instance {{ $labels.instance }} has {{ $value }} connected clients"
+        - alert: RedisRejectedConnections
+          expr: increase(redis_rejected_connections_total[5m]) > 0
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Redis is rejecting connections"
+            description: "Redis instance {{ $labels.instance }} has rejected {{ $value }} connections in the last 5 minutes"

@@ -88,6 +88,22 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 512Mi
+          exporter:
+            image:
+              repository: oliver006/redis_exporter
+              tag: v1.66.0
+            args:
+              - --redis.addr=redis://localhost:6379
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 64Mi
     defaultPodOptions:
       labels:
         app.kubernetes.io/name: redis
@@ -104,6 +120,8 @@ spec:
         ports:
           redis:
             port: 6379
+          metrics:
+            port: 9121
     persistence:
       data:
         enabled: true

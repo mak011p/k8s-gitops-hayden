@@ -7,3 +7,4 @@ namespace: velero
 resources:
   - externalsecret.yaml
   - helmrelease.yaml
+  - prometheusrule.yaml

@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kyverno
+  namespace: security-system
+spec:
+  groups:
+    - name: kyverno
+      rules:
+        - alert: KyvernoPolicyViolation
+          expr: increase(kyverno_policy_results_total{rule_result="fail"}[10m]) > 0
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Kyverno policy violation detected"
+            description: "Policy {{ $labels.policy_name }} rule {{ $labels.rule_name }} has {{ $value }} violations in namespace {{ $labels.resource_namespace }}"
+        - alert: KyvernoAdmissionControllerDown
+          expr: absent(up{job=~".*kyverno-admission-controller.*"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Kyverno admission controller is down"
+            description: "Kyverno admission controller is not responding - policy enforcement is compromised"
+        - alert: KyvernoBackgroundControllerDown
+          expr: absent(up{job=~".*kyverno-background-controller.*"} == 1)
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Kyverno background controller is down"
+            description: "Kyverno background controller is not responding - background policy scans are not running"
+        - alert: KyvernoHighPolicyFailureRate
+          expr: |
+            sum(rate(kyverno_policy_results_total{rule_result="fail"}[5m])) /
+            sum(rate(kyverno_policy_results_total[5m])) > 0.1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High Kyverno policy failure rate"
+            description: "More than 10% of policy evaluations are failing, indicating potential misconfigurations or policy issues"

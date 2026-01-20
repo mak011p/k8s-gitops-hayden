@@ -6,3 +6,5 @@ namespace: database-system
 resources:
   - ocirepository.yaml
   - helmrelease.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml

@@ -90,3 +90,11 @@ spec:
         memory: 256Mi
       limits:
         memory: 512Mi
+
+    # Monitoring
+    metrics:
+      enabled: true
+      scrapeInterval: 30s
+      serviceMonitor:
+        enabled: true
+        autodetect: true

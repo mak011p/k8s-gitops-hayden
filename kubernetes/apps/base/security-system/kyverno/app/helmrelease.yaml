@@ -42,3 +42,7 @@ spec:
   driftDetection:
     mode: enabled
   maxHistory: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: kyverno-values
+      valuesKey: values.yaml

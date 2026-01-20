@@ -1,0 +1,84 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: thanos-compactor
+  namespace: observability
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: thanos
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 5m
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  values:
+    # Only deploy the compactor component
+    # Other components (query, storegateway, etc.) are not needed
+    # as we're using Prometheus + Thanos sidecar for querying
+    query:
+      enabled: false
+    queryFrontend:
+      enabled: false
+    bucketweb:
+      enabled: false
+    storegateway:
+      enabled: false
+    ruler:
+      enabled: false
+    receive:
+      enabled: false
+
+    # Compactor configuration
+    compactor:
+      enabled: true
+      retentionResolutionRaw: 30d
+      retentionResolution5m: 90d
+      retentionResolution1h: 365d
+      consistencyDelay: 30m
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+      persistence:
+        enabled: true
+        storageClass: ceph-block
+        size: 10Gi
+
+    # Object storage configuration (reuse existing secret)
+    existingObjstoreSecret: thanos-objstore-config
+    existingObjstoreSecretItems:
+      - key: thanos.yaml
+        path: objstore.yml
+
+    # Metrics
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true

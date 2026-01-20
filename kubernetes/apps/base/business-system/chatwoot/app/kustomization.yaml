@@ -9,6 +9,7 @@ resources:
   - secret-chatwoot-pg-app.enc.age.yaml
   - secret-chatwoot-pg-superuser.enc.age.yaml
   - postgres-cluster.yaml
+  - scheduledbackup.yaml
   - helmrepository.yaml
   - helmrelease.yaml
   - httproute.yaml

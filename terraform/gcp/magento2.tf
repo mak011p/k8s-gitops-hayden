@@ -1,19 +1,23 @@
-# Magento 2 (Auntalma) PostgreSQL Backup Infrastructure
+# Magento 2 (Auntalma) Backup Infrastructure
 #
 # This creates:
-# - GCS bucket for Barman backups (uses shared KMS key from kms.tf)
+# - GCS bucket for MariaDB backups (uses shared KMS key from kms.tf)
 # - Service account with Storage Object Admin role
+# - HMAC keys for S3-compatible access (required by MariaDB operator)
 #
-# After applying, retrieve the SA key and save to 1Password:
-#   terraform output -raw magento2_backup_sa_key | base64 -d > /tmp/magento2-sa-key.json
-#   # Copy contents to 1Password item "magento2-objstore" field "serviceAccount"
+# After applying, save HMAC keys to 1Password:
+#   terraform -chdir=terraform/gcp output magento2_hmac_access_id
+#   terraform -chdir=terraform/gcp output -raw magento2_hmac_secret
+#   # Save to 1Password item "magento2-objstore":
+#   #   accessKeyId: <access_id>
+#   #   secretAccessKey: <secret>
 
 locals {
   magento2_backup_bucket = "hayden-magento2-backups"
 }
 
 # -----------------------------------------------------------------------------
-# GCS Bucket for CNPG/Barman backups
+# GCS Bucket for MariaDB backups
 # -----------------------------------------------------------------------------
 
 resource "google_storage_bucket" "magento2_backups" {
@@ -49,13 +53,13 @@ resource "google_storage_bucket" "magento2_backups" {
 }
 
 # -----------------------------------------------------------------------------
-# Service Account for CNPG/Barman
+# Service Account for MariaDB Backups
 # -----------------------------------------------------------------------------
 
 resource "google_service_account" "magento2_backup" {
   account_id   = "magento2-pg-backup"
-  display_name = "Magento 2 PostgreSQL Backup (CNPG/Barman)"
-  description  = "Service account for CNPG to write PostgreSQL backups to GCS"
+  display_name = "Auntalma MariaDB Backup"
+  description  = "Service account for MariaDB operator to write Auntalma backups to GCS"
 }
 
 # Grant SA permission to read/write/delete objects in the bucket
@@ -65,14 +69,21 @@ resource "google_storage_bucket_iam_member" "magento2_backup_object_admin" {
   member = "serviceAccount:${google_service_account.magento2_backup.email}"
 }
 
-# Barman Cloud also needs storage.buckets.get for WAL archive checks
+# Also needs storage.buckets.get for bucket operations
 resource "google_storage_bucket_iam_member" "magento2_backup_bucket_reader" {
   bucket = google_storage_bucket.magento2_backups.name
   role   = "roles/storage.legacyBucketReader"
   member = "serviceAccount:${google_service_account.magento2_backup.email}"
 }
 
-# SA key managed externally via 1Password (magento2-objstore)
+# -----------------------------------------------------------------------------
+# HMAC Keys for S3-compatible access (MariaDB operator)
+# -----------------------------------------------------------------------------
+
+resource "google_storage_hmac_key" "magento2_backup" {
+  service_account_email = google_service_account.magento2_backup.email
+  project               = var.project_id
+}
 
 # -----------------------------------------------------------------------------
 # Outputs
@@ -86,4 +97,15 @@ output "magento2_backup_sa_email" {
 output "magento2_backup_bucket" {
   value       = google_storage_bucket.magento2_backups.name
   description = "GCS bucket name for Magento 2 backups"
+}
+
+output "magento2_hmac_access_id" {
+  value       = google_storage_hmac_key.magento2_backup.access_id
+  description = "HMAC access ID for S3-compatible access (save to 1Password accessKeyId)"
+}
+
+output "magento2_hmac_secret" {
+  value       = google_storage_hmac_key.magento2_backup.secret
+  description = "HMAC secret for S3-compatible access (save to 1Password secretAccessKey)"
+  sensitive   = true
 }

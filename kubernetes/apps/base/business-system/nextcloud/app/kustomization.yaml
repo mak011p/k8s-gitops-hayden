@@ -9,3 +9,11 @@ resources:
   - ocirepository.yaml
   - pvc.yaml
   - secret.enc.age.yaml
+  # VolSync backup - enable after creating nextcloud-data-restic secret
+  # 1. Apply terraform: terraform -chdir=terraform/gcp apply
+  # 2. Create SA key and save to 1Password "nextcloud-objstore"
+  # 3. Create secret: cp secret-data-restic.yaml.template secret-data-restic.enc.age.yaml
+  # 4. Edit and encrypt: sops -e -i secret-data-restic.enc.age.yaml
+  # 5. Uncomment these lines
+  # - secret-data-restic.enc.age.yaml
+  # - replicationsource.yaml

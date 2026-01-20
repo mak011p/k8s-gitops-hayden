@@ -19,8 +19,8 @@ spec:
   storage:
     # Use S3-compatible storage (GCS)
     s3:
-      bucket: hayden-agencies-auntalma-backups
-      prefix: mariadb
+      bucket: hayden-magento2-backups
+      prefix: auntalma/mariadb
       endpoint: storage.googleapis.com
       region: australia-southeast1
       accessKeyIdSecretKeyRef:

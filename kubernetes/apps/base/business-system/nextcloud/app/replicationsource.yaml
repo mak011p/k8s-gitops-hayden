@@ -1,0 +1,32 @@
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: nextcloud-data
+  namespace: business-system
+spec:
+  sourcePVC: nextcloud-data
+  trigger:
+    # Daily at 5:00 UTC (16:00 AEDT)
+    schedule: "0 5 * * *"
+  restic:
+    # Secret containing RESTIC_REPOSITORY, RESTIC_PASSWORD, and rclone GCS config
+    repository: nextcloud-data-restic
+    # Retention policy: 7 daily, 4 weekly, 3 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 3
+    # Use TrueNAS CSI snapshots for consistent backups
+    copyMethod: Snapshot
+    volumeSnapshotClassName: truenas-iscsi
+    # Storage class for temporary snapshot PVC
+    storageClassName: truenas-iscsi-csi
+    # Cache for faster incremental backups
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 5Gi
+    # Mover pod security context (match Nextcloud's UID/GID - www-data)
+    moverSecurityContext:
+      runAsUser: 33
+      runAsGroup: 33
+      fsGroup: 33

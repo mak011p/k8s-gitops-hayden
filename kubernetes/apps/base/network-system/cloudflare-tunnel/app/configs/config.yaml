@@ -20,6 +20,13 @@ ingress:
     originRequest:
       proxyType: socks
 
+  # Route Chatwoot through Envoy Gateway for SecurityPolicy support
+  - hostname: chat.${CLUSTER_DOMAIN}
+    service: https://envoy-external.network-system.svc.cluster.local:443
+    originRequest:
+      http2Origin: true
+      originServerName: chat.${CLUSTER_DOMAIN}
+
   - hostname: "*.${CLUSTER_DOMAIN}"
     service: https://cilium-gateway-external.kube-system.svc.cluster.local:443
     originRequest:

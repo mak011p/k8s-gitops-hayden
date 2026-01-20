@@ -76,9 +76,9 @@ spec:
           size: 100Mi
     agent:
       acquisition:
-        - namespace: nginx-ingress
-          podName: ingress-nginx-controller-*
-          program: nginx
+        - namespace: envoy-gateway-system
+          podName: envoy-external-*
+          program: envoy
       metrics:
         enabled: true
         serviceMonitor:

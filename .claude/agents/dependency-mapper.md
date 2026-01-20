@@ -82,8 +82,9 @@ Rook-Ceph Operator (rook-ceph)
 **Network System:**
 - cert-manager (no deps)
 - external-dns (depends on cert-manager)
-- ingress-nginx (depends on cert-manager)
-- oauth2-proxy (depends on cert-manager, ingress-nginx)
+- envoy-gateway (depends on cert-manager)
+- envoy-gateway-gateway-api (depends on envoy-gateway)
+- oauth2-proxy (depends on cert-manager, envoy-gateway)
 
 **Observability:**
 - prometheus-operator-crds (no deps)

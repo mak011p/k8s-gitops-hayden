@@ -6,6 +6,21 @@
 locals {
   haydenagencies_zone_id = data.cloudflare_zone.haydenagencies.id
   odoo_webhook_hostname  = "odoo-webhook.${var.domain}"
+  tunnel_id              = "116ee772-e4a7-45e3-a401-522d76f1138c"
+}
+
+# ==============================================
+# DNS Records - Cloudflare Tunnel
+# ==============================================
+
+resource "cloudflare_record" "tunnel_ingress" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "ingress"
+  content = "${local.tunnel_id}.cfargotunnel.com"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1 # Auto when proxied
+  comment = "Cloudflare Tunnel ingress for cluster services"
 }
 
 # ==============================================

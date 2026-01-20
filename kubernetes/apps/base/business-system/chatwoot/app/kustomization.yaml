@@ -13,3 +13,5 @@ resources:
   - helmrepository.yaml
   - helmrelease.yaml
   - httproute.yaml
+  - httproute-admin.yaml
+  - securitypolicy.yaml

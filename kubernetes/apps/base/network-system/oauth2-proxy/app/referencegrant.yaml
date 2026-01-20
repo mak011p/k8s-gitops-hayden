@@ -18,6 +18,10 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       namespace: ai-system
+    # Allow SecurityPolicy in business-system to reference oauth2-proxy for ext_authz
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: business-system
   to:
     - group: ""
       kind: Service

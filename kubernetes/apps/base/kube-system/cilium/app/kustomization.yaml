@@ -5,11 +5,13 @@ kind: Kustomization
 namespace: kube-system
 
 resources:
+  - certificates.yaml
   - grafanadashboard.yaml
   - helmrelease.yaml
   - httproute.yaml
   - loadbalancer.yaml
   - ocirepository.yaml
+  - referencegrant.yaml
 
 configMapGenerator:
   - name: cilium-values

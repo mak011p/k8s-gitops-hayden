@@ -14,7 +14,7 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-  path: "./kubernetes/apps/base/network-system/envoy-gateway/app"
+  path: "./apps/base/network-system/envoy-gateway/app"
   prune: true
   wait: true
   sourceRef:

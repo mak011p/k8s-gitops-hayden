@@ -13,8 +13,8 @@ spec:
   schedule:
     cron: "0 17 * * SAT"
     suspend: false
-  # Maximum number of backups to retain
-  maxRetention: "4"
+  # Maximum retention period for backups (4 weeks)
+  maxRetention: "28d"
   # Storage configuration
   storage:
     # Use S3-compatible storage (GCS)

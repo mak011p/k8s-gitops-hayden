@@ -67,6 +67,7 @@ spec:
         set_xauthrequest = true
         skip_jwt_bearer_tokens = true
         skip_provider_button = true
+        prompt = ""
         ssl_insecure_skip_verify = false
         standard_logging = true
         upstreams = [ "static://200" ]

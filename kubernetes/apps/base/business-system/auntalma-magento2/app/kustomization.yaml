@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   # Source repositories
   - ocirepository.yaml
-  - ocirepository-redis.yaml
+  # - ocirepository-redis.yaml  # Legacy Bitnami chart - deprecated Aug 2025
   # External secrets
   - externalsecret-ghcr.yaml
   - externalsecret-backup.yaml
@@ -16,8 +16,9 @@ resources:
   # Database
   - mariadb-cluster.yaml
   - scheduledbackup.yaml
-  # Redis cache
-  - helmrelease-redis.yaml
+  # Redis cache (official image, replaces Bitnami HelmRelease)
+  - redis-statefulset.yaml
+  # - helmrelease-redis.yaml  # Legacy Bitnami chart - deprecated Aug 2025
   # Storage
   - pvc-media.yaml
   - pvc-var.yaml

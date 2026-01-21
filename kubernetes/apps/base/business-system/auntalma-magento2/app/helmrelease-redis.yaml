@@ -37,11 +37,14 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
-    # Redis 7.2 for Magento
+    # Redis 7.2 for Magento - using official images (Bitnami deprecated Aug 2025)
     image:
       registry: docker.io
       repository: bitnami/redis
-      tag: 7.2.6
+      tag: 7.4.2-debian-12-r3
+    global:
+      imageRegistry: docker.io
+      storageClass: ceph-block
 
     # Standalone mode (no replication for dev)
     architecture: standalone

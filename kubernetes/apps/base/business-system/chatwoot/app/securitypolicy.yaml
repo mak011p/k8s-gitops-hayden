@@ -12,6 +12,9 @@ spec:
       name: chatwoot-admin
   extAuth:
     failOpen: false
+    headersToExtAuth:
+      - cookie
+      - authorization
     http:
       backendRefs:
         - group: ""
@@ -19,9 +22,6 @@ spec:
           name: oauth2-proxy
           namespace: network-system
           port: 80
-      headersToExtAuth:
-        - cookie
-        - authorization
       headersToBackend:
         - x-auth-request-user
         - x-auth-request-email

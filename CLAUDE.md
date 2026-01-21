@@ -450,3 +450,110 @@ Use `get_kubernetes_contexts` and `set_kubernetes_context` to switch between clu
 ceph osd tree    # New OSD should be up
 ceph -s          # PGs should be active+clean, 3 OSDs in cluster
 ```
+
+## OAuth2 + Envoy Gateway External Authorization
+
+This cluster uses **oauth2-proxy** with **Dex** (OIDC provider) for authentication, protected by Envoy Gateway's **SecurityPolicy** with external authorization (ext_authz).
+
+### Architecture Flow
+```
+User Request → Envoy Gateway → SecurityPolicy (ext_authz) → oauth2-proxy
+                                      ↓
+                              oauth2-proxy validates cookie
+                                      ↓
+                    If no cookie: redirect to Dex → GitHub OAuth → callback
+                    If valid cookie: allow request to backend
+```
+
+### Critical Configuration Requirements
+
+#### 1. SecurityPolicy must forward cookies to ext_authz
+Without `headersToExtAuth`, the session cookie won't be sent to oauth2-proxy during auth checks, causing an **infinite login loop**.
+
+```yaml
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+spec:
+  extAuth:
+    failOpen: false
+    headersToExtAuth:        # REQUIRED - at extAuth level, NOT under http
+      - cookie
+      - authorization
+    http:
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+      headersToBackend:      # Headers from oauth2-proxy to backend
+        - x-auth-request-user
+        - x-auth-request-email
+        - x-auth-request-groups
+        - authorization
+```
+
+#### 2. oauth2-proxy must not force consent prompts
+If oauth2-proxy sends `prompt=consent`, Dex will show the approval screen even with `skipApprovalScreen: true`.
+
+```yaml
+# In oauth2-proxy HelmRelease values
+config:
+  configFile: |
+    prompt = ""              # Empty string - don't override Dex settings
+    skip_provider_button = true
+```
+
+#### 3. Dex must have skipApprovalScreen enabled
+```yaml
+# In Dex values
+config:
+  oauth2:
+    skipApprovalScreen: true
+    alwaysShowLoginScreen: false
+```
+
+#### 4. HTTPRoute must handle /oauth2/* callbacks
+The main HTTPRoute (not the admin route) must route `/oauth2/*` to oauth2-proxy for callbacks:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+spec:
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+```
+
+### Common Issues and Symptoms
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Infinite login loop (auth succeeds but redirects to login again) | `headersToExtAuth` missing - cookie not forwarded to oauth2-proxy | Add `headersToExtAuth: [cookie, authorization]` to SecurityPolicy |
+| Dex approval screen shows despite `skipApprovalScreen: true` | oauth2-proxy sending `prompt=consent` | Set `prompt = ""` in oauth2-proxy config |
+| "Grant Access" button does nothing | Stale auth request (expired CSRF token) | Clear cookies and start fresh |
+| `dry-run failed: field not declared in schema` | `headersToExtAuth` at wrong level or wrong EG version | Ensure field is under `extAuth`, not `extAuth.http` |
+
+### Debugging Commands
+```bash
+# Check oauth2-proxy logs for auth flow
+kubectl logs -n network-system -l app.kubernetes.io/name=oauth2-proxy --tail=50
+
+# Check Dex logs for login events
+kubectl logs -n network-system -l app.kubernetes.io/name=dex --tail=50
+
+# Verify SecurityPolicy configuration
+kubectl get securitypolicy -n <namespace> <name> -o yaml | grep -A10 headersToExtAuth
+
+# Check if cookie is being set (look for Set-Cookie in callback response)
+# In browser DevTools: Network tab → filter by /oauth2/callback
+```
+
+### Reference
+- [Envoy Gateway External Authorization](https://gateway.envoyproxy.io/docs/tasks/security/ext-auth/)
+- [Authelia + Envoy Gateway Integration](https://www.authelia.com/integration/kubernetes/envoy/gateway/)
+- [Dex OAuth2 Configuration](https://dexidp.io/docs/configuration/oauth2/)

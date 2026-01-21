@@ -12,3 +12,6 @@ configMapGenerator:
   - name: kyverno-values
     files:
       - values.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true

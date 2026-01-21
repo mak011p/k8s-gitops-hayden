@@ -37,6 +37,12 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
+    # Use official Thanos image instead of Bitnami
+    image:
+      registry: quay.io
+      repository: thanos/thanos
+      tag: v0.37.2
+
     # Only deploy the compactor component
     # Other components (query, storegateway, etc.) are not needed
     # as we're using Prometheus + Thanos sidecar for querying

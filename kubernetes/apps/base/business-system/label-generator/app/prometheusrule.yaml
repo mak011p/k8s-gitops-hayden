@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: label-generator
+  namespace: business-system
+spec:
+  groups:
+    - name: label-generator
+      rules:
+        - alert: LabelGeneratorDown
+          expr: probe_success{service="label-generator"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Label Generator is down"
+            description: "Label Generator service is not responding to health checks"
+        - alert: LabelGeneratorHighLatency
+          expr: probe_http_duration_seconds{service="label-generator"} > 30
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Label Generator high latency"
+            description: "Label Generator is responding slowly ({{ $value }}s response time)"

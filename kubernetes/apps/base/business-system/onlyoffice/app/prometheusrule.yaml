@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: onlyoffice
+  namespace: business-system
+spec:
+  groups:
+    - name: onlyoffice
+      rules:
+        - alert: OnlyOfficeDown
+          expr: probe_success{service="onlyoffice"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OnlyOffice Document Server is down"
+            description: "OnlyOffice is not responding to health checks at /healthcheck"
+        - alert: OnlyOfficeHighLatency
+          expr: probe_http_duration_seconds{service="onlyoffice"} > 10
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "OnlyOffice high latency"
+            description: "OnlyOffice is responding slowly ({{ $value }}s response time)"

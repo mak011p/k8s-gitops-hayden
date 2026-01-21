@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: chatwoot
+  namespace: business-system
+spec:
+  groups:
+    - name: chatwoot
+      rules:
+        - alert: ChatwootDown
+          expr: probe_success{service="chatwoot"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Chatwoot is down"
+            description: "Chatwoot web service is not responding to health checks"
+        - alert: ChatwootHighLatency
+          expr: probe_http_duration_seconds{service="chatwoot"} > 5
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Chatwoot high latency"
+            description: "Chatwoot is responding slowly ({{ $value }}s response time)"
+    - name: chatwoot-pg.backup
+      rules:
+        - alert: ChatwootPgBackupFailed
+          expr: |
+            max by (cluster) (cnpg_collector_last_failed_backup_timestamp{cluster="chatwoot-pg"}) > 0
+              and (time() - max by (cluster) (cnpg_collector_last_failed_backup_timestamp{cluster="chatwoot-pg"})) < 6 * 60 * 60
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Chatwoot PostgreSQL backup failure"
+            description: "CloudNativePG reported a failed backup for {{ $labels.cluster }}"
+        - alert: ChatwootPgBackupsStale
+          expr: |
+            max by (cluster) (cnpg_collector_last_available_backup_timestamp{cluster="chatwoot-pg"}) > 0
+              and (time() - max by (cluster) (cnpg_collector_last_available_backup_timestamp{cluster="chatwoot-pg"})) > 8 * 24 * 60 * 60
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Chatwoot PostgreSQL backups are stale"
+            description: "No successful backup for {{ $labels.cluster }} in over 8 days"

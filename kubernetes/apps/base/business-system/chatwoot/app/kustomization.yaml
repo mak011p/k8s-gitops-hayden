@@ -15,3 +15,6 @@ resources:
   - httproute.yaml
   - httproute-admin.yaml
   - securitypolicy.yaml
+  - probe.yaml
+  - podmonitor.yaml
+  - prometheusrule.yaml

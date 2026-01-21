@@ -3,10 +3,30 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: odoo-pg-backup-alerts
+  name: odoo
   namespace: business-system
 spec:
   groups:
+    - name: odoo
+      rules:
+        - alert: OdooDown
+          expr: probe_success{service="odoo"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: odoo
+          annotations:
+            summary: "Odoo ERP is down"
+            description: "Odoo web service is not responding to health checks at /web/health"
+        - alert: OdooHighLatency
+          expr: probe_http_duration_seconds{service="odoo"} > 10
+          for: 10m
+          labels:
+            severity: warning
+            service: odoo
+          annotations:
+            summary: "Odoo high latency"
+            description: "Odoo is responding slowly ({{ $value }}s response time)"
     - name: odoo-pg.backup
       rules:
         - alert: OdooPgBackupFailedRecently

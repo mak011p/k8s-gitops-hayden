@@ -9,3 +9,5 @@ resources:
   - ocirepository.yaml
   - pvc.yaml
   - secret.enc.age.yaml
+  - probe.yaml
+  - prometheusrule.yaml

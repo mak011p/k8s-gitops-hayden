@@ -16,6 +16,7 @@ resources:
   - pvc.yaml
   - podmonitor.yaml
   - prometheusrule.yaml
+  - probe.yaml
   - scheduledbackup.yaml
   - httproute.yaml
   # VolSync disabled until TrueNAS is set up

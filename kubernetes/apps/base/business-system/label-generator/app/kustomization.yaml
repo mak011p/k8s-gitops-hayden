@@ -8,3 +8,5 @@ resources:
   - helmrelease.yaml
   - ocirepository.yaml
   - httproute.yaml
+  - probe.yaml
+  - prometheusrule.yaml

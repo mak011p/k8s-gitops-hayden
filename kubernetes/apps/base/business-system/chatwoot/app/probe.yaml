@@ -12,7 +12,7 @@ spec:
   targets:
     staticConfig:
       static:
-        - chatwoot-web.business-system.svc.cluster.local:3000
+        - chatwoot.business-system.svc.cluster.local:3000
   metricRelabelings:
     - targetLabel: service
       replacement: chatwoot

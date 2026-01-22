@@ -75,7 +75,7 @@ task fluxcd:diff            # Preview FluxCD operator changes
 task talos:config           # Decrypt and load talosconfig to ~/.talos/config
 
 # Core Operations
-task core:gpg               # Import SOPS PGP keys
+task core:gpg               # Import SOPS keys (legacy)
 task core:lint              # Run yamllint
 
 # View available tasks
@@ -101,24 +101,17 @@ Active hooks include:
 - Trailing whitespace and EOF fixes
 
 ### Secret Management
-Secrets are encrypted using [SOPS](https://github.com/mozilla/sops) with dual encryption (PGP + GCP KMS):
+Secrets are managed via **1Password** (External Secrets Operator) and **SOPS** (Age encryption) for GitOps files.
+
 ```bash
-# Edit encrypted files (automatically decrypts/encrypts)
-sops path/to/file.enc.yaml
+# Edit SOPS-encrypted files (automatically decrypts/encrypts)
+sops path/to/file.enc.age.yaml
 
-# Decrypt for viewing only
-sops -d path/to/file.enc.yaml
-
-# Encrypt new secrets (must use .enc.age.yaml extension for creation rules to match)
+# Encrypt new secrets
 mv secret.yaml secret.enc.age.yaml && sops -e -i secret.enc.age.yaml
 ```
 
-**SOPS Configuration:**
-- **PGP Key**: `67AF5B5A73800481D8E41667C87721FBF6BBF30C`
-- **Age Key**: `age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h`
-- **GCP KMS**: `projects/hayden-agencies-infra/locations/global/keyRings/sops/cryptoKeys/sops-key`
-- Encrypted files use `.enc.yaml` or `.enc.age.yaml` suffix
-- Creation rules in `.sops.yaml` only match `*.enc.age.yaml` for kubernetes paths
+> **For detailed secrets inventory, rotation procedures, and troubleshooting, see [SECRETS.md](SECRETS.md)**
 
 ## Key Technologies & Patterns
 
@@ -174,8 +167,8 @@ upgrade:
 ```
 
 ### Security Practices
-- **Dual encryption**: SOPS with PGP (primary) + GCP KMS backup
-- **Never commit unencrypted secrets**: All secrets use `.enc.yaml` suffix
+- **Secret encryption**: SOPS with Age (primary) + GCP KMS backup
+- **Never commit unencrypted secrets**: All secrets use `.enc.age.yaml` suffix
 - **Policy enforcement**: Kyverno & OPA Gatekeeper
 - **Runtime security**: Falco & Tetragon
 - **Pod security labels**: Applied to all namespaces
@@ -351,7 +344,6 @@ gh workflow run upstream-sync.yaml -f dry_run=false
 ### File Naming
 - `ks.yaml`: Flux Kustomization resources (defines how to apply manifests)
 - `kustomization.yaml`: Kustomize configuration (defines what resources to include)
-- `*.enc.yaml`: SOPS-encrypted with PGP
 - `*.enc.age.yaml`: SOPS-encrypted with Age
 - `helmfile.yaml`: Helmfile configurations (used in bootstrap)
 - `helmrelease.yaml`: Helm release definitions
@@ -397,7 +389,7 @@ dependsOn:
   - Google Cloud Storage for Velero backups
   - OAuth for authentication
 - **GitHub**: Source control, authentication, and OCI registry for Helm charts
-- **SOPS/age**: Secret encryption (requires PGP and/or age key setup)
+- **SOPS/Age**: Secret encryption (requires Age key setup)
 - **Task**: Task runner (must be installed locally)
 - **Helmfile**: Used for bootstrap process
 - **Let's Encrypt**: Certificate generation for secure communication

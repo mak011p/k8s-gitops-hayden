@@ -42,9 +42,11 @@
       // Custom versioning for Odoo with date+time tags (18.0.YYYYMMDD.HHMM-sha)
       // patch=date, prerelease=time ensures proper sorting for same-day builds
       // Time component (.HHMM) is optional to support legacy tags (18.0.YYYYMMDD-sha)
+      // NOTE: SHA suffix (-abc1234) is matched but NOT captured - this allows Renovate
+      // to properly compare versions without treating each SHA as a unique "build" version
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<prerelease>\\d+))?-(?<build>.+)$",
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<prerelease>\\d+))?-[a-f0-9]+$",
     },
     {
       // Custom versioning for label-generator with date-based tags (YYYYMMDD-sha)

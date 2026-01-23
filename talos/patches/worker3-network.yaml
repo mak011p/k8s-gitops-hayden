@@ -8,7 +8,7 @@ machine:
   network:
     hostname: worker3
     interfaces:
-      - interface: eno1
+      - interface: enp5s0f1
         addresses:
           - 192.168.50.23/24
         routes:
@@ -16,3 +16,7 @@ machine:
             gateway: 192.168.50.1
     nameservers:
       - 192.168.50.1
+  kubelet:
+    nodeIP:
+      validSubnets:
+        - 192.168.50.23/32

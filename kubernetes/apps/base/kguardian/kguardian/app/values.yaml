@@ -27,3 +27,7 @@ mcpServer:
   useKmcp: false
   image:
     tag: "pr-552"
+
+database:
+  persistence:
+    enabled: true

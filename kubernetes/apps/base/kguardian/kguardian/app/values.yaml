@@ -31,3 +31,4 @@ mcpServer:
 database:
   persistence:
     enabled: true
+    existingClaim: kguardian-db-data

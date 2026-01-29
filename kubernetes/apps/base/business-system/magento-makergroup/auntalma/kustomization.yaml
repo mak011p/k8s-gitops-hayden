@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   # External secrets
   - externalsecret-backup.yaml
+  - externalsecret-apikeys.yaml
   # SOPS encrypted secrets
   - secret-magento-app.enc.age.yaml
   - secret-mariadb-app.enc.age.yaml

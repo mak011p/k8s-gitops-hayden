@@ -7,8 +7,10 @@ metadata:
   namespace: business-system
 spec:
   podSelector:
-    matchLabels:
-      app.kubernetes.io/name: chatwoot
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [chatwoot]
   policyTypes:
     - Ingress
     - Egress
@@ -84,6 +86,52 @@ spec:
         - port: 443
           protocol: TCP
 ---
+# Chatwoot migrate job - needs DNS and PostgreSQL access
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chatwoot-migrate
+  namespace: business-system
+spec:
+  podSelector:
+    matchLabels:
+      batch.kubernetes.io/job-name: chatwoot-migrate
+  policyTypes:
+    - Egress
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: chatwoot-pg
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Redis (needed for cache during migration)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: database-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+---
 # PostgreSQL pods - only Chatwoot app and CNPG replication
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -98,11 +146,21 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Chatwoot app connections
+    # Chatwoot app connections (web, worker)
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: [chatwoot]
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Chatwoot migrate job
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: chatwoot
+              batch.kubernetes.io/job-name: chatwoot-migrate
       ports:
         - port: 5432
           protocol: TCP

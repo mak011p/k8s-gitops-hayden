@@ -17,7 +17,6 @@ resources:
   - ../../base/business-system-staging
   - ../../base/business-system-staging/odoo-staging/ks.yaml
   - ../../base/business-system/label-generator/ks.yaml
-  - ../../base/business-system/magento-makergroup/ks.yaml
   - ../../base/democratic-csi
   - ../../base/democratic-csi/democratic-csi/ks.yaml
   # development namespace already included via cluster-00 base

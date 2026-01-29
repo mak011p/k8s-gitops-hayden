@@ -12,7 +12,7 @@ spec:
     topologyKey: kubernetes.io/hostname
     podAntiAffinityType: required
   imageName: ghcr.io/cloudnative-pg/postgresql:17.7-202512080807-system-bookworm
-  enableSuperuserAccess: true
+  enableSuperuserAccess: false
   superuserSecret:
     name: chatwoot-pg-superuser
   monitoring:

@@ -1,0 +1,157 @@
+---
+# Chatwoot web/worker pods - restrict ingress to gateway and internal services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chatwoot-app
+  namespace: business-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: chatwoot
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from Envoy Gateway (network-system)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: network-system
+      ports:
+        - port: 3000
+          protocol: TCP
+    # Allow from within business-system namespace (inter-pod)
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 3000
+          protocol: TCP
+    # Allow Prometheus scraping
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+      ports:
+        - port: 3000
+          protocol: TCP
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # PostgreSQL (within namespace)
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: chatwoot-pg
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Redis (database-system)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: database-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+    # SMTP (external)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - port: 587
+          protocol: TCP
+        - port: 465
+          protocol: TCP
+        - port: 443
+          protocol: TCP
+---
+# PostgreSQL pods - only Chatwoot app and CNPG replication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chatwoot-pg
+  namespace: business-system
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: chatwoot-pg
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Chatwoot app connections
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: chatwoot
+      ports:
+        - port: 5432
+          protocol: TCP
+    # CNPG replication between instances
+    - from:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: chatwoot-pg
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Prometheus metrics scraping
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+      ports:
+        - port: 9187
+          protocol: TCP
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # CNPG replication
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: chatwoot-pg
+      ports:
+        - port: 5432
+          protocol: TCP
+    # GCS backups (external HTTPS)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - port: 443
+          protocol: TCP

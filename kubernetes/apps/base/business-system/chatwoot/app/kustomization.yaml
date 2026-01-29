@@ -18,3 +18,5 @@ resources:
   - probe.yaml
   - podmonitor.yaml
   - prometheusrule.yaml
+  - networkpolicy.yaml
+  - backendtrafficpolicy.yaml

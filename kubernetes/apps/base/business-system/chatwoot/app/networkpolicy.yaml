@@ -194,23 +194,6 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
-    # Kubernetes API (required for CNPG instance manager)
-    - to:
-        - ipBlock:
-            cidr: 10.96.0.1/32
-      ports:
-        - port: 443
-          protocol: TCP
-    - to:
-        - ipBlock:
-            cidr: 192.168.50.11/32
-        - ipBlock:
-            cidr: 192.168.50.12/32
-        - ipBlock:
-            cidr: 192.168.50.13/32
-      ports:
-        - port: 6443
-          protocol: TCP
     # CNPG replication
     - to:
         - podSelector:
@@ -230,3 +213,18 @@ spec:
       ports:
         - port: 443
           protocol: TCP
+---
+# CiliumNetworkPolicy for CNPG pods - Kubernetes API access
+# Standard NetworkPolicy ipBlock rules don't work for K8s API with Cilium CNI
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: chatwoot-pg-apiserver
+  namespace: business-system
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: chatwoot-pg
+  egress:
+    - toEntities:
+        - kube-apiserver

@@ -19,4 +19,3 @@ resources:
   - podmonitor.yaml
   - prometheusrule.yaml
   - networkpolicy.yaml
-  - backendtrafficpolicy.yaml

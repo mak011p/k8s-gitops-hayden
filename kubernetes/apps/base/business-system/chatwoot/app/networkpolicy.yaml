@@ -164,13 +164,15 @@ spec:
       ports:
         - port: 5432
           protocol: TCP
-    # CNPG replication between instances
+    # CNPG replication and instance manager health checks
     - from:
         - podSelector:
             matchLabels:
               cnpg.io/cluster: chatwoot-pg
       ports:
         - port: 5432
+          protocol: TCP
+        - port: 8000
           protocol: TCP
     # Prometheus metrics scraping
     - from:
@@ -194,13 +196,15 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
-    # CNPG replication
+    # CNPG replication and instance manager health checks
     - to:
         - podSelector:
             matchLabels:
               cnpg.io/cluster: chatwoot-pg
       ports:
         - port: 5432
+          protocol: TCP
+        - port: 8000
           protocol: TCP
     # GCS backups (external HTTPS)
     - to:

@@ -46,8 +46,8 @@ spec:
       tag: v4.10.1
       pullPolicy: IfNotPresent
 
-    # Reference existing secret for sensitive env vars
-    existingEnvSecret: chatwoot-env
+    # Reference existing secret for sensitive env vars (supplements chart-managed chatwoot-env)
+    existingEnvSecret: chatwoot-env-secrets
 
     # Disable bundled PostgreSQL - using CNPG
     postgresql:
@@ -57,7 +57,7 @@ spec:
       auth:
         username: chatwoot
         database: chatwoot_production
-        existingSecret: chatwoot-env
+        existingSecret: chatwoot-env-secrets
         secretKeys:
           adminPasswordKey: POSTGRES_PASSWORD
 

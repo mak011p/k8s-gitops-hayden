@@ -12,31 +12,7 @@ spec:
         operator: In
         values: [chatwoot]
   policyTypes:
-    - Ingress
     - Egress
-  ingress:
-    # Allow from Envoy Gateway (network-system)
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: network-system
-      ports:
-        - port: 3000
-          protocol: TCP
-    # Allow from within business-system namespace (inter-pod)
-    - from:
-        - podSelector: {}
-      ports:
-        - port: 3000
-          protocol: TCP
-    # Allow Prometheus scraping
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: observability
-      ports:
-        - port: 3000
-          protocol: TCP
   egress:
     # DNS
     - to:

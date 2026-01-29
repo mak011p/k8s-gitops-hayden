@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: magento-makergroup-shared
+  namespace: business-system
+spec:
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/magento-makergroup/shared"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  dependsOn:
+    - name: onepassword
+      namespace: external-secrets
+  targetNamespace: business-system
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: magento-makergroup-auntalma
+  namespace: business-system
+spec:
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/magento-makergroup/auntalma"
+  prune: true
+  wait: false
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  dependsOn:
+    - name: magento-makergroup-shared
+      namespace: business-system
+    - name: mariadb-operator
+      namespace: database-system
+    - name: auntalma-elasticsearch
+      namespace: business-system
+    - name: auntalma-rabbitmq
+      namespace: business-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: envoy-gateway-gateway-api
+      namespace: network-system
+  targetNamespace: business-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age-secret
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: magento-makergroup-hayden
+  namespace: business-system
+spec:
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/magento-makergroup/hayden"
+  prune: true
+  wait: false
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  dependsOn:
+    - name: magento-makergroup-shared
+      namespace: business-system
+    - name: mariadb-operator
+      namespace: database-system
+    - name: hayden-elasticsearch
+      namespace: business-system
+    - name: hayden-rabbitmq
+      namespace: business-system
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: envoy-gateway-gateway-api
+      namespace: network-system
+  targetNamespace: business-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age-secret

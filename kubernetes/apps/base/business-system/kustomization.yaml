@@ -13,5 +13,7 @@ resources:
   - onlyoffice/ks.yaml
   - auntalma-elasticsearch/ks.yaml
   - auntalma-rabbitmq/ks.yaml
-  - auntalma-magento2/ks.yaml
+  - hayden-elasticsearch/ks.yaml
+  - hayden-rabbitmq/ks.yaml
+  - magento-makergroup/ks.yaml
   - chatwoot/ks.yaml

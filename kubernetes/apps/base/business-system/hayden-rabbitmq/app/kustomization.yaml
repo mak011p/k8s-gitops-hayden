@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - rabbitmqcluster.yaml
+  # Legacy Bitnami chart replaced by RabbitMQ Cluster Operator CR
+  # - ocirepository.yaml
+  # - helmrelease.yaml
+  # Secret no longer needed - operator creates hayden-rabbitmq-default-user
+  # - secret.enc.age.yaml

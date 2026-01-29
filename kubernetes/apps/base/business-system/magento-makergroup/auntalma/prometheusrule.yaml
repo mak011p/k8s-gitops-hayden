@@ -1,0 +1,117 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: auntalma-alerts
+  namespace: business-system
+spec:
+  groups:
+    - name: auntalma.mariadb
+      rules:
+        - alert: AuntalmaMariaDBDown
+          expr: |
+            mysql_up{job=~".*auntalma-mariadb.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: auntalma-mariadb
+          annotations:
+            summary: "Auntalma MariaDB is down"
+            description: >
+              MariaDB instance {{ $labels.instance }} is not responding.
+              Check pod status and logs for auntalma-mariadb.
+
+        - alert: AuntalmaMariaDBGaleraNotReady
+          expr: |
+            mysql_galera_cluster_status{job=~".*auntalma-mariadb.*"} != 1
+          for: 5m
+          labels:
+            severity: critical
+            service: auntalma-mariadb
+          annotations:
+            summary: "Auntalma MariaDB Galera cluster not ready"
+            description: >
+              Galera cluster {{ $labels.instance }} is not in Primary state.
+              wsrep_cluster_status should be Primary (1).
+
+        - alert: AuntalmaMariaDBGaleraClusterSizeDegraded
+          expr: |
+            mysql_galera_cluster_size{job=~".*auntalma-mariadb.*"} < 3
+          for: 10m
+          labels:
+            severity: warning
+            service: auntalma-mariadb
+          annotations:
+            summary: "Auntalma MariaDB Galera cluster degraded"
+            description: >
+              Galera cluster has {{ $value }} nodes instead of expected 3.
+              Check if all MariaDB pods are running.
+
+        - alert: AuntalmaMariaDBHighConnections
+          expr: |
+            mysql_global_status_threads_connected{job=~".*auntalma-mariadb.*"} / mysql_global_variables_max_connections{job=~".*auntalma-mariadb.*"} > 0.8
+          for: 5m
+          labels:
+            severity: warning
+            service: auntalma-mariadb
+          annotations:
+            summary: "Auntalma MariaDB high connection usage"
+            description: >
+              MariaDB {{ $labels.instance }} is using {{ $value | humanizePercentage }} of max connections.
+              Consider increasing max_connections or investigating connection leaks.
+
+    - name: auntalma.magento
+      rules:
+        - alert: AuntalmaPodNotReady
+          expr: |
+            kube_pod_status_ready{namespace="business-system", pod=~"auntalma-.*"} == 0
+          for: 10m
+          labels:
+            severity: warning
+            service: auntalma
+          annotations:
+            summary: "Auntalma pod not ready"
+            description: >
+              Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for more than 10 minutes.
+
+        - alert: AuntalmaHighMemoryUsage
+          expr: |
+            container_memory_working_set_bytes{namespace="business-system", pod=~"auntalma-.*", container="php"} / container_spec_memory_limit_bytes{namespace="business-system", pod=~"auntalma-.*", container="php"} > 0.9
+          for: 5m
+          labels:
+            severity: warning
+            service: auntalma
+          annotations:
+            summary: "Auntalma PHP container high memory usage"
+            description: >
+              PHP container in pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of memory limit.
+              Consider increasing memory limits or investigating memory leaks.
+
+    - name: auntalma.backup
+      rules:
+        - alert: AuntalmaBackupFailed
+          expr: |
+            mariadb_backup_complete{job=~".*auntalma.*", result="failed"} > 0
+          for: 1h
+          labels:
+            severity: warning
+            service: auntalma-mariadb
+          annotations:
+            summary: "Auntalma MariaDB backup failed"
+            description: >
+              MariaDB backup for auntalma has failed.
+              Check backup job logs and GCS access.
+
+        - alert: AuntalmaVolSyncFailed
+          expr: |
+            volsync_replication_source_last_sync_status{name=~"auntalma-.*"} == 0
+          for: 2h
+          labels:
+            severity: warning
+            service: auntalma
+          annotations:
+            summary: "Auntalma VolSync backup failed"
+            description: >
+              VolSync backup {{ $labels.name }} has failed.
+              Check restic repository access and mover pod logs.

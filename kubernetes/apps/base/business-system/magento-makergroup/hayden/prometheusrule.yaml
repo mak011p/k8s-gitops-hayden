@@ -1,0 +1,117 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: hayden-alerts
+  namespace: business-system
+spec:
+  groups:
+    - name: hayden.mariadb
+      rules:
+        - alert: HaydenMariaDBDown
+          expr: |
+            mysql_up{job=~".*hayden-mariadb.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: hayden-mariadb
+          annotations:
+            summary: "Hayden MariaDB is down"
+            description: >
+              MariaDB instance {{ $labels.instance }} is not responding.
+              Check pod status and logs for hayden-mariadb.
+
+        - alert: HaydenMariaDBGaleraNotReady
+          expr: |
+            mysql_galera_cluster_status{job=~".*hayden-mariadb.*"} != 1
+          for: 5m
+          labels:
+            severity: critical
+            service: hayden-mariadb
+          annotations:
+            summary: "Hayden MariaDB Galera cluster not ready"
+            description: >
+              Galera cluster {{ $labels.instance }} is not in Primary state.
+              wsrep_cluster_status should be Primary (1).
+
+        - alert: HaydenMariaDBGaleraClusterSizeDegraded
+          expr: |
+            mysql_galera_cluster_size{job=~".*hayden-mariadb.*"} < 3
+          for: 10m
+          labels:
+            severity: warning
+            service: hayden-mariadb
+          annotations:
+            summary: "Hayden MariaDB Galera cluster degraded"
+            description: >
+              Galera cluster has {{ $value }} nodes instead of expected 3.
+              Check if all MariaDB pods are running.
+
+        - alert: HaydenMariaDBHighConnections
+          expr: |
+            mysql_global_status_threads_connected{job=~".*hayden-mariadb.*"} / mysql_global_variables_max_connections{job=~".*hayden-mariadb.*"} > 0.8
+          for: 5m
+          labels:
+            severity: warning
+            service: hayden-mariadb
+          annotations:
+            summary: "Hayden MariaDB high connection usage"
+            description: >
+              MariaDB {{ $labels.instance }} is using {{ $value | humanizePercentage }} of max connections.
+              Consider increasing max_connections or investigating connection leaks.
+
+    - name: hayden.magento
+      rules:
+        - alert: HaydenPodNotReady
+          expr: |
+            kube_pod_status_ready{namespace="business-system", pod=~"hayden-.*"} == 0
+          for: 10m
+          labels:
+            severity: warning
+            service: hayden
+          annotations:
+            summary: "Hayden pod not ready"
+            description: >
+              Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for more than 10 minutes.
+
+        - alert: HaydenHighMemoryUsage
+          expr: |
+            container_memory_working_set_bytes{namespace="business-system", pod=~"hayden-.*", container="php"} / container_spec_memory_limit_bytes{namespace="business-system", pod=~"hayden-.*", container="php"} > 0.9
+          for: 5m
+          labels:
+            severity: warning
+            service: hayden
+          annotations:
+            summary: "Hayden PHP container high memory usage"
+            description: >
+              PHP container in pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of memory limit.
+              Consider increasing memory limits or investigating memory leaks.
+
+    - name: hayden.backup
+      rules:
+        - alert: HaydenBackupFailed
+          expr: |
+            mariadb_backup_complete{job=~".*hayden.*", result="failed"} > 0
+          for: 1h
+          labels:
+            severity: warning
+            service: hayden-mariadb
+          annotations:
+            summary: "Hayden MariaDB backup failed"
+            description: >
+              MariaDB backup for hayden has failed.
+              Check backup job logs and GCS access.
+
+        - alert: HaydenVolSyncFailed
+          expr: |
+            volsync_replication_source_last_sync_status{name=~"hayden-.*"} == 0
+          for: 2h
+          labels:
+            severity: warning
+            service: hayden
+          annotations:
+            summary: "Hayden VolSync backup failed"
+            description: >
+              VolSync backup {{ $labels.name }} has failed.
+              Check restic repository access and mover pod logs.

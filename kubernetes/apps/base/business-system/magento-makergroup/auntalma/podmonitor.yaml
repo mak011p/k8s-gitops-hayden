@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/podmonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: auntalma-mariadb
+  namespace: business-system
+spec:
+  namespaceSelector:
+    matchNames:
+      - business-system
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mariadb
+      app.kubernetes.io/instance: auntalma-mariadb
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s

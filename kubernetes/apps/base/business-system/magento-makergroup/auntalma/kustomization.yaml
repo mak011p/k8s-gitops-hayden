@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # External secrets
+  - externalsecret-backup.yaml
+  # SOPS encrypted secrets
+  - secret-magento-app.enc.age.yaml
+  - secret-mariadb-app.enc.age.yaml
+  - secret-mariadb-superuser.enc.age.yaml
+  # Database
+  - mariadb-cluster.yaml
+  - scheduledbackup.yaml
+  # Redis cache
+  - redis-statefulset.yaml
+  # Storage
+  - pvc-media.yaml
+  - pvc-var.yaml
+  # Configuration
+  - configmap-nginx.yaml
+  - configmap-php.yaml
+  # Application
+  - helmrelease.yaml
+  - httproute.yaml
+  # Observability
+  - podmonitor.yaml
+  - prometheusrule.yaml
+  # Backups (VolSync disabled until TrueNAS configured)
+  # - replicationsource-media.yaml
+  # - replicationsource-var.yaml

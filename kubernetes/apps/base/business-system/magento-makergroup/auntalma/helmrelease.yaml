@@ -254,6 +254,14 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      # Nginx writable directories (cache, pid, etc.)
+      nginx-cache:
+        type: emptyDir
+        advancedMounts:
+          auntalma:
+            nginx:
+              - path: /var/cache/nginx
+              - path: /var/run
       # Shared docroot volume for nginx to serve static files
       docroot:
         type: emptyDir

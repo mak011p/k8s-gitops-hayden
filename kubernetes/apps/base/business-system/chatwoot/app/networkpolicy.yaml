@@ -194,6 +194,13 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
+    # Kubernetes API (required for CNPG instance manager)
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.1/32
+      ports:
+        - port: 443
+          protocol: TCP
     # CNPG replication
     - to:
         - podSelector:

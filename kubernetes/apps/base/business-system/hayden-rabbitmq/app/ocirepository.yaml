@@ -9,4 +9,4 @@ spec:
   interval: 30m
   url: oci://registry-1.docker.io/bitnamicharts/rabbitmq
   ref:
-    tag: 15.5.3
+    tag: 16.0.14

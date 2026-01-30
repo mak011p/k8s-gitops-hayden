@@ -24,7 +24,7 @@ spec:
     sst: mariabackup
     replicaThreads: 1
     agent:
-      image: ghcr.io/mariadb-operator/mariadb-operator:0.38.1
+      image: ghcr.io/mariadb-operator/mariadb-operator:25.10.4
       gracefulShutdownTimeout: 5s
     recovery:
       enabled: true
@@ -34,7 +34,7 @@ spec:
       podRecoveryTimeout: 5m
       podSyncTimeout: 5m
     initContainer:
-      image: ghcr.io/mariadb-operator/mariadb-operator:0.38.1
+      image: ghcr.io/mariadb-operator/mariadb-operator:25.10.4
     config:
       reuseStorageVolume: false
     initJob:

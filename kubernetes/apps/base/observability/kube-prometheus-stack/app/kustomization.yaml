@@ -8,5 +8,6 @@ resources:
   - grafanadashboard.yaml
   - helmrelease.yaml
   - httproute.yaml
+  - securitypolicy.yaml
   - ocirepository.yaml
   - scrapeconfig.yaml

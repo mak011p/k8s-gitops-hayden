@@ -13,6 +13,15 @@ spec:
   hostnames:
     - 'kopia.${CLUSTER_DOMAIN}'
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     - backendRefs:
         - name: kopia
           port: 80

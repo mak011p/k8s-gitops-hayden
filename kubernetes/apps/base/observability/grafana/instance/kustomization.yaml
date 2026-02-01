@@ -8,3 +8,4 @@ resources:
   - grafanadatasource.yaml
   - servicemonitor.yaml
   - httproute.yaml
+  - securitypolicy.yaml

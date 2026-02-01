@@ -13,6 +13,15 @@ spec:
   hostnames:
     - 'alert-manager.${CLUSTER_DOMAIN}'
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     - backendRefs:
         - name: alertmanager-operated
           port: 9093
@@ -32,6 +41,15 @@ spec:
   hostnames:
     - 'prometheus.${CLUSTER_DOMAIN}'
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     - backendRefs:
         - name: kube-prometheus-stack-prometheus
           port: 9090

@@ -9,6 +9,7 @@ resources:
   - grafanadashboard.yaml
   - helmrelease.yaml
   - httproute.yaml
+  - securitypolicy.yaml
   - loadbalancer.yaml
   - ocirepository.yaml
   - referencegrant.yaml

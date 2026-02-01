@@ -16,6 +16,15 @@ spec:
   hostnames:
     - 'hass.${CLUSTER_DOMAIN}'
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     - backendRefs:
         - name: home-assistant
           port: 8123
@@ -35,6 +44,15 @@ spec:
   hostnames:
     - 'hass-code.${CLUSTER_DOMAIN}'
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /oauth2/
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: network-system
+          port: 80
+          weight: 100
     - backendRefs:
         - name: home-assistant
           port: 12321

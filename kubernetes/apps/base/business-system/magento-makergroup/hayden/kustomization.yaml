@@ -13,8 +13,9 @@ resources:
   # Database
   - mariadb-cluster.yaml
   - scheduledbackup.yaml
-  # Redis cache
-  - redis-statefulset.yaml
+  # Redis Sentinel (Bitnami Helm chart)
+  - redis-ocirepository.yaml
+  - redis-helmrelease.yaml
   # Storage
   - pvc-media.yaml
   - pvc-var.yaml

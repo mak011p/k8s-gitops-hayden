@@ -61,27 +61,39 @@ spec:
                   secretKeyRef:
                     name: hayden-mariadb-app
                     key: password
-              # Redis - Sessions (DB 5)
+              # Redis Sentinel - Sessions (DB 5)
               - name: MAGENTO_SESSION_REDIS_HOST
-                value: hayden-redis-master.business-system.svc.cluster.local
+                value: hayden-redis.business-system.svc.cluster.local
               - name: MAGENTO_SESSION_REDIS_PORT
-                value: "6379"
+                value: "26379"
               - name: MAGENTO_SESSION_REDIS_DB
                 value: "5"
-              # Redis - Cache (DB 6)
+              - name: MAGENTO_SESSION_REDIS_SENTINEL_MASTER
+                value: mymaster
+              - name: MAGENTO_SESSION_REDIS_SENTINEL_SERVERS
+                value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
+              # Redis Sentinel - Cache (DB 6)
               - name: MAGENTO_CACHE_REDIS_HOST
-                value: hayden-redis-master.business-system.svc.cluster.local
+                value: hayden-redis.business-system.svc.cluster.local
               - name: MAGENTO_CACHE_REDIS_PORT
-                value: "6379"
+                value: "26379"
               - name: MAGENTO_CACHE_REDIS_DB
                 value: "6"
-              # Redis - Page Cache (DB 1)
+              - name: MAGENTO_CACHE_REDIS_SENTINEL_MASTER
+                value: mymaster
+              - name: MAGENTO_CACHE_REDIS_SENTINEL_SERVERS
+                value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
+              # Redis Sentinel - Page Cache (DB 1)
               - name: MAGENTO_PAGE_CACHE_REDIS_HOST
-                value: hayden-redis-master.business-system.svc.cluster.local
+                value: hayden-redis.business-system.svc.cluster.local
               - name: MAGENTO_PAGE_CACHE_REDIS_PORT
-                value: "6379"
+                value: "26379"
               - name: MAGENTO_PAGE_CACHE_REDIS_DB
                 value: "1"
+              - name: MAGENTO_PAGE_CACHE_REDIS_SENTINEL_MASTER
+                value: mymaster
+              - name: MAGENTO_PAGE_CACHE_REDIS_SENTINEL_SERVERS
+                value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
               # Elasticsearch (ECK operator)
               - name: MAGENTO_ES_HOST
                 value: hayden-elasticsearch-es-http.business-system.svc.cluster.local

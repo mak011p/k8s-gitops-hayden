@@ -1,0 +1,52 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hayden-redis
+  namespace: business-system
+spec:
+  interval: 15m
+  chartRef:
+    kind: OCIRepository
+    name: hayden-redis
+    namespace: business-system
+  values:
+    architecture: replication
+    auth:
+      enabled: false
+    commonConfiguration: |-
+      maxmemory 768mb
+      maxmemory-policy allkeys-lru
+      appendonly yes
+    sentinel:
+      enabled: true
+      masterSet: mymaster
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+    master:
+      persistence:
+        enabled: true
+        storageClass: ceph-block
+        size: 5Gi
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+    replica:
+      replicaCount: 3
+      persistence:
+        enabled: true
+        storageClass: ceph-block
+        size: 5Gi
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi

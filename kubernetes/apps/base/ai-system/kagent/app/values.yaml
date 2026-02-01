@@ -1,6 +1,11 @@
 ---
 providers:
   default: Anthropic
+  anthropic:
+    apiKeySecretRef: kagent-values-secret
+    apiKeySecretKey: ANTHROPIC_API_KEY
+    model: claude-sonnet-4-5-20250929
+    provider: Anthropic
 
 # Configure Grafana MCP to point to the correct Grafana instance
 grafana-mcp:

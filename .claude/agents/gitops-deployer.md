@@ -124,9 +124,9 @@ When deploying a new application:
 
 7. **Create Secret (if needed)**
    - Create unencrypted secret first
-   - Encrypt with SOPS: `sops -e secret.yaml > secret.enc.age.yaml`
+   - Encrypt with SOPS: `sops -e secret.yaml > secret.enc.yaml`
    - Delete unencrypted version
-   - Add `.enc.age.yaml` suffix
+   - Add `.enc.yaml` suffix
 
 8. **Update Parent Kustomization**
    Add to `kubernetes/apps/base/[system-name]/kustomization.yaml`:
@@ -140,7 +140,7 @@ When deploying a new application:
 ### File Naming
 - `ks.yaml`: Flux Kustomization resources (how to apply)
 - `kustomization.yaml`: Kustomize configuration (what to apply)
-- `*.enc.age.yaml`: SOPS Age-encrypted files
+- `*.enc.yaml`: SOPS-encrypted files
 - `helmrelease.yaml`: Helm release definitions
 - `ocirepository.yaml`: OCI chart sources
 - `namespace.yaml`: Namespace with pod security labels

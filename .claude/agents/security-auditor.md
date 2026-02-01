@@ -19,10 +19,11 @@ When reviewing configurations, systematically check:
 ### 1. Secret Management
 
 **Critical Checks:**
-- All secrets MUST use `.enc.age.yaml` suffix (SOPS Age encrypted)
+- All secrets MUST use `.enc.yaml` suffix (SOPS encrypted)
 - No base64-encoded secrets without SOPS encryption
-- Verify SOPS Age recipient matches repository config:
-  - Age: `age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h`
+- Verify SOPS fingerprints match repository config:
+  - PGP: `0635B8D34037A9453003FB7B93CAA682FF4C9014`
+  - Age: `age19gj66fq5v2veu940ftyj4pkw0w5tgxgddlyqnd00pnjzyndevurqx70g4t`
 
 **Commands:**
 ```bash
@@ -209,7 +210,7 @@ SUMMARY:
 
 ## Repository-Specific Context
 
-- **SOPS**: Age-only (`age1ha5rk...`), secrets use `.enc.age.yaml` suffix
+- **SOPS Keys**: PGP `0635B8D...`, Age `age19gj...`
 - **Pod Security**: Most namespaces use `privileged` enforcement
 - **Service Mesh**: Istio deployed, use AuthorizationPolicy
 - **Policy Engines**: Kyverno and OPA Gatekeeper available

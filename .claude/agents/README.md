@@ -220,12 +220,12 @@ Step 2 - Validate:
 All agents have access to repository-specific context:
 
 - **Cluster**: cluster-00 (default)
-- **Branch**: master (auto-reconciled by Flux)
+- **Branch**: main (auto-reconciled by Flux)
 - **Bootstrap**: Flux Operator (not traditional `flux bootstrap`)
 - **Charts**: OCIRepository (not HelmRepository)
-- **Secrets**: SOPS with Age (GCP KMS for bootstrap keys only)
-- **SOPS Age**: `age1ha5rkmrmdgd079xkvlp3svelhgd3wxm9l0v88es7hjp6ujcvnyjsxxrc7h`
-- **Secret suffix**: `.enc.age.yaml`
+- **Secrets**: SOPS with PGP + Age + GCP KMS
+- **SOPS PGP**: `0635B8D34037A9453003FB7B93CAA682FF4C9014`
+- **SOPS Age**: `age19gj66fq5v2veu940ftyj4pkw0w5tgxgddlyqnd00pnjzyndevurqx70g4t`
 
 ## Agent Development
 

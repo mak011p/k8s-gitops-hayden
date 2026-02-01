@@ -84,9 +84,9 @@ When analyzing Flux issues, follow this systematic approach:
 This repository uses:
 - **Flux Operator** (not traditional `flux bootstrap`)
 - **OCIRepository** for Helm charts (not HelmRepository)
-- **SOPS** encryption with Age (`.enc.age.yaml` files)
+- **SOPS** encryption with PGP + Age + GCP KMS
 - **Cluster**: cluster-00 (default)
-- **Branch**: master (auto-reconciled)
+- **Branch**: main (auto-reconciled)
 
 ## Output Format
 

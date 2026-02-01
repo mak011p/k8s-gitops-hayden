@@ -10,6 +10,7 @@ resources:
   - httproute.yaml
   - securitypolicy.yaml
   - modelconfig.yaml
+  - agent-flux-troubleshooter.yaml
   - secret-kagent-values.enc.age.yaml
 
 configMapGenerator:

@@ -2,6 +2,11 @@
 providers:
   default: Anthropic
 
+# Configure Grafana MCP to point to the correct Grafana instance
+grafana-mcp:
+  grafana:
+    url: http://grafana-service.observability:3000
+
 # Disable all default agents - we define our own as GitOps manifests
 agents:
   argo-rollouts-agent:

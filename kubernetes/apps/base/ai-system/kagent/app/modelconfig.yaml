@@ -7,6 +7,6 @@ metadata:
 spec:
   apiKeySecret: kagent-values-secret
   apiKeySecretKey: ANTHROPIC_API_KEY
-  model: claude-sonnet-4-20250514
+  model: claude-opus-4-5-20251101
   provider: Anthropic
   anthropic: {}

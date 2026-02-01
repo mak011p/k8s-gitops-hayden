@@ -6,6 +6,7 @@ namespace: security-system
 
 resources:
   - helmrelease.yaml
+  - ocirepository.yaml
   - prometheusrule.yaml
 
 configMapGenerator:

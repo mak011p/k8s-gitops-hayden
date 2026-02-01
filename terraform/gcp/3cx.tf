@@ -38,6 +38,16 @@ resource "google_storage_bucket" "threecx_backups" {
   public_access_prevention    = "enforced"
   force_destroy               = false
 
+  # Delete backups older than 60 days
+  lifecycle_rule {
+    condition {
+      age = 60
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
   depends_on = [google_project_service.threecx_storage]
 }
 

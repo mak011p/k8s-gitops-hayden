@@ -27,6 +27,27 @@ resource "google_storage_bucket" "thanos" {
     default_kms_key_name = google_kms_crypto_key.backup_encryption.id
   }
 
+  # Downgrade to Nearline after 30 days (metrics rarely re-read)
+  lifecycle_rule {
+    condition {
+      age = 30
+    }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "NEARLINE"
+    }
+  }
+
+  # Delete metrics older than 90 days
+  lifecycle_rule {
+    condition {
+      age = 90
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
   depends_on = [
     google_kms_crypto_key_iam_member.gcs_backup_encryption
   ]

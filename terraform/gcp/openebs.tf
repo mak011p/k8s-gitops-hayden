@@ -27,6 +27,16 @@ resource "google_storage_bucket" "openebs" {
     default_kms_key_name = google_kms_crypto_key.backup_encryption.id
   }
 
+  # Delete snapshots older than 60 days
+  lifecycle_rule {
+    condition {
+      age = 60
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
   depends_on = [
     google_kms_crypto_key_iam_member.gcs_backup_encryption
   ]

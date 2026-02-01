@@ -19,6 +19,7 @@ resources:
   - probe.yaml
   - scheduledbackup.yaml
   - httproute.yaml
+  - securitypolicy.yaml
   # VolSync disabled until TrueNAS is set up
   # - secret-filestore-restic.enc.yaml
   # - replicationsource.yaml

@@ -39,7 +39,7 @@ spec:
   values:
     controllers:
       *app :
-        replicas: 1
+        # replicas managed by HPA (minReplicas: 1, maxReplicas: 3)
         containers:
           app:
             image:
@@ -148,7 +148,7 @@ spec:
             port: 8072
     persistence:
       filestore:
-        existingClaim: odoo-filestore
+        existingClaim: odoo-filestore-rwx
         globalMounts:
           - path: /var/lib/odoo
       config:

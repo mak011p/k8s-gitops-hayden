@@ -32,4 +32,6 @@ resources:
   - ../../base/home-system/mosquitto/ks.yaml
   - ../../base/home-system/zigbee2mqtt/ks.yaml
   - ../../base/observability/thanos-compactor/ks.yaml
+  - ../../base/observability/thanos-store/ks.yaml
+  - ../../base/observability/thanos-query/ks.yaml
   - ../../base/security-system/kyverno/ks.yaml

@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-query
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: thanos-query
+    app.kubernetes.io/component: query
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: thanos-query
+      app.kubernetes.io/component: query
+  endpoints:
+    - port: http
+      interval: 30s

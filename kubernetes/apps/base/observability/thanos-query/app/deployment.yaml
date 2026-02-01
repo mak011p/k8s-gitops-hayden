@@ -33,6 +33,8 @@ spec:
             - query
             - --log.level=warn
             - --log.format=logfmt
+            - --http-address=0.0.0.0:9090
+            - --grpc-address=0.0.0.0:10901
             - --endpoint=dnssrv+_grpc._tcp.prometheus-operated.observability.svc.cluster.local
             - --endpoint=thanos-store.observability.svc.cluster.local:10901
             - --query.auto-downsampling

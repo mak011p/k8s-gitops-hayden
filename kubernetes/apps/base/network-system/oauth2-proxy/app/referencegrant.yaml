@@ -6,6 +6,7 @@ metadata:
   namespace: network-system
 spec:
   from:
+    # HTTPRoute references
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       namespace: business-system
@@ -18,7 +19,28 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       namespace: ai-system
-    # Allow SecurityPolicy in business-system to reference oauth2-proxy for ext_authz
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: observability
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: kube-system
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: volsync-system
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: security-system
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: development
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: kguardian
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: network-system
+    # SecurityPolicy references (ext_authz)
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: business-system
@@ -28,6 +50,30 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: ai-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: home-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: observability
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kube-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: volsync-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: security-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: development
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kguardian
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: network-system
   to:
     - group: ""
       kind: Service

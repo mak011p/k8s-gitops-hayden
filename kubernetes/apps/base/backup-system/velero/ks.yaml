@@ -6,6 +6,8 @@ metadata:
   name: velero
   namespace: velero
 spec:
+  decryption:
+    provider: sops
   interval: 30m
   retryInterval: 1m
   timeout: 10m
@@ -35,6 +37,8 @@ metadata:
   name: velero-schedules
   namespace: velero
 spec:
+  decryption:
+    provider: sops
   interval: 30m
   retryInterval: 1m
   timeout: 5m

@@ -12,8 +12,10 @@ spec:
     namespace: business-system
   values:
     architecture: replication
+    global:
+      imageRegistry: public.ecr.aws
     image:
-      registry: docker.io
+      registry: public.ecr.aws
       repository: bitnami/redis
       tag: 8.2.1-debian-12-r0
     auth:
@@ -26,7 +28,7 @@ spec:
       enabled: true
       masterSet: mymaster
       image:
-        registry: docker.io
+        registry: public.ecr.aws
         repository: bitnami/redis-sentinel
         tag: 8.2.1-debian-12-r0
       resources:

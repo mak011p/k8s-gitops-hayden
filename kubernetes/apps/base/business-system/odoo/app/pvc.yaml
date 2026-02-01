@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: odoo-filestore
+  name: odoo-filestore-rwx
   namespace: business-system
   labels:
     app.kubernetes.io/name: odoo

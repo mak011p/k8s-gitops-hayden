@@ -6,6 +6,7 @@ metadata:
   name: zigbee2mqtt
   namespace: home-system
 spec:
+  suspend: true
   decryption:
     provider: sops
   interval: 30m

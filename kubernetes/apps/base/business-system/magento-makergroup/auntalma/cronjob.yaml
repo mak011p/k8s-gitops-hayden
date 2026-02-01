@@ -31,6 +31,7 @@ spec:
           containers:
             - name: cron
               image: ghcr.io/hayden-agencies/magento2-makergroup:latest
+              workingDir: /var/www/html
               command: ["/bin/sh", "-c", "php bin/magento cron:run 2>&1"]
               env:
                 - name: MAGENTO_DB_HOST

@@ -3,3 +3,6 @@
 # Once Prometheus is deployed via Flux, this can be enabled
 serviceMonitor:
   create: false
+web:
+  networkPolicy:
+    create: false

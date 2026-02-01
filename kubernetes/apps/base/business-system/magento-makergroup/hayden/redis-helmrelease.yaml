@@ -6,6 +6,10 @@ metadata:
   namespace: business-system
 spec:
   interval: 15m
+  install:
+    timeout: 10m
+  upgrade:
+    timeout: 10m
   chartRef:
     kind: OCIRepository
     name: hayden-redis

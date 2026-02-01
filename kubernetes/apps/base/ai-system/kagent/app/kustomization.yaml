@@ -7,6 +7,10 @@ namespace: ai-system
 resources:
   - helmrelease.yaml
   - ocirepository.yaml
+  - httproute.yaml
+  - securitypolicy.yaml
+  - modelconfig.yaml
+  - secret-kagent-values.enc.age.yaml
 
 configMapGenerator:
   - name: kagent-values

@@ -8,6 +8,8 @@ resources:
   - helmrelease.yaml
   - helmrepository.yaml
   - httproute.yaml
+  - securitypolicy.yaml
+  - secret-n8n-values.enc.age.yaml
 
 configMapGenerator:
   - name: n8n-values

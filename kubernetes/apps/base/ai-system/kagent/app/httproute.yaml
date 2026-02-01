@@ -3,7 +3,8 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: n8n
+  name: kagent-ui
+  namespace: ai-system
   annotations:
     external-dns.alpha.kubernetes.io/target: 'external.${CLUSTER_DOMAIN}'
     external-dns.alpha.kubernetes.io/external: 'true'
@@ -13,7 +14,7 @@ spec:
       namespace: network-system
       sectionName: https
   hostnames:
-    - 'n8n.${CLUSTER_DOMAIN}'
+    - 'ai.${CLUSTER_DOMAIN}'
   rules:
     # OAuth2 proxy callback routes
     - matches:
@@ -25,29 +26,8 @@ spec:
           namespace: network-system
           port: 80
           weight: 100
-    # Default route to n8n UI
+    # Default route to kagent UI
     - backendRefs:
-        - name: n8n
-          port: 5678
-          weight: 100
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: n8n-webhook
-  annotations:
-    external-dns.alpha.kubernetes.io/target: 'external.${CLUSTER_DOMAIN}'
-    external-dns.alpha.kubernetes.io/external: 'true'
-spec:
-  parentRefs:
-    - name: envoy-external
-      namespace: network-system
-      sectionName: https
-  hostnames:
-    - 'webhook.${CLUSTER_DOMAIN}'
-  rules:
-    - backendRefs:
-        - name: n8n
-          port: 5678
+        - name: kagent-ui
+          port: 8080
           weight: 100

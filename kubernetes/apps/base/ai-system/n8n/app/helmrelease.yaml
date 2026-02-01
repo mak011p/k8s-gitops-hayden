@@ -44,6 +44,5 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: n8n-values
-    # TODO: Re-encrypt values.enc.age.yaml with local AGE key
-    # - kind: Secret
-    #   name: n8n-values-secret
+    - kind: Secret
+      name: n8n-values-secret

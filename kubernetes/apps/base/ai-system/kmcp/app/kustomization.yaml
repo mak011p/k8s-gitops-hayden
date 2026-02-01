@@ -7,6 +7,7 @@ namespace: ai-system
 resources:
   - helmrelease.yaml
   - ocirepository.yaml
+  - secret-kmcp-values.enc.age.yaml
 
 configMapGenerator:
   - name: kmcp-values

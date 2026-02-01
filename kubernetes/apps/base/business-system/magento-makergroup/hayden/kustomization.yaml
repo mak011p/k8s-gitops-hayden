@@ -25,9 +25,12 @@ resources:
   # Application
   - helmrelease.yaml
   - httproute.yaml
+  - httproute-admin.yaml
+  - securitypolicy.yaml
+  - cronjob.yaml
   # Observability
   - podmonitor.yaml
   - prometheusrule.yaml
-  # Backups (VolSync disabled until TrueNAS configured)
+  # Backups (VolSync) - uncomment after creating restic secrets in 1Password
   # - replicationsource-media.yaml
   # - replicationsource-var.yaml

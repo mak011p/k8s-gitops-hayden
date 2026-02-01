@@ -20,6 +20,6 @@ resources:
   - scheduledbackup.yaml
   - httproute.yaml
   - securitypolicy.yaml
-  # VolSync disabled until TrueNAS is set up
+  # VolSync backups - uncomment after creating restic secret (see secret-filestore-restic.yaml.template)
   # - secret-filestore-restic.enc.yaml
   # - replicationsource.yaml

@@ -134,7 +134,7 @@ spec:
             port: 8072
     persistence:
       filestore:
-        existingClaim: odoo-filestore
+        existingClaim: odoo-filestore-staging
         globalMounts:
           - path: /var/lib/odoo
       config:

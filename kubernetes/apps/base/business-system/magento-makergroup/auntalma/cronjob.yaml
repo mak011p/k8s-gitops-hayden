@@ -1,0 +1,119 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: auntalma-magento-cron
+  namespace: business-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: auntalma
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile: { type: RuntimeDefault }
+          imagePullSecrets:
+            - name: ghcr-pull
+          containers:
+            - name: cron
+              image: ghcr.io/hayden-agencies/magento2-makergroup:latest
+              command: ["/bin/sh", "-c", "php bin/magento cron:run 2>&1"]
+              env:
+                - name: MAGENTO_DB_HOST
+                  value: auntalma-mariadb-primary.business-system.svc.cluster.local
+                - name: MAGENTO_DB_PORT
+                  value: "3306"
+                - name: MAGENTO_DB_NAME
+                  value: magento
+                - name: MAGENTO_DB_USER
+                  value: magento
+                - name: MAGENTO_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-mariadb-app
+                      key: password
+                - name: MAGENTO_SESSION_REDIS_HOST
+                  value: auntalma-redis-master.business-system.svc.cluster.local
+                - name: MAGENTO_SESSION_REDIS_PORT
+                  value: "6379"
+                - name: MAGENTO_SESSION_REDIS_DB
+                  value: "5"
+                - name: MAGENTO_CACHE_REDIS_HOST
+                  value: auntalma-redis-master.business-system.svc.cluster.local
+                - name: MAGENTO_CACHE_REDIS_PORT
+                  value: "6379"
+                - name: MAGENTO_CACHE_REDIS_DB
+                  value: "6"
+                - name: MAGENTO_PAGE_CACHE_REDIS_HOST
+                  value: auntalma-redis-master.business-system.svc.cluster.local
+                - name: MAGENTO_PAGE_CACHE_REDIS_PORT
+                  value: "6379"
+                - name: MAGENTO_PAGE_CACHE_REDIS_DB
+                  value: "1"
+                - name: MAGENTO_ES_HOST
+                  value: auntalma-elasticsearch-es-http.business-system.svc.cluster.local
+                - name: MAGENTO_ES_PORT
+                  value: "9200"
+                - name: MAGENTO_AMQP_HOST
+                  value: auntalma-rabbitmq.business-system.svc.cluster.local
+                - name: MAGENTO_AMQP_PORT
+                  value: "5672"
+                - name: MAGENTO_AMQP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-rabbitmq-default-user
+                      key: username
+                - name: MAGENTO_AMQP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-rabbitmq-default-user
+                      key: password
+                - name: MAGENTO_MODE
+                  value: production
+                - name: MAGENTO_CRYPT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-magento-app
+                      key: crypt-key
+              volumeMounts:
+                - name: media
+                  mountPath: /var/www/html/pub/media
+                - name: var
+                  mountPath: /var/www/html/var
+                - name: env-php
+                  mountPath: /var/www/html/app/etc/env.php
+                  subPath: env.php
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities: { drop: ["ALL"] }
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 512Mi
+                limits:
+                  memory: 2Gi
+          volumes:
+            - name: media
+              persistentVolumeClaim:
+                claimName: auntalma-media
+            - name: var
+              persistentVolumeClaim:
+                claimName: auntalma-var
+            - name: env-php
+              configMap:
+                name: auntalma-env-php

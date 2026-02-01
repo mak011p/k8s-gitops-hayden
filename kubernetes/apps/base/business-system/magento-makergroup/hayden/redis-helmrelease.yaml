@@ -14,6 +14,8 @@ spec:
     architecture: replication
     global:
       imageRegistry: public.ecr.aws
+      security:
+        allowInsecureImages: true
     image:
       registry: public.ecr.aws
       repository: bitnami/redis

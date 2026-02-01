@@ -12,6 +12,10 @@ spec:
     namespace: business-system
   values:
     architecture: replication
+    image:
+      registry: docker.io
+      repository: bitnami/redis
+      tag: 8.2.1-debian-12-r0
     auth:
       enabled: false
     commonConfiguration: |-
@@ -21,6 +25,10 @@ spec:
     sentinel:
       enabled: true
       masterSet: mymaster
+      image:
+        registry: docker.io
+        repository: bitnami/redis-sentinel
+        tag: 8.2.1-debian-12-r0
       resources:
         requests:
           cpu: 50m

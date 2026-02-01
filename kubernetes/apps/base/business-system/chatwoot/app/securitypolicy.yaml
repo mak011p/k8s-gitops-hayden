@@ -3,13 +3,16 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: chatwoot-admin-auth
+  name: chatwoot-auth
   namespace: business-system
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: chatwoot-admin
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: chatwoot
   extAuth:
     failOpen: false
     headersToExtAuth:

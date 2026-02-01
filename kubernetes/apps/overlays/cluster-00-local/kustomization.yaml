@@ -14,9 +14,15 @@ resources:
   - ../../base/ai-system/n8n/ks.yaml
   - ../../base/backup-system
   - ../../base/backup-system/velero/ks.yaml
+  - ../../base/business-system
+  - ../../base/business-system/odoo/ks.yaml
+  - ../../base/business-system/label-generator/ks.yaml
   - ../../base/business-system-staging
   - ../../base/business-system-staging/odoo-staging/ks.yaml
-  - ../../base/business-system/label-generator/ks.yaml
+  - ../../base/database-system
+  - ../../base/database-system/cnpg/ks.yaml
+  - ../../base/database-system/mariadb-operator/crds/ks.yaml
+  - ../../base/database-system/mariadb-operator/app/ks.yaml
   - ../../base/democratic-csi
   - ../../base/democratic-csi/democratic-csi/ks.yaml
   # development namespace already included via cluster-00 base
@@ -25,4 +31,5 @@ resources:
   - ../../base/home-system/home-assistant/ks.yaml
   - ../../base/home-system/mosquitto/ks.yaml
   - ../../base/home-system/zigbee2mqtt/ks.yaml
+  - ../../base/observability/thanos-compactor/ks.yaml
   - ../../base/security-system/kyverno/ks.yaml

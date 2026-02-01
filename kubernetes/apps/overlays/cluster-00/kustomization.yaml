@@ -6,9 +6,7 @@ kind: Kustomization
 resources:
   # - ../../base/actions-runner-system
   - ../../base/ai-system
-  - ../../base/business-system
   - ../../base/crossplane-system
-  - ../../base/database-system
   - ../../base/development
   - ../../base/external-secrets
   - ../../base/kguardian
@@ -20,11 +18,7 @@ resources:
   - ../../base/volsync-system
   - ../../base/actions-runner-system/gha-runner-scale-set-controller/ks.yaml
   - ../../base/ai-system/kgateway/ks.yaml
-  - ../../base/business-system/odoo/ks.yaml
   # - ../../base/crossplane-system/crossplane/ks.yaml
-  - ../../base/database-system/cnpg/ks.yaml
-  - ../../base/database-system/mariadb-operator/crds/ks.yaml
-  - ../../base/database-system/mariadb-operator/app/ks.yaml
   # - ../../base/development/backstage/ks.yaml
   - ../../base/external-secrets/external-secrets/ks.yaml
   - ../../base/external-secrets/onepassword/ks.yaml
@@ -54,7 +48,6 @@ resources:
   # - ../../base/observability/kiali/ks.yaml
   - ../../base/observability/kromgo/ks.yaml
   - ../../base/observability/kube-prometheus-stack/ks.yaml
-  - ../../base/observability/thanos-compactor/ks.yaml
   # - ../../base/observability/loki/ks.yaml
   # - ../../base/observability/otel/ks.yaml
   - ../../base/observability/silence-operator/ks.yaml

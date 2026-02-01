@@ -37,7 +37,8 @@ This is a Kubernetes GitOps repository for SME cluster managed with FluxCD and T
 │   │   │       ├── namespace.yaml
 │   │   │       └── kustomization.yaml
 │   │   └── overlays/
-│   │       └── cluster-00/           # Cluster-specific overrides
+│   │       ├── cluster-00/           # Upstream overlay (from xunholy/k8s-gitops)
+│   │       └── cluster-00-local/     # Production overlay (extends cluster-00 with local additions)
 │   ├── bootstrap/
 │   │   └── helmfile.yaml             # Bootstrap Flux Operator and dependencies
 │   ├── clusters/
@@ -58,6 +59,15 @@ This is a Kubernetes GitOps repository for SME cluster managed with FluxCD and T
 ├── .taskfiles/                       # Task automation definitions
 └── docs/                             # Documentation
 ```
+
+### Overlay Strategy
+
+This repo is forked from [xunholy/k8s-gitops](https://github.com/xunholy/k8s-gitops). Two overlays exist to cleanly separate upstream from local:
+
+- **`cluster-00`**: Mirrors the upstream overlay. Kept close to upstream to minimize merge conflicts during syncs.
+- **`cluster-00-local`**: Extends `cluster-00` (via `- ../cluster-00` base reference) and adds local resources (kagent, kmcp, n8n, velero, home-assistant, democratic-csi, odoo-staging, kyverno, etc.).
+
+The root Flux Kustomization (`kubernetes/clusters/cluster-00/ks.yaml`) points to `cluster-00-local`, so **`cluster-00-local` is the active production overlay**.
 
 ## Common Commands
 

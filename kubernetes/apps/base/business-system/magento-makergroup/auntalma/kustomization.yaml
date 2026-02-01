@@ -28,6 +28,10 @@ resources:
   - httproute-admin.yaml
   - securitypolicy.yaml
   - cronjob.yaml
+  # Resilience
+  - networkpolicy.yaml
+  - pdb.yaml
+  - hpa.yaml
   # Observability
   - podmonitor.yaml
   - prometheusrule.yaml

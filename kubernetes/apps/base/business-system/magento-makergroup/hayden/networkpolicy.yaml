@@ -1,0 +1,79 @@
+---
+# Magento Hayden app pods - restrict egress to known dependencies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: hayden-app
+  namespace: business-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: hayden
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Envoy Gateway ingress
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: envoy-gateway-system
+      ports:
+        - port: 8080
+          protocol: TCP
+    # Prometheus metrics scraping
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # MariaDB
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: mariadb
+              app.kubernetes.io/instance: hayden-mariadb
+      ports:
+        - port: 3306
+          protocol: TCP
+    # Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+              app.kubernetes.io/instance: hayden-redis
+      ports:
+        - port: 6379
+          protocol: TCP
+    # Elasticsearch
+    - to:
+        - podSelector:
+            matchLabels:
+              elasticsearch.k8s.elastic.co/cluster-name: hayden-elasticsearch
+      ports:
+        - port: 9200
+          protocol: TCP
+    # RabbitMQ
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: hayden-rabbitmq
+      ports:
+        - port: 5672
+          protocol: TCP

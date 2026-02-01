@@ -21,6 +21,7 @@ resources:
   # Configuration
   - configmap-nginx.yaml
   - configmap-php.yaml
+  - configmap-env-php.yaml
   # Application
   - helmrelease.yaml
   - httproute.yaml

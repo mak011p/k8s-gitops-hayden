@@ -37,6 +37,9 @@ spec:
         registry: public.ecr.aws
         repository: bitnami/redis-sentinel
         tag: 8.2.1-debian-12-r0
+      startupProbe:
+        failureThreshold: 60
+        periodSeconds: 10
       resources:
         requests:
           cpu: 50m

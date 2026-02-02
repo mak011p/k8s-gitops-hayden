@@ -20,6 +20,9 @@ spec:
         - path:
             type: PathPrefix
             value: /bot
+        - path:
+            type: PathPrefix
+            value: /omniauth/
       backendRefs:
         - name: chatwoot
           port: 3000

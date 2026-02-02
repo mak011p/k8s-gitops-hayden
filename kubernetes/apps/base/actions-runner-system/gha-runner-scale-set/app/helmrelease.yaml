@@ -72,15 +72,7 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: status.hostIP
-            volumeMounts:
-              - mountPath: /var/run/secrets/talos.dev
-                name: talos
-                readOnly: true
-        serviceAccountName: k8s-gitops-runner
-        volumes:
-          - name: talos
-            secret:
-              secretName: k8s-gitops-runner
+        serviceAccountName: gha-runner-scale-set
     listenerMetrics:
       counters:
         gha_started_jobs_total:

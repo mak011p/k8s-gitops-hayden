@@ -22,7 +22,7 @@ env:
 
 jobs:
   publish:
-    runs-on: gha-runner-scale-set
+    runs-on: ubuntu-latest
     env:
       COSIGN_EXPERIMENTAL: "true"
       COSIGN_YES: "true"

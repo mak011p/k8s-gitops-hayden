@@ -23,6 +23,12 @@ spec:
         - path:
             type: PathPrefix
             value: /omniauth/
+        - path:
+            type: PathPrefix
+            value: /packs/
+        - path:
+            type: PathPrefix
+            value: /assets/
       backendRefs:
         - name: chatwoot
           port: 3000

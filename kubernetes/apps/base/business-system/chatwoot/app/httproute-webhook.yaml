@@ -31,6 +31,9 @@ spec:
             value: /assets/
         - path:
             type: PathPrefix
+            value: /vite/
+        - path:
+            type: PathPrefix
             value: /widget
         - path:
             type: PathPrefix

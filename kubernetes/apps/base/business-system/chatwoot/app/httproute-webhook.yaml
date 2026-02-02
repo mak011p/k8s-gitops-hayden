@@ -17,6 +17,9 @@ spec:
         - path:
             type: PathPrefix
             value: /webhooks/
+        - path:
+            type: PathPrefix
+            value: /bot
       backendRefs:
         - name: chatwoot
           port: 3000

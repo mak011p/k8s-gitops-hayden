@@ -55,4 +55,4 @@ spec:
               - name: Permissions-Policy
                 value: "camera=(), microphone=(self), geolocation=()"
               - name: Content-Security-Policy
-                value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' wss: https:; frame-ancestors 'self'"
+                value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' wss: https:; frame-src 'self' https://www.facebook.com https://web.facebook.com; frame-ancestors 'self'"

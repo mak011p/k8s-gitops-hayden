@@ -22,6 +22,7 @@ resources:
   - securitypolicy.yaml
   - pdb.yaml
   - hpa.yaml
+  - pooler.yaml
   # VolSync backups - uncomment after creating restic secret (see secret-filestore-restic.yaml.template)
   # - secret-filestore-restic.enc.yaml
   # - replicationsource.yaml

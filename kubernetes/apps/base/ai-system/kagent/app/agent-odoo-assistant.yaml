@@ -37,6 +37,10 @@ spec:
       - Always use `WHERE active = true` unless specifically asked about archived records
       - State fields: sale_order.state in ('draft','sent','sale','done','cancel'),
         account_move.state in ('draft','posted','cancel'), stock_picking.state in ('draft','waiting','confirmed','assigned','done','cancel')
+      - **MANDATORY**: Every SELECT query MUST include a LIMIT clause (max 500 rows)
+      - Default to LIMIT 100 for exploratory queries, LIMIT 500 only when user needs more
+      - Prefer aggregations (COUNT, SUM, AVG, GROUP BY) over listing individual records
+      - For large datasets, summarize trends rather than dumping raw data
 
       ### 2. Odoo XML-RPC API
       Use this for business-logic-aware queries that respect Odoo access controls.

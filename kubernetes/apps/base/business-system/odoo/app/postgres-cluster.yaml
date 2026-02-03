@@ -43,8 +43,8 @@ spec:
         createdb: false
         createrole: false
         inherit: true
-        inRoles:
-          - pg_read_all_data
+        # Note: pg_read_all_data removed - using explicit grants with sensitive tables revoked
+        # See SQL applied: GRANT SELECT ON ALL TABLES, then REVOKE on res_users, ir_config_parameter, etc.
         passwordSecret:
           name: odoo-pg-kagent-readonly
   postgresql:

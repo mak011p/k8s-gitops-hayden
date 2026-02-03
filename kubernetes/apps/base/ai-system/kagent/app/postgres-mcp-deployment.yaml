@@ -16,13 +16,33 @@ spec:
       labels:
         app.kubernetes.io/name: postgres-mcp
     spec:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres-mcp
-          image: crystaldba/postgres-mcp:latest
-          args:
-            - --access-mode=restricted
-            - --transport=sse
+          # Use uv to install from git main branch (has streamable-http support)
+          image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+          command:
+            - /bin/sh
+            - -c
+            - |
+              uv pip install --system "postgres-mcp @ git+https://github.com/crystaldba/postgres-mcp.git@main" && \
+              postgres-mcp \
+                --access-mode=restricted \
+                --transport=streamable-http \
+                --streamable-http-host=0.0.0.0 \
+                --streamable-http-port=8000
           env:
+            - name: UV_CACHE_DIR
+              value: /tmp/uv-cache
+            - name: HOME
+              value: /tmp
             - name: DATABASE_URI
               valueFrom:
                 secretKeyRef:
@@ -32,20 +52,26 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
           resources:
             requests:
               cpu: 50m
               memory: 128Mi
             limits:
               cpu: 500m
-              memory: 256Mi
+              memory: 512Mi
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 10
+            initialDelaySeconds: 60
             periodSeconds: 30
           readinessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 10

@@ -23,6 +23,8 @@ resources:
   - odoo-mcp-service.yaml
   - odoo-mcp-remotemcpserver.yaml
   - secret-odoo-mcp.enc.age.yaml
+  # Network isolation for MCP servers
+  - networkpolicy.yaml
 
 configMapGenerator:
   - name: kagent-values

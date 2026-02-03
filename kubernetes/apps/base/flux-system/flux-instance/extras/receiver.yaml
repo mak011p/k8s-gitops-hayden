@@ -14,5 +14,5 @@ spec:
     name: webhook-token
   resources:
     - apiVersion: source.toolkit.fluxcd.io/v1
-      kind: GitRepository
+      kind: OCIRepository
       name: flux-system

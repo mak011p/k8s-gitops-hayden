@@ -8,9 +8,13 @@ data:
   odoo.conf: |
     [options]
     # PgBouncer pooler for connection efficiency (transaction mode)
-    # If longpolling/LISTEN issues occur, revert to: odoo-pg-rw.business-system.svc.cluster.local
+    # LISTEN/NOTIFY (used by queue_job and bus) bypasses PgBouncer via dedicated settings below
     db_host = odoo-pg-pooler.business-system.svc.cluster.local
     db_port = 5432
+
+    # Direct PG connection for bus longpolling (LISTEN/NOTIFY incompatible with PgBouncer transaction mode)
+    imdispatcher_db_host = odoo-pg-rw.business-system.svc.cluster.local
+    imdispatcher_db_port = 5432
     db_template = template0
     import_limit = 25000
 
@@ -26,7 +30,7 @@ data:
     data_dir = /var/lib/odoo
 
     # Server-wide modules (queue_job enables background job processing)
-    server_wide_modules = base,web,queue_job
+    server_wide_modules = base,web,queue_job,bus_alt_connection
 
     # Log settings
     log_level = info
@@ -50,3 +54,6 @@ data:
     # Queue Job Configuration
     [queue_job]
     channels = root:6,root.sale_order:4,root.product_template:2,root.inventory:2
+    # Direct PG connection for jobrunner (LISTEN/NOTIFY incompatible with PgBouncer transaction mode)
+    jobrunner_db_host = odoo-pg-rw.business-system.svc.cluster.local
+    jobrunner_db_port = 5432

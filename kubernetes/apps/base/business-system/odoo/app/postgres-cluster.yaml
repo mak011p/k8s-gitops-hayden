@@ -35,18 +35,6 @@ spec:
       memory: 2Gi
     limits:
       memory: 6Gi
-  managed:
-    roles:
-      - name: kagent_readonly
-        login: true
-        superuser: false
-        createdb: false
-        createrole: false
-        inherit: true
-        # Note: pg_read_all_data removed - using explicit grants with sensitive tables revoked
-        # See SQL applied: GRANT SELECT ON ALL TABLES, then REVOKE on res_users, ir_config_parameter, etc.
-        passwordSecret:
-          name: odoo-pg-kagent-readonly
   postgresql:
     parameters:
       max_connections: "200"

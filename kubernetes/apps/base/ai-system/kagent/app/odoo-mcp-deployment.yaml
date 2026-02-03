@@ -38,6 +38,10 @@ spec:
           env:
             - name: UV_CACHE_DIR
               value: /tmp/uv-cache
+            - name: UV_TOOL_DIR
+              value: /tmp/uv-tools
+            - name: HOME
+              value: /tmp
             - name: ODOO_URL
               value: http://odoo.business-system.svc.cluster.local:8071
             - name: ODOO_DB

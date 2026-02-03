@@ -1,0 +1,9 @@
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: odoo-mcp
+  namespace: ai-system
+spec:
+  protocol: STREAMABLE_HTTP
+  url: http://odoo-mcp.ai-system:8000/mcp

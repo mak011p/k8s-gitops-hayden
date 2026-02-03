@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-mcp
+  namespace: ai-system
+  labels:
+    app.kubernetes.io/name: postgres-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-mcp
+    spec:
+      containers:
+        - name: postgres-mcp
+          image: crystaldba/postgres-mcp:latest
+          args:
+            - --access-mode=restricted
+            - --transport=sse
+          env:
+            - name: DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-mcp-connection
+                  key: uri
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /sse
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /sse
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odoo-mcp
+  namespace: ai-system
+  labels:
+    app.kubernetes.io/name: odoo-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: odoo-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: odoo-mcp
+    spec:
+      containers:
+        - name: odoo-mcp
+          image: ghcr.io/alberto-re/mcp-server-odoo:latest
+          env:
+            - name: ODOO_BASE_URL
+              value: http://odoo.business-system.svc.cluster.local:8071
+            - name: ODOO_DATABASE
+              value: odoo
+            - name: ODOO_VERSION
+              value: "18"
+            - name: ODOO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: odoo-mcp-credentials
+                  key: username
+            - name: ODOO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: odoo-mcp-credentials
+                  key: password
+            - name: TRANSPORT_PROTOCOL
+              value: streamable-http
+            - name: HOST
+              value: "0.0.0.0"
+            - name: LOG_LEVEL
+              value: INFO
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10

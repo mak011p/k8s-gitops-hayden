@@ -64,7 +64,13 @@ spec:
                 valueFrom:
                   fieldRef:
                     fieldPath: status.hostIP
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
         serviceAccountName: gha-runner-scale-set
+        volumes:
+          - name: work
+            emptyDir: {}
     listenerMetrics:
       counters:
         gha_started_jobs_total:

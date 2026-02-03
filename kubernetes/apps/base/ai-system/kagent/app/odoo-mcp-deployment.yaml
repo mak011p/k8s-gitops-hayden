@@ -16,6 +16,7 @@ spec:
       labels:
         app.kubernetes.io/name: odoo-mcp
     spec:
+      enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -42,9 +43,6 @@ spec:
               value: /tmp/uv-tools
             - name: HOME
               value: /tmp
-            # Override Kubernetes service discovery env var collision
-            - name: ODOO_MCP_PORT
-              value: "8000"
             - name: ODOO_URL
               value: http://odoo.business-system.svc.cluster.local:8071
             - name: ODOO_DB

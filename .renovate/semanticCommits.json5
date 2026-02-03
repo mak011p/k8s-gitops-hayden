@@ -9,12 +9,12 @@
     },
     {
       matchUpdateTypes: ["minor"],
-      semanticCommitType: "feat",
+      semanticCommitType: "chore",
       commitMessageExtra: "( {{currentVersion}} → {{newVersion}} )",
     },
     {
       matchUpdateTypes: ["patch"],
-      semanticCommitType: "fix",
+      semanticCommitType: "chore",
       commitMessageExtra: "( {{currentVersion}} → {{newVersion}} )",
     },
     {

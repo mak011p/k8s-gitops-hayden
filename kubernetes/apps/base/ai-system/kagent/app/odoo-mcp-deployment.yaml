@@ -16,16 +16,30 @@ spec:
       labels:
         app.kubernetes.io/name: odoo-mcp
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: odoo-mcp
-          image: ghcr.io/alberto-re/mcp-server-odoo:latest
+          image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+          command:
+            - uvx
+            - mcp-server-odoo
+            - --transport
+            - streamable-http
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
           env:
-            - name: ODOO_BASE_URL
+            - name: ODOO_URL
               value: http://odoo.business-system.svc.cluster.local:8071
-            - name: ODOO_DATABASE
+            - name: ODOO_DB
               value: odoo
-            - name: ODOO_VERSION
-              value: "18"
             - name: ODOO_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -36,25 +50,30 @@ spec:
                 secretKeyRef:
                   name: odoo-mcp-credentials
                   key: password
-            - name: TRANSPORT_PROTOCOL
-              value: streamable-http
-            - name: HOST
-              value: "0.0.0.0"
-            - name: LOG_LEVEL
-              value: INFO
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
           resources:
             requests:
               cpu: 50m
               memory: 128Mi
             limits:
               cpu: 500m
-              memory: 256Mi
+              memory: 512Mi
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
           readinessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 10

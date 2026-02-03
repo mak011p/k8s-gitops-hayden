@@ -40,14 +40,12 @@ spec:
               cpu: 500m
               memory: 256Mi
           livenessProbe:
-            httpGet:
-              path: /sse
+            tcpSocket:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 30
           readinessProbe:
-            httpGet:
-              path: /sse
+            tcpSocket:
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10

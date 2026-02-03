@@ -28,6 +28,8 @@ resource "google_storage_bucket" "thanos" {
   }
 
   # Downgrade to Nearline after 30 days (metrics rarely re-read)
+  # No delete rule - Thanos compactor manages retention:
+  #   raw: 90d, 5m downsampled: 180d, 1h downsampled: 365d
   lifecycle_rule {
     condition {
       age = 30
@@ -35,16 +37,6 @@ resource "google_storage_bucket" "thanos" {
     action {
       type          = "SetStorageClass"
       storage_class = "NEARLINE"
-    }
-  }
-
-  # Delete metrics older than 90 days
-  lifecycle_rule {
-    condition {
-      age = 90
-    }
-    action {
-      type = "Delete"
     }
   }
 

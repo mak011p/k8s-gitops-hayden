@@ -9,7 +9,7 @@ data:
     [options]
     # PgBouncer pooler for connection efficiency (transaction mode)
     # If longpolling/LISTEN issues occur, revert to: odoo-pg-rw.business-system.svc.cluster.local
-    db_host = odoo-pg-pooler-rw.business-system.svc.cluster.local
+    db_host = odoo-pg-pooler.business-system.svc.cluster.local
     db_port = 5432
     db_template = template0
     import_limit = 25000

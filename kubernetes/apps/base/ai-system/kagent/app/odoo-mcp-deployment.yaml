@@ -36,9 +36,14 @@ spec:
               os.environ.setdefault('ODOO_MCP_TRANSPORT', 'streamable-http')
               os.environ.setdefault('ODOO_MCP_HOST', '0.0.0.0')
               os.environ.setdefault('ODOO_MCP_PORT', '8000')
-              from mcp.server.transport_security import TransportSecuritySettings
-              # Disable DNS rebinding protection for internal k8s traffic
-              TransportSecuritySettings.__init__ = lambda self, **kw: setattr(self, 'enable_dns_rebinding_protection', False) or setattr(self, 'allowed_hosts', None) or setattr(self, 'allowed_origins', None)
+              # Patch FastMCP to disable DNS rebinding protection for internal k8s traffic
+              import mcp.server.fastmcp.server as fastmcp_mod
+              _orig_init = fastmcp_mod.FastMCP.__init__
+              def _patched_init(self, *args, **kwargs):
+                  from mcp.server.transport_security import TransportSecuritySettings
+                  kwargs['transport_security'] = TransportSecuritySettings(enable_dns_rebinding_protection=False)
+                  return _orig_init(self, *args, **kwargs)
+              fastmcp_mod.FastMCP.__init__ = _patched_init
               from mcp_server_odoo.__main__ import main
               main()
               "

@@ -31,9 +31,9 @@ data:
     log_handler = :INFO
 
     # Performance settings
-    workers = 60
+    workers = 6
     worker_class = gevent
-    max_cron_threads = 8
+    max_cron_threads = 2
     limit_memory_hard = 5368709120
     limit_memory_soft = 4294967296
     limit_request = 8192
@@ -47,4 +47,4 @@ data:
 
     # Queue Job Configuration
     [queue_job]
-    channels = root:60,root.sale_order:45,root.product_template:5,root.inventory:10
+    channels = root:6,root.sale_order:4,root.product_template:2,root.inventory:2

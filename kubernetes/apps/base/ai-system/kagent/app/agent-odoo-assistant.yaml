@@ -65,12 +65,27 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: postgres-mcp
+          toolNames:
+            - list_schemas
+            - list_objects
+            - get_object_details
+            - explain_query
+            - analyze_workload_indexes
+            - analyze_query_indexes
+            - analyze_db_health
+            - get_top_queries
+            - execute_sql
         type: McpServer
-      # Odoo XML-RPC tools
+      # Odoo XML-RPC tools (read-only subset)
       - mcpServer:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: odoo-mcp
+          toolNames:
+            - search_records
+            - get_record
+            - list_models
+            - list_resource_templates
         type: McpServer
   description: >-
     Odoo business data assistant for Hayden Agencies. Answers questions about

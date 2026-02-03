@@ -59,7 +59,7 @@ spec:
                   key: password
             # Use YOLO mode=read to connect to standard Odoo XML-RPC endpoints
             # (without requiring the mcp_server Odoo module)
-            - name: ODOO_MCP_YOLO
+            - name: ODOO_YOLO
               value: "read"
           ports:
             - name: http

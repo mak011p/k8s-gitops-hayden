@@ -36,10 +36,12 @@ spec:
             - --port
             - "8000"
           env:
+            - name: UV_CACHE_DIR
+              value: /tmp/uv-cache
             - name: ODOO_URL
               value: http://odoo.business-system.svc.cluster.local:8071
             - name: ODOO_DB
-              value: odoo
+              value: prod
             - name: ODOO_USERNAME
               valueFrom:
                 secretKeyRef:

@@ -57,6 +57,10 @@ spec:
                 secretKeyRef:
                   name: odoo-mcp-credentials
                   key: password
+            # Use YOLO mode=read to connect to standard Odoo XML-RPC endpoints
+            # (without requiring the mcp_server Odoo module)
+            - name: ODOO_MCP_YOLO
+              value: "read"
           ports:
             - name: http
               containerPort: 8000

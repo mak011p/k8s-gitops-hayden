@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dovecot-config
+  namespace: business-system
+data:
+  dovecot.conf: |
+    # Logging
+    log_path = /dev/stderr
+    info_log_path = /dev/stderr
+
+    # Listen on all interfaces
+    listen = *
+
+    # Protocols - only IMAP needed for proxy
+    protocols = imap
+
+    # Base directory for runtime files
+    base_dir = /run/dovecot
+
+    # Mail home directory
+    mail_home = /srv/vmail/%u
+
+    # Include our custom configurations
+    !include_try conf.d/*.conf
+
+  10-auth.conf: |
+    # Allow plaintext auth (in-cluster only)
+    disable_plaintext_auth = no
+
+    # Auth mechanisms
+    auth_mechanisms = plain login
+
+    # Passdb - authenticate against Migadu IMAP
+    passdb {
+      driver = imap
+      args = host=imap.migadu.com port=993 ssl=imaps ssl_ca_dir=/etc/ssl/certs
+      default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
+    }
+
+    # Userdb - prefetch from passdb
+    userdb {
+      driver = prefetch
+    }
+
+  10-mail.conf: |
+    # Mail location using imapc with local caching
+    mail_location = imapc:~/imapc
+
+    # Namespace configuration
+    namespace inbox {
+      inbox = yes
+      separator = /
+    }
+
+  20-imapc.conf: |
+    # Migadu IMAP server
+    imapc_host = imap.migadu.com
+    imapc_port = 993
+    imapc_ssl = imaps
+    ssl_client_ca_dir = /etc/ssl/certs
+
+    # Credentials from auth (populated by passdb)
+    imapc_user = %u
+    imapc_password = %w
+
+    # Enable features for better caching
+    imapc_features = rfc822.size fetch-headers fetch-bodystructure search
+
+    # Connection pooling
+    imapc_max_idle_time = 30 secs
+
+    # Command timeout
+    imapc_cmd_timeout = 5 mins
+
+  no-chroot.conf: |
+    # Rootless container settings - run all as same unprivileged user
+    # Prevents fchown() attempts that fail without CAP_CHOWN
+    default_internal_user = dovecot
+    default_login_user = dovecot
+
+    # Disable chroot and privilege dropping for all services
+    service anvil {
+      chroot =
+      user = dovecot
+    }
+    service imap-login {
+      chroot =
+      user = dovecot
+      group = dovecot
+    }
+    service imap {
+      chroot =
+      user = dovecot
+    }
+    service auth {
+      user = dovecot
+    }
+    service auth-worker {
+      user = dovecot
+    }
+
+  10-ssl.conf: |
+    # Disable SSL for in-cluster communication
+    # Roundcube connects via ClusterIP, traffic stays in cluster
+    # Dovecot-to-Migadu connection uses IMAPS (TLS)
+    ssl = no

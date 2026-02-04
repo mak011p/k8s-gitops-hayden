@@ -81,8 +81,8 @@ spec:
         $config['preview_pane'] = true;
         $config['preview_pane_mark_read'] = 3;
 
-        // Longer IMAP timeouts for high-latency connections to Migadu
-        $config['imap_timeout'] = 60;
+        // IMAP timeout (local Dovecot proxy, so can be shorter)
+        $config['imap_timeout'] = 30;
         $config['smtp_timeout'] = 30;
 
         // Cache larger messages (up to 500KB)
@@ -114,11 +114,11 @@ spec:
       user: roundcube
       # password injected via valuesFrom Secret
 
-    # Migadu IMAP configuration
+    # IMAP via local Dovecot proxy (caches against Migadu)
     imap:
-      host: imap.migadu.com
-      port: 993
-      encryption: ssltls
+      host: dovecot.business-system.svc.cluster.local
+      port: 143
+      encryption: none
 
     # Migadu SMTP configuration (uses user's IMAP credentials)
     smtp:

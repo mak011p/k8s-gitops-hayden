@@ -139,8 +139,8 @@ spec:
                           sync -1 -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
                 done < /etc/dovecot-sync/users
 
-                echo "=== Sync complete, sleeping 5m ==="
-                sleep 300
+                echo "=== Sync complete, sleeping 90s ==="
+                sleep 90
               done
           volumeMounts:
             - name: credentials

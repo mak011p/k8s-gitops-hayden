@@ -7,7 +7,7 @@ metadata:
 data:
   dovecot.conf: |
     # Dovecot 2.4 requires version declaration
-    dovecot_config_version = 2.4
+    dovecot_config_version = 2.4.0
 
     # Logging
     log_path = /dev/stderr

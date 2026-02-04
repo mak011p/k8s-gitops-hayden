@@ -127,7 +127,11 @@ spec:
                   echo "Syncing $user..."
                   doveadm -o first_valid_uid=101 \
                           -o first_valid_gid=102 \
-                          -o base_dir=/tmp/doveadm \
+                          -o base_dir=/var/run/dovecot-sync \
+                          -o mail_uid=101 \
+                          -o mail_gid=102 \
+                          -o "userdb_driver=static" \
+                          -o "userdb_args=uid=101 gid=102 home=/srv/vmail/%u" \
                           -o imapc_host=imap.migadu.com \
                           -o imapc_port=993 \
                           -o imapc_ssl=imaps \
@@ -149,8 +153,8 @@ spec:
               readOnly: true
             - name: cache
               mountPath: /srv/vmail
-            - name: run
-              mountPath: /run/dovecot
+            - name: sync-run
+              mountPath: /var/run/dovecot-sync
           resources:
             requests:
               cpu: 50m
@@ -176,6 +180,8 @@ spec:
           persistentVolumeClaim:
             claimName: dovecot-cache
         - name: run
+          emptyDir: {}
+        - name: sync-run
           emptyDir: {}
         - name: tmp
           emptyDir: {}

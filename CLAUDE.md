@@ -244,6 +244,37 @@ ssh truenas_admin@192.168.50.17
 ```
 Uses `~/.ssh/rog_laptop_key` (configured globally in SSH config).
 
+### Branch Protection
+
+The `master` branch is protected with required status checks. Direct pushes are blocked.
+
+**Required checks before merge:**
+- `Flux Local - Success` - Validates Kubernetes manifests with flux-local
+- `Security - Success` - Runs Trivy IaC, Semgrep SAST, and Gitleaks scans
+
+**Settings:**
+- Strict mode enabled (branch must be up-to-date with master)
+- Admins can bypass in emergencies (`enforce_admins: false`)
+- Force pushes and deletions disabled
+
+**Workflow for changes:**
+```bash
+# Create branch, make changes, push
+git checkout -b fix/my-change
+# ... make changes ...
+git add . && git commit -m "fix: description"
+git push -u origin fix/my-change
+
+# Create PR and merge (waits for CI)
+gh pr create --fill
+gh pr merge --auto --merge  # Auto-merges when checks pass
+```
+
+**Quick one-liner for simple fixes:**
+```bash
+git checkout -b fix/quick && git add . && git commit -m "fix: quick change" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --auto --merge && git checkout master
+```
+
 ### Making Changes to Applications
 1. **Edit base configuration** in `kubernetes/apps/base/[system-name]/[app-name]/`
 2. **Use overlays** for cluster-specific customization in `kubernetes/apps/overlays/cluster-00/`

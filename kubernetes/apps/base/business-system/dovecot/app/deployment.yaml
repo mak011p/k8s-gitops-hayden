@@ -22,9 +22,6 @@ spec:
         app.kubernetes.io/component: imap-proxy
     spec:
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
@@ -80,10 +77,12 @@ spec:
               memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             capabilities:
               drop:
                 - ALL
+              add:
+                - NET_BIND_SERVICE
       volumes:
         - name: config
           configMap:

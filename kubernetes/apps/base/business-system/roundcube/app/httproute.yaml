@@ -14,7 +14,7 @@ spec:
       namespace: network-system
       sectionName: https
   hostnames:
-    - 'mail.${CLUSTER_DOMAIN}'
+    - 'webmail.${CLUSTER_DOMAIN}'
   rules:
     - matches:
         - path:

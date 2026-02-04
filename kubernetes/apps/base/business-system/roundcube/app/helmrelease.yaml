@@ -76,6 +76,17 @@ spec:
         // Messages cache (requires IMAP QRESYNC - Migadu supports this)
         $config['messages_cache'] = true;
         $config['messages_cache_ttl'] = '10d';
+
+        // Preview pane - prefetches message content while browsing list
+        $config['preview_pane'] = true;
+        $config['preview_pane_mark_read'] = 3;
+
+        // Longer IMAP timeouts for high-latency connections to Migadu
+        $config['imap_timeout'] = 60;
+        $config['smtp_timeout'] = 30;
+
+        // Cache larger messages (up to 500KB)
+        $config['message_cache_threshold'] = 500;
       # PHP-FPM tuning for better concurrency
       customPhpFpmConfig: |
         pm = dynamic

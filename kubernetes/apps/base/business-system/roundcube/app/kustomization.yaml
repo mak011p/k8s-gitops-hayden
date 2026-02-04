@@ -5,6 +5,7 @@ kind: Kustomization
 
 resources:
   - helmrepository.yaml
+  - cnpg-cluster.yaml
   - helmrelease.yaml
   - secret.enc.age.yaml
   - httproute.yaml

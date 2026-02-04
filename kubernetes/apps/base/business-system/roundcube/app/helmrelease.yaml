@@ -40,12 +40,49 @@ spec:
   driftDetection:
     mode: enabled
   maxHistory: 3
+  # Inject sensitive values from Secrets
+  valuesFrom:
+    # Database password from CNPG-generated secret
+    - kind: Secret
+      name: roundcube-db-app
+      valuesKey: password
+      targetPath: externalDatabase.password
+    # DES key for session encryption
+    - kind: Secret
+      name: roundcube-secret
+      valuesKey: des-key
+      targetPath: config.desKey
   values:
-    # Deployment settings
-    replicaCount: 1
+    # Use default image
+    imagePullPolicy: IfNotPresent
 
-    image:
-      pullPolicy: IfNotPresent
+    # Roundcube configuration
+    config:
+      defaultLanguage: en_US
+      defaultSkin: elastic
+      uploadMaxFilesize: 25M
+      # Custom config for product name
+      customRoundcubeConfig: |
+        $config['product_name'] = 'Hayden Mail';
+      plugins:
+        managesieve:
+          enabled: true
+          config:
+            host: "imap.migadu.com:4190"
+            useTls: true
+
+    # Database configuration - use external CNPG database
+    database:
+      source: external
+
+    # External database connection (password injected via valuesFrom)
+    externalDatabase:
+      type: pgsql
+      host: roundcube-db-rw.business-system.svc.cluster.local
+      port: 5432
+      name: roundcube
+      user: roundcube
+      # password injected via valuesFrom Secret
 
     # Migadu IMAP configuration
     imap:
@@ -58,66 +95,18 @@ spec:
       host: smtp.migadu.com
       port: 465
       encryption: ssltls
-      user: "%u"
+      username: "%u"
       password: "%p"
 
-    # External PostgreSQL database (uses embedded chart)
-    externalDatabase:
-      type: pgsql
-      host: roundcube-postgresql
-      port: 5432
-      name: roundcube
-      user: roundcube
-      existingSecret: roundcube-secret
-      existingSecretPasswordKey: db-password
-
-    # Enable embedded PostgreSQL (Bitnami subchart)
-    zalandoPostgresql:
-      enabled: false
-
-    postgresql:
-      enabled: true
-      auth:
-        database: roundcube
-        username: roundcube
-        existingSecret: roundcube-secret
-        secretKeys:
-          userPasswordKey: db-password
-      primary:
-        persistence:
-          enabled: true
-          storageClass: ceph-block
-          size: 5Gi
-        resources:
-          requests:
-            cpu: 50m
-            memory: 128Mi
-          limits:
-            memory: 512Mi
-
-    # Roundcube configuration
-    roundcube:
-      desKey:
-        existingSecret: roundcube-secret
-        existingSecretKey: des-key
-      defaultHost: imap.migadu.com
-      productName: "Hayden Mail"
-      uploadMaxFilesize: 25M
-
-    # Skin configuration
-    skins:
-      elastic:
-        enabled: true
-        default: true
-
-    # Plugins configuration
-    plugins:
-      managesieve:
-        enabled: true
-        config:
-          managesieve_host: imap.migadu.com
-          managesieve_port: 4190
-          managesieve_usetls: true
+    # Deployment settings
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
 
     # Ingress disabled - using Gateway API
     ingress:
@@ -125,18 +114,9 @@ spec:
 
     # Service configuration
     service:
-      type: ClusterIP
       port: 80
 
-    # Resources
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        memory: 1Gi
-
     # Pod disruption budget
-    podDisruptionBudget:
+    pdb:
       enabled: true
       minAvailable: 1

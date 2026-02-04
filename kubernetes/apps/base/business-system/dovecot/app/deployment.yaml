@@ -112,6 +112,11 @@ spec:
             - -c
             - |
               echo "Starting sync sidecar..."
+
+              # Resolve Migadu IMAP hostname using system DNS (bypasses Dovecot dns-client)
+              MIGADU_IP=$(getent hosts imap.migadu.com | awk '{print $1}' | head -1)
+              echo "Resolved imap.migadu.com to $MIGADU_IP"
+
               while true; do
                 echo "=== Sync run at $(date) ==="
 
@@ -125,23 +130,22 @@ spec:
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."
-                  doveadm -o first_valid_uid=101 \
+                  # Use --no-userdb-lookup to bypass auth process entirely
+                  # USER env var specifies the user instead of -u flag
+                  USER="$user" doveadm sync --no-userdb-lookup \
+                          -o first_valid_uid=101 \
                           -o first_valid_gid=102 \
-                          -o base_dir=/var/run/dovecot-sync \
-                          -o mail_uid=101 \
-                          -o mail_gid=102 \
-                          -o "userdb_driver=static" \
-                          -o "userdb_args=uid=101 gid=102 home=/srv/vmail/%u" \
-                          -o imapc_host=imap.migadu.com \
+                          -o imapc_host=$MIGADU_IP \
                           -o imapc_port=993 \
                           -o imapc_ssl=imaps \
+                          -o imapc_ssl_verify=no \
                           -o imapc_user="$user" \
                           -o imapc_password="$password" \
                           -o imapc_features="rfc822.size fetch-headers fetch-bodystructure" \
                           -o ssl_client_ca_dir=/etc/ssl/certs \
                           -o mail_location="mdbox:/srv/vmail/$user/mdbox" \
                           -o mail_prefetch_count=20 \
-                          sync -1 -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
+                          -1 -R imapc: 2>&1 || echo "Sync failed for $user"
                 done < /etc/dovecot-sync/users
 
                 echo "=== Sync complete, sleeping 90s ==="
@@ -153,8 +157,8 @@ spec:
               readOnly: true
             - name: cache
               mountPath: /srv/vmail
-            - name: sync-run
-              mountPath: /var/run/dovecot-sync
+            - name: run
+              mountPath: /run/dovecot
           resources:
             requests:
               cpu: 50m
@@ -180,8 +184,6 @@ spec:
           persistentVolumeClaim:
             claimName: dovecot-cache
         - name: run
-          emptyDir: {}
-        - name: sync-run
           emptyDir: {}
         - name: tmp
           emptyDir: {}

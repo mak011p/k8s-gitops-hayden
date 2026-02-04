@@ -46,18 +46,18 @@ spec:
     # Kubescape operator configuration
     clusterName: cluster-00
 
-    # Enable all scanning capabilities
+    # Lean capabilities - scanning only (Falco/Tetragon handle runtime security)
     capabilities:
       continuousScan: enable
       nodeScan: enable
       vulnerabilityScan: enable
-      runtimeObservability: enable
+      runtimeObservability: disable  # Tetragon provides this
       networkPolicyService: enable
-      autoUpgrading: enable
-      seccompProfileService: enable
-      relevancy: enable
-      runtimeDetection: enable
-      malwareDetection: enable
+      autoUpgrading: disable  # Manual control preferred
+      seccompProfileService: disable  # Not needed
+      relevancy: disable  # Reduces node-agent overhead
+      runtimeDetection: disable  # Falco handles this
+      malwareDetection: disable  # Removes ClamAV sidecar
 
     # Resource limits for operator components
     kubescape:
@@ -110,13 +110,14 @@ spec:
           memory: 256Mi
 
     nodeAgent:
+      # Minimal resources - no runtime/malware detection
       resources:
         requests:
-          cpu: 100m
-          memory: 128Mi
+          cpu: 10m
+          memory: 64Mi
         limits:
-          cpu: 500m
-          memory: 512Mi
+          cpu: 100m
+          memory: 256Mi
 
     storage:
       resources:

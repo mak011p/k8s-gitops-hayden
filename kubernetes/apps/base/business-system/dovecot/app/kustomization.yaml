@@ -9,4 +9,3 @@ resources:
   - deployment.yaml
   - service.yaml
   - externalsecret.yaml
-  - cronjob.yaml

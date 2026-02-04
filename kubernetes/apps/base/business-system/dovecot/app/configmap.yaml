@@ -51,6 +51,10 @@ data:
     }
 
   10-mail.conf: |
+    # Allow dovecot user (UID 101) to access mail
+    first_valid_uid = 101
+    first_valid_gid = 102
+
     # Mail location using imapc with local caching
     mail_location = imapc:~/imapc
 

@@ -34,7 +34,7 @@ spec:
               mountPath: /run/dovecot
       containers:
         - name: dovecot
-          image: dovecot/dovecot:2.3.21
+          image: dovecot/dovecot:2.4.2
           ports:
             - name: imap
               containerPort: 143

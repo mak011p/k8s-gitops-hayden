@@ -126,27 +126,38 @@ spec:
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."
-                  # Common doveadm options
-                  OPTS="-o base_dir=/run/dovecot \
-                        -o first_valid_uid=101 \
-                        -o first_valid_gid=102 \
-                        -o imapc_host=imap.migadu.com \
-                        -o imapc_port=993 \
-                        -o imapc_ssl=imaps \
-                        -o imapc_user=$user \
-                        -o imapc_password=$password \
-                        -o imapc_features=rfc822.size\ fetch-headers\ fetch-bodystructure \
-                        -o ssl_client_ca_dir=/etc/ssl/certs \
-                        -o mail_location=mdbox:/srv/vmail/$user/mdbox \
-                        -o mail_prefetch_count=20"
 
                   # 1. Pull new mail from Migadu (one-way, won't delete local if deleted on Migadu)
                   echo "  Pulling from Migadu..."
-                  doveadm $OPTS sync -1 -R -u "$user" imapc: 2>&1 || echo "Pull failed for $user"
+                  doveadm -o base_dir=/run/dovecot \
+                          -o first_valid_uid=101 \
+                          -o first_valid_gid=102 \
+                          -o imapc_host=imap.migadu.com \
+                          -o imapc_port=993 \
+                          -o imapc_ssl=imaps \
+                          -o imapc_user="$user" \
+                          -o imapc_password="$password" \
+                          -o imapc_features="rfc822.size fetch-headers fetch-bodystructure" \
+                          -o ssl_client_ca_dir=/etc/ssl/certs \
+                          -o mail_location="mdbox:/srv/vmail/$user/mdbox" \
+                          -o mail_prefetch_count=20 \
+                          sync -1 -R -u "$user" imapc: 2>&1 || echo "Pull failed for $user"
 
                   # 2. Push local changes to Migadu (one-way, pushes deletes to Migadu)
                   echo "  Pushing to Migadu..."
-                  doveadm $OPTS sync -1 -u "$user" imapc: 2>&1 || echo "Push failed for $user"
+                  doveadm -o base_dir=/run/dovecot \
+                          -o first_valid_uid=101 \
+                          -o first_valid_gid=102 \
+                          -o imapc_host=imap.migadu.com \
+                          -o imapc_port=993 \
+                          -o imapc_ssl=imaps \
+                          -o imapc_user="$user" \
+                          -o imapc_password="$password" \
+                          -o imapc_features="rfc822.size fetch-headers fetch-bodystructure" \
+                          -o ssl_client_ca_dir=/etc/ssl/certs \
+                          -o mail_location="mdbox:/srv/vmail/$user/mdbox" \
+                          -o mail_prefetch_count=20 \
+                          sync -1 -u "$user" imapc: 2>&1 || echo "Push failed for $user"
                 done < /etc/dovecot-sync/users
 
                 echo "=== Sync complete, sleeping 30s ==="

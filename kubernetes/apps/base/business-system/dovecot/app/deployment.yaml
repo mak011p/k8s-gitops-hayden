@@ -58,6 +58,10 @@ spec:
             - name: config
               mountPath: /etc/dovecot/conf.d/10-ssl.conf
               subPath: 10-ssl.conf
+            - name: credentials
+              mountPath: /etc/dovecot/users
+              subPath: users
+              readOnly: true
             - name: cache
               mountPath: /srv/vmail
             - name: run

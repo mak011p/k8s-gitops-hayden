@@ -32,22 +32,16 @@ data:
     # Auth mechanisms
     auth_mechanisms = plain login
 
-    # Passdb - authenticate against Migadu IMAP
+    # Passdb - local passwd file (same creds as sync)
     passdb {
-      driver = imap
-      args = host=imap.migadu.com port=993 ssl=imaps ssl_ca_dir=/etc/ssl/certs
-      default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
+      driver = passwd-file
+      args = scheme=PLAIN /etc/dovecot/users
     }
 
-    # Userdb - prefetch from passdb (for login)
-    userdb {
-      driver = prefetch
-    }
-
-    # Static userdb fallback for doveadm operations
+    # Userdb - static config for all users
     userdb {
       driver = static
-      args = uid=101 gid=102 home=/srv/vmail/%u allow_all_users=yes
+      args = uid=101 gid=102 home=/srv/vmail/%u
     }
 
   10-mail.conf: |

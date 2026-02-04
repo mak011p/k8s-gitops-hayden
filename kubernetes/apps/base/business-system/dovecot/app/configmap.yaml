@@ -84,10 +84,11 @@ data:
     default_internal_user = dovecot
     default_login_user = dovecot
 
-    # Disable dns-client service - causes panics in containers
+    # Completely disable dns-client service - causes panics in containers
     # (doesn't respond to SIGINT, triggers assertion failure)
+    # Setting executable to empty prevents the service from ever starting
     service dns-client {
-      process_limit = 0
+      executable =
     }
 
     # Disable chroot and privilege dropping for all services

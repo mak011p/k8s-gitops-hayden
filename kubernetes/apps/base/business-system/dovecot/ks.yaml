@@ -3,15 +3,15 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: roundcube
+  name: dovecot
   namespace: business-system
 spec:
   interval: 30m
   retryInterval: 1m
   timeout: 10m
-  path: "./apps/base/business-system/roundcube/app"
+  path: "./apps/base/business-system/dovecot/app"
   prune: true
-  wait: false
+  wait: true
   sourceRef:
     kind: OCIRepository
     name: flux-system
@@ -19,14 +19,4 @@ spec:
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: envoy-gateway-gateway-api
-      namespace: network-system
-    - name: redis
-      namespace: database-system
-    - name: dovecot
-      namespace: business-system
   targetNamespace: business-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age-secret

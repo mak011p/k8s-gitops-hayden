@@ -29,3 +29,7 @@ kubernetes/apps/base/actions-runner-system/gha-runner-scale-set/
 # Cilium mTLS certificates - not secrets, public CA certs for service mesh
 # Risk accepted: required for Cilium Hubble/mTLS, rotated via cert-manager
 talos/integrations/cilium/
+
+# Dovecot IMAP proxy - needs writable filesystem for /var/lib/dovecot state
+# Risk accepted: runs with dropped capabilities, no privilege escalation
+kubernetes/apps/base/business-system/dovecot/app/deployment.yaml

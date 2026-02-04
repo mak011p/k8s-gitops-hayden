@@ -125,7 +125,6 @@ spec:
                           -o mail_uid=101 \
                           -o mail_gid=102 \
                           -o mail_prefetch_count=20 \
-                          -o auth_socket_path= \
                           sync -1 -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
                 done < /etc/dovecot-sync/users
 
@@ -138,6 +137,8 @@ spec:
               readOnly: true
             - name: cache
               mountPath: /srv/vmail
+            - name: run
+              mountPath: /run/dovecot
           resources:
             requests:
               cpu: 50m

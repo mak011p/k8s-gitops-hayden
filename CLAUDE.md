@@ -257,28 +257,36 @@ The `master` branch is protected with required status checks. Direct pushes are 
 - Admin bypass disabled (`enforce_admins: true`) - all users must use PRs
 - Force pushes and deletions disabled
 
+**Merge strategy: Squash merge**
+- All PRs use squash merge - multiple commits on a feature branch become one commit on master
+- This keeps master history clean while allowing iterative work on branches
+- Remote branches auto-delete on merge; clean up local branches manually
+
 **Workflow for changes:**
 ```bash
-# Create branch, make changes, push
-git checkout -b fix/my-change
-# ... make changes ...
-git add . && git commit -m "fix: description"
-git push -u origin fix/my-change
+# 1. Create feature branch
+git checkout -b feat/my-feature
 
-# Create PR and merge (waits for CI)
-gh pr create --fill
-gh pr merge --auto --merge --delete-branch  # Auto-merges when checks pass, deletes remote branch
+# 2. Make changes (multiple commits are fine - they'll be squashed)
+git add . && git commit -m "wip: initial implementation"
+git add . && git commit -m "wip: add tests"
+git add . && git commit -m "wip: fix edge case"
 
-# Return to master and clean up local branch
-git checkout master && git pull && git branch -d fix/my-change
+# 3. Push and create PR
+git push -u origin feat/my-feature
+gh pr create --fill  # or --title "feat: description" --body "details"
+
+# 4. Merge (squashes all commits into one)
+gh pr merge --squash --delete-branch
+
+# 5. Return to master and clean up
+git checkout master && git pull && git branch -d feat/my-feature
 ```
 
 **Quick one-liner for simple fixes:**
 ```bash
-git checkout -b fix/quick && git add . && git commit -m "fix: quick change" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --auto --merge --delete-branch && git checkout master && git pull && git branch -d fix/quick
+git checkout -b fix/quick && git add . && git commit -m "fix: description" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --squash --delete-branch && git checkout master && git pull && git branch -d fix/quick
 ```
-
-**Branch cleanup:** Always delete branches after merging. Use `--delete-branch` with `gh pr merge` to delete remote branches automatically. Run `git branch -d <branch>` locally after switching back to master.
 
 ### Making Changes to Applications
 1. **Edit base configuration** in `kubernetes/apps/base/[system-name]/[app-name]/`

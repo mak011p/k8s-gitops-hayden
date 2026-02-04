@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: dovecot
-          image: dovecot/dovecot:2.4.0
+          image: dovecot/dovecot:2.3.21
           ports:
             - name: imap
               containerPort: 31143

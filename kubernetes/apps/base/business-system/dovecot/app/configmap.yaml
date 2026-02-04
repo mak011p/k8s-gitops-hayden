@@ -6,14 +6,11 @@ metadata:
   namespace: business-system
 data:
   dovecot.conf: |
-    # Dovecot 2.4 requires version declaration
-    dovecot_config_version = 2.4.0
-
     # Logging
     log_path = /dev/stderr
     info_log_path = /dev/stderr
 
-    # Listen on all interfaces, non-privileged port
+    # Listen on all interfaces
     listen = *
 
     # Protocols - only IMAP needed for proxy
@@ -22,31 +19,29 @@ data:
     # Base directory for runtime files
     base_dir = /run/dovecot
 
-    # Mail location using imapc driver with local cache
-    mail_driver = imapc
+    # Mail home directory
     mail_home = /srv/vmail/%u
 
     # Include our custom configurations
     !include_try conf.d/*.conf
 
   10-auth.conf: |
-    # Disable SSL requirement since we're in-cluster
+    # Allow plaintext auth (in-cluster only)
     disable_plaintext_auth = no
 
     # Auth mechanisms
     auth_mechanisms = plain login
 
     # Passdb - authenticate against Migadu IMAP
-    passdb imap {
+    passdb {
+      driver = imap
       args = host=imap.migadu.com port=993 ssl=imaps
-      fields {
-        userdb_imapc_user = %u
-        userdb_imapc_password = %w
-      }
+      default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
     }
 
     # Userdb - prefetch from passdb
-    userdb prefetch {
+    userdb {
+      driver = prefetch
     }
 
   10-mail.conf: |

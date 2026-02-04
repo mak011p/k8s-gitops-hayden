@@ -52,7 +52,7 @@ spec:
       nodeScan: enable
       vulnerabilityScan: enable
       runtimeObservability: disable  # Tetragon provides this
-      networkPolicyService: enable
+      networkPolicyService: disable  # Requires node-agent
       autoUpgrading: disable  # Manual control preferred
       seccompProfileService: disable  # Not needed
       relevancy: disable  # Reduces node-agent overhead
@@ -110,14 +110,8 @@ spec:
           memory: 256Mi
 
     nodeAgent:
-      # Minimal resources - no runtime/malware detection
-      resources:
-        requests:
-          cpu: 10m
-          memory: 64Mi
-        limits:
-          cpu: 100m
-          memory: 256Mi
+      # Disabled - Cilium/Tetragon/Falco already saturate eBPF map space
+      enabled: false
 
     storage:
       resources:

@@ -127,6 +127,7 @@ spec:
                   echo "Syncing $user..."
                   doveadm -o first_valid_uid=101 \
                           -o first_valid_gid=102 \
+                          -o dns_client_socket_path= \
                           -o imapc_host=imap.migadu.com \
                           -o imapc_port=993 \
                           -o imapc_ssl=imaps \

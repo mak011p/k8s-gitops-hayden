@@ -35,7 +35,7 @@ data:
     # Passdb - authenticate against Migadu IMAP
     passdb {
       driver = imap
-      args = host=imap.migadu.com port=993 ssl=imaps
+      args = host=imap.migadu.com port=993 ssl=imaps ssl_ca_dir=/etc/ssl/certs
       default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
     }
 
@@ -59,6 +59,7 @@ data:
     imapc_host = imap.migadu.com
     imapc_port = 993
     imapc_ssl = imaps
+    imapc_ssl_ca_dir = /etc/ssl/certs
 
     # Credentials from auth (populated by passdb)
     imapc_user = %u

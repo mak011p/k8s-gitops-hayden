@@ -30,19 +30,18 @@ data:
     !include_try conf.d/*.conf
 
   10-auth.conf: |
-    # Disable SSL requirement since we're in-cluster
-    disable_plaintext_auth = no
+    # Allow cleartext auth (in-cluster only, Dovecot 2.4 syntax)
+    auth_allow_cleartext = yes
 
     # Auth mechanisms
     auth_mechanisms = plain login
 
-    # Passdb - authenticate against Migadu IMAP
+    # Passdb - authenticate against Migadu IMAP (Dovecot 2.4 syntax)
     passdb imap {
-      args = host=imap.migadu.com port=993 ssl=imaps
-      fields {
-        userdb_imapc_user = %u
-        userdb_imapc_password = %w
-      }
+      host = imap.migadu.com
+      port = 993
+      ssl = imaps
+      default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
     }
 
     # Userdb - prefetch from passdb

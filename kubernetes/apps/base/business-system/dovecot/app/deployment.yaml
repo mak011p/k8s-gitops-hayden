@@ -148,6 +148,8 @@ spec:
             limits:
               memory: 256Mi
           securityContext:
+            runAsUser: 101
+            runAsGroup: 102
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
             capabilities:

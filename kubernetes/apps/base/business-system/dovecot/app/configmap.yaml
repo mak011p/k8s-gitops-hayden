@@ -39,9 +39,15 @@ data:
       default_fields = userdb_imapc_user=%u userdb_imapc_password=%w
     }
 
-    # Userdb - prefetch from passdb
+    # Userdb - prefetch from passdb (for login)
     userdb {
       driver = prefetch
+    }
+
+    # Static userdb fallback for doveadm operations
+    userdb {
+      driver = static
+      args = uid=101 gid=102 home=/srv/vmail/%u
     }
 
   10-mail.conf: |

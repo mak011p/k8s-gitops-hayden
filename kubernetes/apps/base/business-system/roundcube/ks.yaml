@@ -21,6 +21,8 @@ spec:
       namespace: rook-ceph
     - name: envoy-gateway-gateway-api
       namespace: network-system
+    - name: redis
+      namespace: database-system
   targetNamespace: business-system
   decryption:
     provider: sops

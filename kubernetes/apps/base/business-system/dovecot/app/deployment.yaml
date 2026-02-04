@@ -25,12 +25,19 @@ spec:
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: cleanup-sockets
+          image: busybox:1.36
+          command: ["sh", "-c", "rm -rf /run/dovecot/*"]
+          volumeMounts:
+            - name: run
+              mountPath: /run/dovecot
       containers:
         - name: dovecot
           image: dovecot/dovecot:2.3.21
           ports:
             - name: imap
-              containerPort: 31143
+              containerPort: 143
               protocol: TCP
           volumeMounts:
             - name: config

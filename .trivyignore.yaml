@@ -31,3 +31,12 @@ misconfigurations:
       Dovecot imapc configuration uses %w variable substitution for runtime
       password passthrough to Migadu IMAP. No actual secrets are stored in the
       ConfigMap - credentials are provided by users at login time.
+
+  # Dovecot IMAP proxy - needs writable filesystem for internal state
+  # Risk accepted: runs with dropped capabilities, no privilege escalation
+  - id: AVD-KSV-0014
+    paths:
+      - apps/base/business-system/dovecot/app/deployment.yaml
+    statement: |
+      Dovecot requires writable filesystem for /var/lib/dovecot state directory.
+      Container runs with dropped capabilities and no privilege escalation.

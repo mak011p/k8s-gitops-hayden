@@ -1,0 +1,11 @@
+---
+# Local Path Provisioner for KIND local development
+# Provides dynamic local storage provisioning
+storageClass:
+  name: local-path
+  defaultClass: true
+  reclaimPolicy: Delete
+nodePathMap:
+  - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+    paths:
+      - /var/local-path-provisioner

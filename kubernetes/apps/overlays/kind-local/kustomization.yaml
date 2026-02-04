@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# KIND Local Development Overlay
+#
+# This overlay includes ONLY components that are safe for local development
+# and do NOT interact with external/live services.
+#
+# EXCLUDED (interact with live services):
+# - external-dns (would update Cloudflare DNS)
+# - cloudflare-tunnel (would create real tunnels)
+# - external-secrets/onepassword (would read from 1Password)
+# - dex/oauth2-proxy (would use GitHub OAuth)
+# - thanos-* (would connect to GCS)
+# - velero (would connect to GCS)
+# - democratic-csi (would connect to TrueNAS)
+# - rook-ceph (requires physical NVMe)
+# - All business apps, home-system, ai-system
+
+resources:
+  # ===================
+  # Core Namespaces
+  # ===================
+  - ../../base/kube-system
+  - ../../base/network-system
+  - ../../base/observability
+
+  # ===================
+  # Flux System
+  # ===================
+  - ../../base/flux-system/repositories
+
+  # ===================
+  # Kube-System Components (safe, no external interaction)
+  # ===================
+  - ../../base/kube-system/metrics-server/ks.yaml
+  - ../../base/kube-system/reflector/ks.yaml
+  - ../../base/kube-system/snapshot-controller/ks.yaml
+  # Local storage instead of rook-ceph
+  - ../../base/kube-system/local-path-provisioner/ks.yaml
+
+  # ===================
+  # Network-System Components (safe only)
+  # ===================
+  # Cert-manager with self-signed issuer (no Let's Encrypt ACME)
+  - ../../base/network-system/cert-manager/ks.yaml
+  # Self-signed cluster issuer for local dev
+  - ../../base/network-system/cert-manager-issuer-local/ks.yaml
+  # Envoy Gateway for local routing
+  - ../../base/network-system/envoy-gateway/ks.yaml
+  # Echo server for testing
+  - ../../base/network-system/echo-server/ks.yaml
+
+  # ===================
+  # Observability (local metrics only, no external storage)
+  # ===================
+  # Uncomment these if you want local monitoring (increases resource usage)
+  # - ../../base/observability/kube-prometheus-stack/ks.yaml
+  # - ../../base/observability/grafana/ks.yaml
+  # - ../../base/observability/vpa/ks.yaml
+
+  # ===================
+  # Security (local policy enforcement)
+  # ===================
+  # Uncomment for policy testing
+  # - ../../base/security-system
+  # - ../../base/security-system/kyverno/ks.yaml
+  # - ../../base/security-system/kubescape/ks.yaml

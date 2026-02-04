@@ -1,0 +1,8 @@
+---
+# KIND-local flux-operator configuration
+# Reduced resources for local development
+serviceMonitor:
+  create: false
+web:
+  networkPolicy:
+    create: false

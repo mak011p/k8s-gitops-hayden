@@ -6,6 +6,7 @@ metadata:
   name: kubescape
   namespace: security-system
 spec:
+  targetNamespace: kubescape
   interval: 1h
   chart:
     spec:

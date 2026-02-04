@@ -8,7 +8,8 @@ resources:
   - ../cluster-00
 
   # Local additions (not present in upstream overlay)
-  - ../../base/actions-runner-system/gha-runner-scale-set/ks.yaml
+  # NOTE: Self-hosted runner disabled - see commit message for reasoning
+  # - ../../base/actions-runner-system/gha-runner-scale-set/ks.yaml
   - ../../base/ai-system/kagent/ks.yaml
   - ../../base/ai-system/kmcp/ks.yaml
   - ../../base/ai-system/n8n/ks.yaml

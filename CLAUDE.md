@@ -254,25 +254,38 @@ The `master` branch is protected with required status checks. Direct pushes are 
 
 **Settings:**
 - Strict mode enabled (branch must be up-to-date with master)
-- Admins can bypass in emergencies (`enforce_admins: false`)
+- Admin bypass disabled (`enforce_admins: true`) - all users must use PRs
 - Force pushes and deletions disabled
+
+**Merge strategy: Squash merge**
+- All PRs use squash merge - multiple commits on a feature branch become one commit on master
+- This keeps master history clean while allowing iterative work on branches
+- Remote branches auto-delete on merge; clean up local branches manually
 
 **Workflow for changes:**
 ```bash
-# Create branch, make changes, push
-git checkout -b fix/my-change
-# ... make changes ...
-git add . && git commit -m "fix: description"
-git push -u origin fix/my-change
+# 1. Create feature branch
+git checkout -b feat/my-feature
 
-# Create PR and merge (waits for CI)
-gh pr create --fill
-gh pr merge --auto --merge  # Auto-merges when checks pass
+# 2. Make changes (multiple commits are fine - they'll be squashed)
+git add . && git commit -m "wip: initial implementation"
+git add . && git commit -m "wip: add tests"
+git add . && git commit -m "wip: fix edge case"
+
+# 3. Push and create PR
+git push -u origin feat/my-feature
+gh pr create --fill  # or --title "feat: description" --body "details"
+
+# 4. Merge (squashes all commits into one)
+gh pr merge --squash --delete-branch
+
+# 5. Return to master and clean up
+git checkout master && git pull && git branch -d feat/my-feature
 ```
 
 **Quick one-liner for simple fixes:**
 ```bash
-git checkout -b fix/quick && git add . && git commit -m "fix: quick change" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --auto --merge && git checkout master
+git checkout -b fix/quick && git add . && git commit -m "fix: description" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --squash --delete-branch && git checkout master && git pull && git branch -d fix/quick
 ```
 
 ### Making Changes to Applications

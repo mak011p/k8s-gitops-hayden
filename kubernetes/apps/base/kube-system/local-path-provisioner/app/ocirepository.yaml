@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/ocirepository-source-v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: local-path-provisioner
+spec:
+  interval: 5m
+  url: oci://ghcr.io/rancher/charts/local-path-provisioner
+  ref:
+    tag: 0.0.30

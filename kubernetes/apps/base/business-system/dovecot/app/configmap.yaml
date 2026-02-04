@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dovecot-config
+  namespace: business-system
+data:
+  dovecot.conf: |
+    # Include vendor defaults for rootless operation
+    !include /etc/dovecot/vendor.d/rootless.conf
+
+    # Logging
+    log_path = /dev/stderr
+    info_log_path = /dev/stderr
+
+    # Listen on all interfaces
+    listen = *
+
+    # Protocols - only IMAP needed for proxy
+    protocols = imap
+
+    # Mail location using imapc driver with local cache
+    mail_driver = imapc
+    mail_home = /srv/vmail/%u
+
+    # Include drop-in configurations
+    !include conf.d/*.conf
+
+  10-auth.conf: |
+    # Disable SSL requirement since we're in-cluster
+    disable_plaintext_auth = no
+
+    # Auth mechanisms
+    auth_mechanisms = plain login
+
+    # Passdb - authenticate against Migadu IMAP
+    passdb imap {
+      args = host=imap.migadu.com port=993 ssl=imaps
+      fields {
+        userdb_imapc_user = %u
+        userdb_imapc_password = %w
+      }
+    }
+
+    # Userdb - prefetch from passdb
+    userdb prefetch {
+    }
+
+  10-mail.conf: |
+    # Mail location using imapc with local caching
+    mail_location = imapc:~/imapc
+
+    # Namespace configuration
+    namespace inbox {
+      inbox = yes
+      separator = /
+    }
+
+  20-imapc.conf: |
+    # Migadu IMAP server
+    imapc_host = imap.migadu.com
+    imapc_port = 993
+    imapc_ssl = imaps
+
+    # Credentials from auth (populated by passdb)
+    imapc_user = %u
+    imapc_password = %w
+
+    # Enable features for better caching
+    imapc_features = rfc822.size fetch-headers fetch-bodystructure search
+
+    # Connection pooling
+    imapc_max_idle_time = 30 secs
+
+    # Command timeout
+    imapc_cmd_timeout = 5 mins
+
+  no-chroot.conf: |
+    # Disable chroot to avoid CAP_SYS_CHROOT requirement
+    service anvil {
+      chroot =
+    }
+    service imap-login {
+      chroot =
+    }
+    service imap {
+      chroot =
+    }
+
+  10-ssl.conf: |
+    # Disable SSL for in-cluster communication
+    # Roundcube connects via ClusterIP, traffic stays in cluster
+    # Dovecot-to-Migadu connection uses IMAPS (TLS)
+    ssl = no

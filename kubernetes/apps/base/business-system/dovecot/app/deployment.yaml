@@ -122,7 +122,10 @@ spec:
                           -o imapc_features="rfc822.size fetch-headers fetch-bodystructure" \
                           -o ssl_client_ca_dir=/etc/ssl/certs \
                           -o mail_location="imapc:/srv/vmail/$user/imapc" \
+                          -o mail_uid=101 \
+                          -o mail_gid=102 \
                           -o mail_prefetch_count=20 \
+                          -o auth_socket_path= \
                           sync -1 -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
                 done < /etc/dovecot-sync/users
 

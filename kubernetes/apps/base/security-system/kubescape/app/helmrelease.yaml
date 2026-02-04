@@ -1,0 +1,142 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kubescape
+  namespace: security-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: kubescape-operator
+      version: 1.24.2
+      sourceRef:
+        kind: HelmRepository
+        name: kubescape
+        namespace: flux-system
+      interval: 10m
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  values:
+    # Kubescape operator configuration
+    clusterName: cluster-00
+
+    # Enable all scanning capabilities
+    capabilities:
+      continuousScan: enable
+      nodeScan: enable
+      vulnerabilityScan: enable
+      runtimeObservability: enable
+      networkPolicyService: enable
+      autoUpgrading: enable
+      seccompProfileService: enable
+      relevancy: enable
+      runtimeDetection: enable
+      malwareDetection: enable
+
+    # Resource limits for operator components
+    kubescape:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+    kubescapeScheduler:
+      enabled: true
+      # Scan daily at 2am
+      scanSchedule: "0 2 * * *"
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    kubevuln:
+      enabled: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
+    operator:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    kollector:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    nodeAgent:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+    storage:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    # Prometheus ServiceMonitor for metrics
+    serviceMonitor:
+      enabled: true
+
+    # Node affinity for amd64 nodes
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64

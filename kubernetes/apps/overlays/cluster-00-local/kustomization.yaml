@@ -35,3 +35,4 @@ resources:
   - ../../base/observability/thanos-store/ks.yaml
   - ../../base/observability/thanos-query/ks.yaml
   - ../../base/security-system/kyverno/ks.yaml
+  - ../../base/security-system/kubescape/ks.yaml

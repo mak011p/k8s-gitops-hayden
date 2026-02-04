@@ -55,8 +55,8 @@ data:
     first_valid_uid = 101
     first_valid_gid = 102
 
-    # Mail location using imapc with local caching
-    mail_location = imapc:~/imapc
+    # Mail location - local mdbox storage (synced from Migadu)
+    mail_location = mdbox:~/mdbox
 
     # Namespace configuration
     namespace inbox {

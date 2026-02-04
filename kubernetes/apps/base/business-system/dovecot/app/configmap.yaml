@@ -6,6 +6,9 @@ metadata:
   namespace: business-system
 data:
   dovecot.conf: |
+    # Dovecot 2.4 requires version declaration
+    dovecot_config_version = 2.4
+
     # Logging
     log_path = /dev/stderr
     info_log_path = /dev/stderr

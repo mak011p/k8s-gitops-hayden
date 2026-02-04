@@ -254,7 +254,7 @@ The `master` branch is protected with required status checks. Direct pushes are 
 
 **Settings:**
 - Strict mode enabled (branch must be up-to-date with master)
-- Admins can bypass in emergencies (`enforce_admins: false`)
+- Admin bypass disabled (`enforce_admins: true`) - all users must use PRs
 - Force pushes and deletions disabled
 
 **Workflow for changes:**
@@ -267,13 +267,18 @@ git push -u origin fix/my-change
 
 # Create PR and merge (waits for CI)
 gh pr create --fill
-gh pr merge --auto --merge  # Auto-merges when checks pass
+gh pr merge --auto --merge --delete-branch  # Auto-merges when checks pass, deletes remote branch
+
+# Return to master and clean up local branch
+git checkout master && git pull && git branch -d fix/my-change
 ```
 
 **Quick one-liner for simple fixes:**
 ```bash
-git checkout -b fix/quick && git add . && git commit -m "fix: quick change" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --auto --merge && git checkout master
+git checkout -b fix/quick && git add . && git commit -m "fix: quick change" && git push -u origin fix/quick && gh pr create --fill && gh pr merge --auto --merge --delete-branch && git checkout master && git pull && git branch -d fix/quick
 ```
+
+**Branch cleanup:** Always delete branches after merging. Use `--delete-branch` with `gh pr merge` to delete remote branches automatically. Run `git branch -d <branch>` locally after switching back to master.
 
 ### Making Changes to Applications
 1. **Edit base configuration** in `kubernetes/apps/base/[system-name]/[app-name]/`

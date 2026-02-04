@@ -82,6 +82,7 @@ spec:
               drop:
                 - ALL
               add:
+                - CHOWN
                 - NET_BIND_SERVICE
       volumes:
         - name: config

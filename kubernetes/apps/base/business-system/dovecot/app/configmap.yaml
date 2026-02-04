@@ -74,15 +74,30 @@ data:
     imapc_cmd_timeout = 5 mins
 
   no-chroot.conf: |
-    # Disable chroot to avoid CAP_SYS_CHROOT requirement
+    # Rootless container settings - run all as same unprivileged user
+    # Prevents fchown() attempts that fail without CAP_CHOWN
+    default_internal_user = dovecot
+    default_login_user = dovecot
+
+    # Disable chroot and privilege dropping for all services
     service anvil {
       chroot =
+      user = dovecot
     }
     service imap-login {
       chroot =
+      user = dovecot
+      group = dovecot
     }
     service imap {
       chroot =
+      user = dovecot
+    }
+    service auth {
+      user = dovecot
+    }
+    service auth-worker {
+      user = dovecot
     }
 
   10-ssl.conf: |

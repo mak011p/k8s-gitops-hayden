@@ -46,16 +46,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
-        with:
-          scan-type: 'config'
-          scan-ref: 'kubernetes/'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          # Skip encrypted SOPS files
-          skip-files: '**/*.enc.yaml,**/*.enc.age.yaml'
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.60.0
+
+      - name: Run Trivy IaC scan (SARIF)
+        run: |
+          trivy config kubernetes/ \
+            --ignorefile .trivyignore.yaml \
+            --severity CRITICAL,HIGH \
+            --skip-dirs .archive \
+            --skip-files '**/*.enc.yaml' \
+            --skip-files '**/*.enc.age.yaml' \
+            --format sarif \
+            --output trivy-results.sarif
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -64,15 +68,15 @@ jobs:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy-iac'
 
-      - name: Run Trivy (table output for PR)
-        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
-        with:
-          scan-type: 'config'
-          scan-ref: 'kubernetes/'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-          skip-files: '**/*.enc.yaml,**/*.enc.age.yaml'
-          exit-code: '1'  # Fail on CRITICAL/HIGH
+      - name: Run Trivy IaC scan (table output, fail on findings)
+        run: |
+          trivy config kubernetes/ \
+            --ignorefile .trivyignore.yaml \
+            --severity CRITICAL,HIGH \
+            --skip-dirs .archive \
+            --skip-files '**/*.enc.yaml' \
+            --skip-files '**/*.enc.age.yaml' \
+            --exit-code 1
 
   gitleaks:
     name: Security - Gitleaks Secret Scan

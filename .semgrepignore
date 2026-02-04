@@ -1,0 +1,31 @@
+# Semgrep ignore file
+# https://semgrep.dev/docs/ignoring-files-folders-code
+
+# Archived/deprecated code - not deployed
+.archive/
+
+# SOPS encrypted files - can't be parsed
+*.enc.yaml
+*.enc.age.yaml
+
+# Talos generated configs - encrypted
+talos/generated/
+
+# Magento CronJobs - require writable filesystem for PHP cache/sessions
+# Risk accepted: containers run as non-root with dropped capabilities
+kubernetes/apps/base/business-system/magento-makergroup/*/cronjob.yaml
+
+# Elasticsearch ECK - securityContext managed by ECK operator
+# Risk accepted: ECK handles pod security internally
+kubernetes/apps/base/business-system/*-elasticsearch/
+
+# Semgrep's own SARIF output file (false positive on secrets detection)
+semgrep-results.sarif
+
+# GitHub Actions Runner - requires writable filesystem to execute jobs
+# Risk accepted: runs as non-root with dropped capabilities
+kubernetes/apps/base/actions-runner-system/gha-runner-scale-set/
+
+# Cilium mTLS certificates - not secrets, public CA certs for service mesh
+# Risk accepted: required for Cilium Hubble/mTLS, rotated via cert-manager
+talos/integrations/cilium/

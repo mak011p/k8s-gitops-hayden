@@ -1,0 +1,23 @@
+# Trivy ignore file for accepted security risks
+# https://trivy.dev/docs/latest/configuration/filtering/
+
+misconfigurations:
+  # Magento CronJobs - require writable filesystem for PHP cache/sessions
+  # Risk accepted: containers run as non-root with dropped capabilities
+  - id: AVD-KSV-0014
+    paths:
+      - apps/base/business-system/magento-makergroup/auntalma/cronjob.yaml
+      - apps/base/business-system/magento-makergroup/auntalma/redis-statefulset.yaml
+      - apps/base/business-system/magento-makergroup/hayden/cronjob.yaml
+    statement: |
+      Magento requires writable filesystem for PHP opcache, session storage,
+      and generated code. Containers run as non-root with dropped capabilities.
+
+  # Multus CNI - ClusterRole needs full access to k8s.cni.cncf.io resources
+  # Risk accepted: CNI plugin requires this for network management
+  - id: AVD-KSV-0046
+    paths:
+      - apps/base/network-system/multus/app/rbac.yaml
+    statement: |
+      Multus CNI requires wildcard RBAC access to manage network-attachment-definitions
+      and related CRDs for container network interface management.

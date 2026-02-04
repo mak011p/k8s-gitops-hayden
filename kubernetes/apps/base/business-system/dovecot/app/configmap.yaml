@@ -6,25 +6,25 @@ metadata:
   namespace: business-system
 data:
   dovecot.conf: |
-    # Include vendor defaults for rootless operation
-    !include /etc/dovecot/vendor.d/rootless.conf
-
     # Logging
     log_path = /dev/stderr
     info_log_path = /dev/stderr
 
-    # Listen on all interfaces
+    # Listen on all interfaces, non-privileged port
     listen = *
 
     # Protocols - only IMAP needed for proxy
     protocols = imap
 
+    # Base directory for runtime files
+    base_dir = /run/dovecot
+
     # Mail location using imapc driver with local cache
     mail_driver = imapc
     mail_home = /srv/vmail/%u
 
-    # Include drop-in configurations
-    !include conf.d/*.conf
+    # Include our custom configurations
+    !include_try conf.d/*.conf
 
   10-auth.conf: |
     # Disable SSL requirement since we're in-cluster

@@ -44,7 +44,7 @@ spec:
           app:
             image:
               repository: ghcr.io/hayden-agencies/odoo
-              tag: 18.0.20260203.2308-146f7d7@sha256:8e05abb9e24d86ba2a6f9437110ab512d8e8b11254c770b516edae2ad92cf414
+              tag: 18.0.20260203.2359-3fb9e8b@sha256:7ff7b7cd369bdfcbfdc1e9461f1d0d71a646231605064bc38e56479c5328015e
             env:
               - name: POSTGRES_HOST
                 value: odoo-pg-staging-rw.business-system-staging.svc.cluster.local

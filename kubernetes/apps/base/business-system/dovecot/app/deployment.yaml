@@ -113,9 +113,10 @@ spec:
             - |
               echo "Starting sync sidecar..."
 
-              # Resolve Migadu IMAP hostname (IPv4 only - IPv6 unreachable in cluster)
+              # Force IPv4 for Migadu - add to /etc/hosts so SNI hostname works
               MIGADU_IP=$(getent ahostsv4 imap.migadu.com | awk '{print $1}' | head -1)
-              echo "Resolved imap.migadu.com to $MIGADU_IP"
+              echo "$MIGADU_IP imap.migadu.com" >> /etc/hosts
+              echo "Added hosts entry: $MIGADU_IP imap.migadu.com"
 
               while true; do
                 echo "=== Sync run at $(date) ==="
@@ -130,14 +131,13 @@ spec:
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."
-                  # Uses main dovecot's auth socket via shared /run/dovecot
+                  # Uses hostname for proper SNI, /etc/hosts forces IPv4
                   doveadm -o base_dir=/run/dovecot \
                           -o first_valid_uid=101 \
                           -o first_valid_gid=102 \
-                          -o imapc_host=$MIGADU_IP \
+                          -o imapc_host=imap.migadu.com \
                           -o imapc_port=993 \
                           -o imapc_ssl=imaps \
-                          -o imapc_ssl_verify=no \
                           -o imapc_user="$user" \
                           -o imapc_password="$password" \
                           -o imapc_features="rfc822.size fetch-headers fetch-bodystructure" \

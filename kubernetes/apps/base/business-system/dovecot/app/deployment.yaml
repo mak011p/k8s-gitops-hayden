@@ -22,7 +22,7 @@ spec:
         app.kubernetes.io/component: imap-proxy
     spec:
       securityContext:
-        fsGroup: 1000
+        fsGroup: 102  # dovecot group - allows writing to cache PVC
         seccompProfile:
           type: RuntimeDefault
       initContainers:

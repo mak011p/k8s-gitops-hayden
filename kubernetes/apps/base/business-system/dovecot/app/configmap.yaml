@@ -84,7 +84,7 @@ data:
     default_internal_user = dovecot
     default_login_user = dovecot
 
-    # dns-client needed for sync DNS resolution (may panic on shutdown but works)
+    # dns-client may panic on shutdown but is needed for IMAP sync DNS resolution
     service dns-client {
       user = dovecot
     }

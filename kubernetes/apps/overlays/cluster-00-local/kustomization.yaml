@@ -27,7 +27,6 @@ resources:
   - ../../base/democratic-csi
   - ../../base/democratic-csi/democratic-csi/ks.yaml
   # development namespace already included via cluster-00 base
-  - ../../base/development/dev-pod/ks.yaml
   - ../../base/home-system
   - ../../base/home-system/home-assistant/ks.yaml
   - ../../base/home-system/mosquitto/ks.yaml

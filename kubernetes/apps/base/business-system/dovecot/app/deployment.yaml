@@ -126,7 +126,7 @@ spec:
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."
-                  # Uses main dovecot's dns-client and auth via shared /run/dovecot
+                  # Uses main dovecot's dns-client via shared /run/dovecot
                   doveadm -o base_dir=/run/dovecot \
                           -o first_valid_uid=101 \
                           -o first_valid_gid=102 \

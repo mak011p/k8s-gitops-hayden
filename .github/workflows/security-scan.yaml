@@ -1,0 +1,163 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Security Scan
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  filter:
+    name: Security - Filter
+    runs-on: ubuntu-latest
+    outputs:
+      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+      any-changed: ${{ steps.changed-files.outputs.any_changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: bjw-s-labs/action-changed-files@015416e33c709af88f84a4496f4030c1f0ef212e # v0.5.0
+        with:
+          patterns: kubernetes/**/*
+
+  trivy:
+    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    needs: filter
+    name: Security - Trivy IaC Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
+        with:
+          scan-type: 'config'
+          scan-ref: 'kubernetes/'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          # Skip encrypted SOPS files
+          skip-files: '**/*.enc.yaml,**/*.enc.age.yaml'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy-iac'
+
+      - name: Run Trivy (table output for PR)
+        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5 # v0.30.0
+        with:
+          scan-type: 'config'
+          scan-ref: 'kubernetes/'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          skip-files: '**/*.enc.yaml,**/*.enc.age.yaml'
+          exit-code: '1'  # Fail on CRITICAL/HIGH
+
+  gitleaks:
+    name: Security - Gitleaks Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          args: --redact
+
+      - name: Upload Gitleaks SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('results.sarif') != ''
+        with:
+          sarif_file: 'results.sarif'
+          category: 'gitleaks'
+
+  semgrep:
+    name: Security - Semgrep SAST
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan \
+            --config "p/security-audit" \
+            --config "p/secrets" \
+            --config "p/supply-chain" \
+            --config "p/dockerfile" \
+            --config "p/kubernetes" \
+            --sarif \
+            --output semgrep-results.sarif \
+            --exclude "*.enc.yaml" \
+            --exclude "*.enc.age.yaml" \
+            --exclude "talos/generated/*" \
+            .
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'semgrep-results.sarif'
+          category: 'semgrep'
+
+      - name: Run Semgrep (text output for PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          semgrep scan \
+            --config "p/security-audit" \
+            --config "p/secrets" \
+            --config "p/supply-chain" \
+            --config "p/dockerfile" \
+            --config "p/kubernetes" \
+            --exclude "*.enc.yaml" \
+            --exclude "*.enc.age.yaml" \
+            --exclude "talos/generated/*" \
+            --error \
+            .
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  success:
+    if: ${{ !cancelled() }}
+    needs: ["trivy", "gitleaks", "semgrep"]
+    name: Security - Success
+    runs-on: ubuntu-latest
+    steps:
+      - name: Any jobs failed?
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
+      - name: All jobs passed or skipped?
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: echo "All security checks passed"

@@ -1,0 +1,55 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubescape
+  namespace: security-system
+spec:
+  groups:
+    - name: kubescape
+      rules:
+        - alert: KubescapeHighRiskWorkload
+          expr: kubescape_control_score{severity="Critical"} > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical security finding detected by Kubescape"
+            description: "Kubescape detected a critical severity security issue in the cluster. Control: {{ $labels.control_name }}"
+
+        - alert: KubescapeMediumRiskWorkload
+          expr: kubescape_control_score{severity="High"} > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High severity security finding detected by Kubescape"
+            description: "Kubescape detected a high severity security issue. Control: {{ $labels.control_name }}"
+
+        - alert: KubescapeVulnerabilityDetected
+          expr: kubescape_vulnerability_count{severity="Critical"} > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical vulnerability detected by Kubescape"
+            description: "Kubescape vulnerability scanner detected critical vulnerabilities in {{ $labels.namespace }}/{{ $labels.workload }}"
+
+        - alert: KubescapeScanFailed
+          expr: kubescape_scan_status{status="failed"} > 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Kubescape scan failed"
+            description: "Kubescape security scan has failed. Check the operator logs for details."
+
+        - alert: KubescapeMalwareDetected
+          expr: kubescape_malware_detection_count > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Malware detected by Kubescape"
+            description: "Kubescape runtime detection identified potential malware in {{ $labels.namespace }}/{{ $labels.pod }}"

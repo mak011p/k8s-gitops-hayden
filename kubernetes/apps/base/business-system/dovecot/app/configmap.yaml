@@ -47,7 +47,7 @@ data:
     # Static userdb fallback for doveadm operations
     userdb {
       driver = static
-      args = uid=101 gid=102 home=/srv/vmail/%u
+      args = uid=101 gid=102 home=/srv/vmail/%u allow_all_users=yes
     }
 
   10-mail.conf: |

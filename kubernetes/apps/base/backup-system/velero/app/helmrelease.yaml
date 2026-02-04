@@ -76,11 +76,11 @@ spec:
       existingSecret: velero-gcs
 
     snapshotsEnabled: true
-    deployNodeAgent: true
-
-    nodeAgent:
-      podVolumePath: /var/lib/kubelet/pods
-      privileged: true
+    # Node-agent disabled - not needed because:
+    # 1. Volume backups use CSI snapshots (csi-ceph-blockpool)
+    # 2. File-level backups handled by VolSync (Restic)
+    # 3. Avoids privileged container security vulnerability
+    deployNodeAgent: false
 
     schedules: {}
 

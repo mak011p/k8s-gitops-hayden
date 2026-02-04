@@ -91,6 +91,9 @@ spec:
         // Threading - Gmail-like conversation view
         $config['default_list_mode'] = 'threads';
         $config['reply_all_mode'] = 1;
+
+        // Temporarily disable save to Sent folder to debug send errors
+        $config['no_save_sent_messages'] = true;
       # PHP-FPM tuning for better concurrency
       customPhpFpmConfig: |
         pm = dynamic

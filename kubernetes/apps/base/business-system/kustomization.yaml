@@ -17,3 +17,4 @@ resources:
   - hayden-rabbitmq/ks.yaml
   - magento-makergroup/ks.yaml
   - chatwoot/ks.yaml
+  - roundcube/ks.yaml

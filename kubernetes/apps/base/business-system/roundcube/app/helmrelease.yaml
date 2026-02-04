@@ -1,0 +1,142 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: roundcube
+  namespace: business-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: roundcube
+      version: "1.16.0"
+      sourceRef:
+        kind: HelmRepository
+        name: mlohr
+        namespace: business-system
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  values:
+    # Deployment settings
+    replicaCount: 1
+
+    image:
+      pullPolicy: IfNotPresent
+
+    # Migadu IMAP configuration
+    imap:
+      host: imap.migadu.com
+      port: 993
+      encryption: ssltls
+
+    # Migadu SMTP configuration (uses user's IMAP credentials)
+    smtp:
+      host: smtp.migadu.com
+      port: 465
+      encryption: ssltls
+      user: "%u"
+      password: "%p"
+
+    # External PostgreSQL database (uses embedded chart)
+    externalDatabase:
+      type: pgsql
+      host: roundcube-postgresql
+      port: 5432
+      name: roundcube
+      user: roundcube
+      existingSecret: roundcube-secret
+      existingSecretPasswordKey: db-password
+
+    # Enable embedded PostgreSQL (Bitnami subchart)
+    zalandoPostgresql:
+      enabled: false
+
+    postgresql:
+      enabled: true
+      auth:
+        database: roundcube
+        username: roundcube
+        existingSecret: roundcube-secret
+        secretKeys:
+          userPasswordKey: db-password
+      primary:
+        persistence:
+          enabled: true
+          storageClass: ceph-block
+          size: 5Gi
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+
+    # Roundcube configuration
+    roundcube:
+      desKey:
+        existingSecret: roundcube-secret
+        existingSecretKey: des-key
+      defaultHost: imap.migadu.com
+      productName: "Hayden Mail"
+      uploadMaxFilesize: 25M
+
+    # Skin configuration
+    skins:
+      elastic:
+        enabled: true
+        default: true
+
+    # Plugins configuration
+    plugins:
+      managesieve:
+        enabled: true
+        config:
+          managesieve_host: imap.migadu.com
+          managesieve_port: 4190
+          managesieve_usetls: true
+
+    # Ingress disabled - using Gateway API
+    ingress:
+      enabled: false
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 80
+
+    # Resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+
+    # Pod disruption budget
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1

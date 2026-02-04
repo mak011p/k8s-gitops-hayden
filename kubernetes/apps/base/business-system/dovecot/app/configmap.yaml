@@ -106,6 +106,12 @@ data:
     }
     service auth {
       user = dovecot
+      # Socket for doveadm userdb lookups
+      unix_listener auth-userdb {
+        mode = 0660
+        user = dovecot
+        group = dovecot
+      }
     }
     service auth-worker {
       user = dovecot

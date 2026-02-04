@@ -1,0 +1,269 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3.41.0'
+
+vars:
+  CLUSTER_ID: '{{.CLUSTER_ID | default "kind-local"}}'
+  KIND_CLUSTER_NAME: '{{.KIND_CLUSTER_NAME | default "k8s-gitops-local"}}'
+  KIND_CONFIG: '{{.ROOT_DIR}}/.taskfiles/kind/kind-config.yaml'
+  DEV_AGE_KEY: '{{.HOME}}/.config/sops/age/keys-dev.txt'
+
+env:
+  CLUSTER_ID: '{{.CLUSTER_ID}}'
+  ROOT_DIR: '{{.ROOT_DIR}}'
+
+tasks:
+  create:
+    desc: "Create KIND cluster for local development"
+    summary: |
+      Creates a KIND (Kubernetes IN Docker) cluster for local GitOps testing.
+      The cluster has 1 control-plane and 2 worker nodes.
+
+      This cluster is isolated from production and does NOT interact with:
+      - Cloudflare (no external-dns, no cloudflare-tunnel)
+      - 1Password (no external-secrets)
+      - GCS (no thanos, no velero)
+      - Let's Encrypt (self-signed certs only)
+    platforms: [darwin, linux]
+    cmds:
+      - kind create cluster --name {{.KIND_CLUSTER_NAME}} --config {{.KIND_CONFIG}}
+      - |
+        echo ""
+        echo "KIND cluster '{{.KIND_CLUSTER_NAME}}' created successfully!"
+        echo "Next steps:"
+        echo "  1. Generate dev Age key:  task kind:age-keygen"
+        echo "  2. Full setup:            task kind:setup"
+    status:
+      - kind get clusters 2>/dev/null | grep -q {{.KIND_CLUSTER_NAME}}
+    preconditions:
+      - which kind
+      - which docker
+      - test -f {{.KIND_CONFIG}}
+
+  delete:
+    desc: "Delete KIND cluster"
+    platforms: [darwin, linux]
+    cmds:
+      - kind delete cluster --name {{.KIND_CLUSTER_NAME}}
+      - echo "KIND cluster '{{.KIND_CLUSTER_NAME}}' deleted"
+    preconditions:
+      - kind get clusters 2>/dev/null | grep -q {{.KIND_CLUSTER_NAME}}
+
+  age-keygen:
+    desc: "Generate development Age key for SOPS (separate from production)"
+    summary: |
+      Generates a new Age keypair for local development.
+      This key is stored at ~/.config/sops/age/keys-dev.txt
+
+      IMPORTANT: This is a SEPARATE key from production.
+      You cannot decrypt production secrets with this key (by design).
+    platforms: [darwin, linux]
+    cmds:
+      - mkdir -p {{.HOME}}/.config/sops/age
+      - |
+        if [ -f "{{.DEV_AGE_KEY}}" ]; then
+          echo "Development Age key already exists at {{.DEV_AGE_KEY}}"
+          echo ""
+          echo "Public key:"
+          grep "public key:" {{.DEV_AGE_KEY}} | cut -d: -f2 | tr -d ' '
+          echo ""
+          echo "To regenerate, first delete: rm {{.DEV_AGE_KEY}}"
+        else
+          age-keygen -o {{.DEV_AGE_KEY}}
+          chmod 600 {{.DEV_AGE_KEY}}
+          echo ""
+          echo "Generated new development Age key at {{.DEV_AGE_KEY}}"
+          echo ""
+          echo "Public key (add this to .sops.yaml for kind-local):"
+          grep "public key:" {{.DEV_AGE_KEY}} | cut -d: -f2 | tr -d ' '
+          echo ""
+          echo "IMPORTANT: Update .sops.yaml with this public key before encrypting secrets"
+        fi
+    preconditions:
+      - which age-keygen
+
+  preflight:
+    desc: "Run preflight checks for KIND bootstrap"
+    summary: |
+      Validates local environment before running KIND bootstrap:
+      - KIND cluster exists
+      - kubectl can connect
+      - Dev Age key exists
+      - Required files exist
+    platforms: [darwin, linux]
+    cmds:
+      - cmd: |
+          if ! kind get clusters 2>/dev/null | grep -q {{.KIND_CLUSTER_NAME}}; then
+            echo "ERROR: KIND cluster '{{.KIND_CLUSTER_NAME}}' not found"
+            echo "Fix with: task kind:create"
+            exit 1
+          fi
+          echo "KIND cluster OK"
+        silent: false
+      - cmd: |
+          if ! kubectl cluster-info --request-timeout=5s >/dev/null 2>&1; then
+            echo "ERROR: kubectl cannot connect to cluster"
+            echo "Ensure KIND cluster is running and kubectl context is set"
+            exit 1
+          fi
+          echo "kubectl connectivity OK"
+        silent: false
+      - cmd: |
+          if [ ! -f "{{.DEV_AGE_KEY}}" ]; then
+            echo "ERROR: Development Age key not found at {{.DEV_AGE_KEY}}"
+            echo "Fix with: task kind:age-keygen"
+            exit 1
+          fi
+          echo "Dev Age key OK"
+        silent: false
+
+  secrets:
+    desc: "Install KIND cluster secrets (Age-only, no GCP required)"
+    summary: |
+      Applies secrets to the KIND cluster using the development Age key.
+      No GCP credentials are required - only local Age decryption.
+    env:
+      SOPS_AGE_KEY_FILE: '{{.DEV_AGE_KEY}}'
+    cmds:
+      - kubectl create namespace flux-system --dry-run=client -oyaml | kubectl apply -f -
+      - sops --decrypt "{{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/sops-age.enc.age.yaml" | kubectl apply -f -
+      - sops --decrypt "{{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/cluster-secrets.enc.age.yaml" | kubectl apply -f -
+      - kubectl apply -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/cluster-config.yaml
+      - echo "Secrets installed successfully"
+    preconditions:
+      - test -f {{.DEV_AGE_KEY}}
+      - test -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/sops-age.enc.age.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/cluster-secrets.enc.age.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/secrets/cluster-config.yaml
+    requires:
+      vars: [CLUSTER_ID]
+    silent: true
+
+  bootstrap:
+    desc: "Bootstrap Flux into KIND cluster"
+    summary: |
+      Bootstraps FluxCD into the KIND cluster using Helmfile.
+      This installs flux-operator, flux-instance, and cert-manager.
+    prompt: "Bootstrap FluxCD into KIND cluster '{{.KIND_CLUSTER_NAME}}'? (CLUSTER_ID={{.CLUSTER_ID}})"
+    deps: [preflight]
+    cmds:
+      - helmfile apply --file {{.ROOT_DIR}}/kubernetes/bootstrap/helmfile.yaml --skip-diff-on-install {{.CLI_ARGS}}
+      - echo ""
+      - echo "Bootstrap complete! Watch reconciliation with:"
+      - echo "  flux get all -A --watch"
+    requires:
+      vars: [CLUSTER_ID]
+    preconditions:
+      - which helmfile
+      - test -f {{.ROOT_DIR}}/kubernetes/bootstrap/helmfile.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/flux-system/flux-operator/app/values.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/clusters/{{.CLUSTER_ID}}/flux-system/flux-instance/app/values.yaml
+    silent: true
+
+  setup:
+    desc: "Full KIND setup: create cluster, secrets, and bootstrap Flux"
+    summary: |
+      One-command setup for local development:
+      1. Creates KIND cluster (if not exists)
+      2. Checks for dev Age key (must exist)
+      3. Applies secrets
+      4. Bootstraps Flux
+
+      Prerequisites:
+      - Run 'task kind:age-keygen' first (one-time)
+      - Ensure secrets are encrypted with dev Age key
+    cmds:
+      - task: create
+      - task: secrets
+      - task: bootstrap
+
+  status:
+    desc: "Show Flux status in KIND cluster"
+    cmds:
+      - flux get all -A
+
+  reconcile:
+    desc: "Force reconcile all Flux resources"
+    cmds:
+      - flux reconcile kustomization flux-system --with-source
+
+  port-forward:grafana:
+    desc: "Port-forward Grafana (http://localhost:3000)"
+    cmds:
+      - |
+        echo "Grafana available at http://localhost:3000"
+        echo "Default credentials: admin / (check cluster-secrets)"
+        kubectl port-forward -n observability svc/grafana 3000:80
+
+  port-forward:prometheus:
+    desc: "Port-forward Prometheus (http://localhost:9090)"
+    cmds:
+      - |
+        echo "Prometheus available at http://localhost:9090"
+        kubectl port-forward -n observability svc/kube-prometheus-stack-prometheus 9090:9090
+
+  verify-isolation:
+    desc: "Verify no external service components are deployed"
+    summary: |
+      Checks that the KIND cluster does NOT have components that interact
+      with external/live services like Cloudflare, 1Password, or GCS.
+    cmds:
+      - |
+        echo "Checking for external service components..."
+        FAILED=0
+
+        # Check external-dns
+        if kubectl get deploy -A 2>/dev/null | grep -q external-dns; then
+          echo "FAIL: external-dns is deployed (would update Cloudflare)"
+          FAILED=1
+        else
+          echo "OK: external-dns not deployed"
+        fi
+
+        # Check cloudflare-tunnel
+        if kubectl get deploy -A 2>/dev/null | grep -q cloudflare; then
+          echo "FAIL: cloudflare component is deployed"
+          FAILED=1
+        else
+          echo "OK: cloudflare components not deployed"
+        fi
+
+        # Check 1Password/external-secrets
+        if kubectl get deploy -A 2>/dev/null | grep -qE "(onepassword|external-secrets)"; then
+          echo "FAIL: external-secrets/1Password is deployed"
+          FAILED=1
+        else
+          echo "OK: external-secrets not deployed"
+        fi
+
+        # Check thanos
+        if kubectl get deploy -A 2>/dev/null | grep -q thanos; then
+          echo "FAIL: thanos is deployed (connects to GCS)"
+          FAILED=1
+        else
+          echo "OK: thanos not deployed"
+        fi
+
+        # Check velero
+        if kubectl get deploy -A 2>/dev/null | grep -q velero; then
+          echo "FAIL: velero is deployed (connects to GCS)"
+          FAILED=1
+        else
+          echo "OK: velero not deployed"
+        fi
+
+        # Summary
+        echo ""
+        if [ $FAILED -eq 0 ]; then
+          echo "All isolation checks passed! KIND cluster is safe."
+        else
+          echo "WARNING: Some external service components are deployed!"
+          exit 1
+        fi
+
+  teardown:
+    desc: "Complete teardown of KIND cluster"
+    prompt: "This will delete the KIND cluster '{{.KIND_CLUSTER_NAME}}'. Continue?"
+    cmds:
+      - task: delete
+      - echo "KIND cluster teardown complete"

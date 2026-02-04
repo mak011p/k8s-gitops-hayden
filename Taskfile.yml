@@ -15,6 +15,7 @@ includes:
   docs: .taskfiles/mkdocs
   odoo: .taskfiles/odoo
   talos: .taskfiles/talos
+  kind: .taskfiles/kind
 
 tasks:
   flux:

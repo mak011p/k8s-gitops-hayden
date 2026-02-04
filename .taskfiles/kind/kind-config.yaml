@@ -1,0 +1,46 @@
+---
+# KIND cluster configuration for local GitOps development
+# This creates a lightweight cluster for testing Flux configurations
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: k8s-gitops-local
+nodes:
+  # Control plane node
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    # Port mappings for local access
+    extraPortMappings:
+      # HTTP - for Envoy Gateway
+      - containerPort: 80
+        hostPort: 8080
+        protocol: TCP
+      # HTTPS - for Envoy Gateway
+      - containerPort: 443
+        hostPort: 8443
+        protocol: TCP
+      # NodePort range for services
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+      - containerPort: 30001
+        hostPort: 30001
+        protocol: TCP
+  # Worker nodes
+  - role: worker
+  - role: worker
+networking:
+  # Use default kindnet CNI (simpler than Cilium for local dev)
+  # Cilium can be installed later if needed for testing
+  disableDefaultCNI: false
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+# containerdConfigPatches for image pulling (optional)
+# containerdConfigPatches:
+#   - |-
+#     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."ghcr.io"]
+#       endpoint = ["https://ghcr.io"]

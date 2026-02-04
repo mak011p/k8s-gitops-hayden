@@ -113,8 +113,8 @@ spec:
             - |
               echo "Starting sync sidecar..."
 
-              # Resolve Migadu IMAP hostname using system DNS (bypasses Dovecot dns-client)
-              MIGADU_IP=$(getent hosts imap.migadu.com | awk '{print $1}' | head -1)
+              # Resolve Migadu IMAP hostname (IPv4 only - IPv6 unreachable in cluster)
+              MIGADU_IP=$(getent ahostsv4 imap.migadu.com | awk '{print $1}' | head -1)
               echo "Resolved imap.migadu.com to $MIGADU_IP"
 
               while true; do

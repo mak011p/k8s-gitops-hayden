@@ -22,7 +22,7 @@ env:
 
 jobs:
   publish:
-    runs-on: gha-runner-scale-set
+    runs-on: ubuntu-latest
     env:
       COSIGN_EXPERIMENTAL: "true"
       COSIGN_YES: "true"
@@ -37,10 +37,6 @@ jobs:
 
       - name: Setup Crane
         uses: imjasonh/setup-crane@31b88efe9de28ae0ffa220711af4b60be9435f6e # v0.4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y gettext-base
 
       - name: Setup Cosign
         uses: sigstore/cosign-installer@main

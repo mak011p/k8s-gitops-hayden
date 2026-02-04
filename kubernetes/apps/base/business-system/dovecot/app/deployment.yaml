@@ -129,7 +129,7 @@ spec:
                           -o ssl_client_ca_dir=/etc/ssl/certs \
                           -o mail_location="mdbox:/srv/vmail/$user/mdbox" \
                           -o mail_prefetch_count=20 \
-                          backup -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
+                          sync -1 -R -u "$user" imapc: 2>&1 || echo "Sync failed for $user"
                 done < /etc/dovecot-sync/users
 
                 echo "=== Sync complete, sleeping 5m ==="

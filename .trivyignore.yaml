@@ -21,3 +21,13 @@ misconfigurations:
     statement: |
       Multus CNI requires wildcard RBAC access to manage network-attachment-definitions
       and related CRDs for container network interface management.
+
+  # Dovecot IMAP proxy - config uses %w variable substitution, not actual secrets
+  # Risk accepted: imapc_password=%w passes client credentials at runtime
+  - id: AVD-KSV-0109
+    paths:
+      - apps/base/business-system/dovecot/app/configmap.yaml
+    statement: |
+      Dovecot imapc configuration uses %w variable substitution for runtime
+      password passthrough to Migadu IMAP. No actual secrets are stored in the
+      ConfigMap - credentials are provided by users at login time.

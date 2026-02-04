@@ -5,4 +5,4 @@ kind: Kustomization
 namespace: velero
 
 resources:
-  - odoo-backup.yaml
+  - business-system-weekly.yaml

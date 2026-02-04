@@ -2,14 +2,14 @@
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
-  name: odoo-weekly
+  name: business-system-weekly
   namespace: velero
 spec:
   # Weekly Sunday 04:00 Melbourne time (AEDT) - 1 hour after CNPG backup
   # 04:00 AEDT = 17:00 UTC Saturday (UTC+11 in summer)
   schedule: "0 17 * * 6"
   template:
-    # Backup business-system namespace
+    # Backup business-system namespace (Odoo, Roundcube, Chatwoot, etc.)
     includedNamespaces:
       - business-system
 

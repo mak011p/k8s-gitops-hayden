@@ -113,11 +113,6 @@ spec:
             - |
               echo "Starting sync sidecar..."
 
-              # Force IPv4 for Migadu - add to /etc/hosts so SNI hostname works
-              MIGADU_IP=$(getent ahostsv4 imap.migadu.com | awk '{print $1}' | head -1)
-              echo "$MIGADU_IP imap.migadu.com" >> /etc/hosts
-              echo "Added hosts entry: $MIGADU_IP imap.migadu.com"
-
               while true; do
                 echo "=== Sync run at $(date) ==="
 
@@ -131,7 +126,7 @@ spec:
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."
-                  # Uses hostname for proper SNI, /etc/hosts forces IPv4
+                  # Uses main dovecot's dns-client and auth via shared /run/dovecot
                   doveadm -o base_dir=/run/dovecot \
                           -o first_valid_uid=101 \
                           -o first_valid_gid=102 \

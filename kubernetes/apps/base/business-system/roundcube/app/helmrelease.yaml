@@ -87,6 +87,10 @@ spec:
 
         // Cache larger messages (up to 500KB)
         $config['message_cache_threshold'] = 500;
+
+        // Threading - Gmail-like conversation view
+        $config['default_list_mode'] = 'threads';
+        $config['reply_all_mode'] = 1;
       # PHP-FPM tuning for better concurrency
       customPhpFpmConfig: |
         pm = dynamic

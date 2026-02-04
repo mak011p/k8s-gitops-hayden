@@ -109,8 +109,8 @@ spec:
                   [ -z "$line" ] && continue
                   echo "$line" | grep -q "^#" && continue
 
-                  user="${line%%:*}"
-                  password="${line#*:}"
+                  user="$${line%%:*}"
+                  password="$${line#*:}"
                   [ -z "$user" ] && continue
 
                   echo "Syncing $user..."

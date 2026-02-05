@@ -25,7 +25,8 @@ spec:
     retryOn:
       # Only retry on connection failures - NOT 'reset' which can cause
       # duplicate execution of non-idempotent Odoo operations (orders, invoices).
-      - connect-failure
+      triggers:
+        - connect-failure
     perRetry:
       timeout: 10s
       backOff:

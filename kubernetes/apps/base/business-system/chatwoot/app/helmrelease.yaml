@@ -46,6 +46,11 @@ spec:
       tag: v4.10.1
       pullPolicy: IfNotPresent
 
+    # Puma web server tuning - fork 2 worker processes per pod
+    # 2 workers x 5 threads x 2 pods = 20 concurrent requests
+    env:
+      WEB_CONCURRENCY: "2"
+
     # Reference existing secret for sensitive env vars (supplements chart-managed chatwoot-env)
     existingEnvSecret: chatwoot-env-secrets
 

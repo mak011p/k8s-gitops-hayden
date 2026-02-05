@@ -8,6 +8,7 @@ resources:
   - envoy.yaml
   - gatewayclass.yaml
   - gateways.yaml
+  - clienttrafficpolicy.yaml
   - grafanadashboards.yaml
   - httproutes.yaml
   - monitors.yaml

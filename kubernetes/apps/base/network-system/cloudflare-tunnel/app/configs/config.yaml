@@ -25,6 +25,11 @@ ingress:
     service: https://envoy-external.network-system.svc.cluster.local
     originRequest:
       originServerName: external.${CLUSTER_DOMAIN}
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      keepAliveTimeout: 90s
+      keepAliveConnections: 100
+      http2Origin: true
 
   # Catch-all rule, which responds with 404 if traffic doesn't match any of
   # the earlier rules

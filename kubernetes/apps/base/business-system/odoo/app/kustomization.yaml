@@ -20,6 +20,7 @@ resources:
   - scheduledbackup.yaml
   - httproute.yaml
   - securitypolicy.yaml
+  - backendtrafficpolicy.yaml
   - pdb.yaml
   - hpa.yaml
   - pooler.yaml

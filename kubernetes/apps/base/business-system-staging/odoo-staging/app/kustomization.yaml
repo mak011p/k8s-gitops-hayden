@@ -14,3 +14,4 @@ resources:
   - pvc.yaml
   - httproute.yaml
   - securitypolicy.yaml
+  - backendtrafficpolicy.yaml

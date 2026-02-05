@@ -27,6 +27,7 @@ spec:
           port: 80
           weight: 100
     # WebSocket/longpolling routes to gevent port
+    # Long-lived connections for Odoo's real-time bus - disable request timeout.
     - matches:
         - path:
             type: PathPrefix
@@ -34,12 +35,19 @@ spec:
         - path:
             type: PathPrefix
             value: /longpolling
+      timeouts:
+        request: 0s
+        backendRequest: 0s
       backendRefs:
         - name: odoo-staging
           port: 8072
           weight: 100
     # Default route to main port
-    - backendRefs:
+    # Odoo official nginx recommendation: proxy_read_timeout 720s (exceeds limit_time_real 120s).
+    - timeouts:
+        request: 720s
+        backendRequest: 720s
+      backendRefs:
         - name: odoo-staging
           port: 8071
           weight: 100

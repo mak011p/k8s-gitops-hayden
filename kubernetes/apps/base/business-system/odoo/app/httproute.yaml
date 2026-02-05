@@ -27,6 +27,8 @@ spec:
           port: 80
           weight: 100
     # WebSocket/longpolling routes to gevent port
+    # These are long-lived connections for Odoo's real-time bus (chat, notifications).
+    # Disable request timeout (0s) so Envoy doesn't kill them prematurely.
     - matches:
         - path:
             type: PathPrefix
@@ -34,12 +36,19 @@ spec:
         - path:
             type: PathPrefix
             value: /longpolling
+      timeouts:
+        request: 0s
+        backendRequest: 0s
       backendRefs:
         - name: odoo
           port: 8072
           weight: 100
     # Default route to main port
-    - backendRefs:
+    # Odoo official nginx recommendation: proxy_read_timeout 720s (exceeds limit_time_real 120s).
+    - timeouts:
+        request: 720s
+        backendRequest: 720s
+      backendRefs:
         - name: odoo
           port: 8071
           weight: 100

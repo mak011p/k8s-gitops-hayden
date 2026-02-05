@@ -101,6 +101,7 @@ spec:
                 - ALL
               add:
                 - CHOWN
+                - KILL
                 - SETGID
                 - SETUID
                 - NET_BIND_SERVICE

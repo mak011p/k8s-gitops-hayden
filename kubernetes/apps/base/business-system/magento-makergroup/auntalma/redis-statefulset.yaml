@@ -32,7 +32,7 @@ spec:
       # Note: initContainer removed - fsGroup handles volume permissions
       containers:
         - name: redis
-          image: redis:7.2-alpine
+          image: redis:8.4-alpine
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -50,8 +50,8 @@ data:
     max_chunks_get_range_requests: 3
     chunk_object_attrs_ttl: 24h
     chunk_subrange_ttl: 24h
-    blocks_iter_ttl: 5m
-    metafile_exists_ttl: 2h
-    metafile_doesnt_exist_ttl: 15m
+    blocks_iter_ttl: 30m
+    metafile_exists_ttl: 6h
+    metafile_doesnt_exist_ttl: 30m
     metafile_content_ttl: 24h
     metafile_max_size: 1MB

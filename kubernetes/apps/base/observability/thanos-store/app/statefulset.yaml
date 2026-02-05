@@ -40,8 +40,10 @@ spec:
             - --index-cache.config-file=/etc/thanos-cache/index-cache.yaml
             # Caching bucket - caches GCS chunks in memcached (REDUCES EGRESS!)
             - --store.caching-bucket.config-file=/etc/thanos-cache/caching-bucket.yaml
-            # Sync blocks more frequently
-            - --sync-block-duration=3m
+            # Sync blocks less frequently to reduce GCS API calls
+            - --sync-block-duration=15m
+            # Lazy load index headers to reduce startup GCS calls
+            - --store.enable-index-header-lazy-reader
             # Increase concurrency for better performance
             - --store.grpc.series-max-concurrency=30
             - --chunk-pool-size=2GB

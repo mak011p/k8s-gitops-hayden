@@ -1,0 +1,57 @@
+---
+# Index cache configuration - caches block index data
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-store-index-cache
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: thanos-store
+    app.kubernetes.io/component: store-gateway
+data:
+  index-cache.yaml: |
+    type: MEMCACHED
+    config:
+      addresses:
+        - thanos-store-memcached.observability.svc.cluster.local:11211
+      timeout: 500ms
+      max_idle_connections: 100
+      max_async_concurrency: 20
+      max_async_buffer_size: 10000
+      max_get_multi_concurrency: 100
+      max_get_multi_batch_size: 0
+      dns_provider_update_interval: 10s
+---
+# Caching bucket configuration - caches GCS object data (chunks)
+# This dramatically reduces GCS egress by caching downloaded blocks
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-store-caching-bucket
+  namespace: observability
+  labels:
+    app.kubernetes.io/name: thanos-store
+    app.kubernetes.io/component: store-gateway
+data:
+  caching-bucket.yaml: |
+    type: MEMCACHED
+    config:
+      addresses:
+        - thanos-store-memcached.observability.svc.cluster.local:11211
+      timeout: 2s
+      max_idle_connections: 100
+      max_async_concurrency: 50
+      max_async_buffer_size: 25000
+      max_get_multi_concurrency: 100
+      max_get_multi_batch_size: 0
+      max_item_size: 5242880
+      dns_provider_update_interval: 10s
+    chunk_subrange_size: 16000
+    max_chunks_get_range_requests: 3
+    chunk_object_attrs_ttl: 24h
+    chunk_subrange_ttl: 24h
+    blocks_iter_ttl: 5m
+    metafile_exists_ttl: 2h
+    metafile_doesnt_exist_ttl: 15m
+    metafile_content_ttl: 24h
+    metafile_max_size: 1048576

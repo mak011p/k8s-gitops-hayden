@@ -32,13 +32,19 @@ spec:
           image: quay.io/thanos/thanos:v0.37.2
           args:
             - store
-            - --log.level=warn
+            - --log.level=info
             - --log.format=logfmt
             - --data-dir=/var/thanos/store
             - --objstore.config-file=/etc/thanos/objstore.yaml
-            - --index-cache-size=512MB
+            # Index cache - uses memcached to cache block indexes
+            - --index-cache.config-file=/etc/thanos-cache/index-cache.yaml
+            # Caching bucket - caches GCS chunks in memcached (REDUCES EGRESS!)
+            - --store.caching-bucket.config-file=/etc/thanos-cache/caching-bucket.yaml
+            # Sync blocks more frequently
+            - --sync-block-duration=3m
+            # Increase concurrency for better performance
+            - --store.grpc.series-max-concurrency=30
             - --chunk-pool-size=2GB
-            - --sync-block-duration=15m
           ports:
             - name: http
               containerPort: 10902
@@ -62,13 +68,16 @@ spec:
             failureThreshold: 20
           resources:
             requests:
-              cpu: 100m
-              memory: 1Gi
+              cpu: 200m
+              memory: 2Gi
             limits:
-              memory: 4Gi
+              memory: 6Gi
           volumeMounts:
             - name: objstore-config
               mountPath: /etc/thanos
+              readOnly: true
+            - name: cache-config
+              mountPath: /etc/thanos-cache
               readOnly: true
             - name: data
               mountPath: /var/thanos/store
@@ -85,6 +94,19 @@ spec:
             items:
               - key: thanos.yaml
                 path: objstore.yaml
+        - name: cache-config
+          projected:
+            sources:
+              - configMap:
+                  name: thanos-store-index-cache
+                  items:
+                    - key: index-cache.yaml
+                      path: index-cache.yaml
+              - configMap:
+                  name: thanos-store-caching-bucket
+                  items:
+                    - key: caching-bucket.yaml
+                      path: caching-bucket.yaml
   volumeClaimTemplates:
     - metadata:
         name: data

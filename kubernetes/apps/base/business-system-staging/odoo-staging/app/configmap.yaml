@@ -37,8 +37,8 @@ data:
     limit_memory_hard = 2147483648
     limit_memory_soft = 1610612736
     limit_request = 8192
-    limit_time_cpu = 300
-    limit_time_real = 600
+    limit_time_cpu = 600
+    limit_time_real = 2400
     limit_time_real_cron = 3600
 
     # Deployment settings

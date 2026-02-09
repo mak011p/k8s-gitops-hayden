@@ -44,12 +44,10 @@ cephClusterSpec:
       osdsPerDevice: "1"
   placement:
     osd:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: node-role.kubernetes.io/control-plane
-                  operator: DoesNotExist
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
 cephBlockPools:
   - name: ceph-blockpool
     spec:

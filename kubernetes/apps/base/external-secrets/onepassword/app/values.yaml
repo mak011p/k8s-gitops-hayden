@@ -1,5 +1,6 @@
 controllers:
   onepassword:
+    replicas: 2
     strategy: RollingUpdate
     annotations:
       reloader.stakater.com/auto: "true"
@@ -90,6 +91,13 @@ controllers:
         resources: *resources
         securityContext: *securityContext
 defaultPodOptions:
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: onepassword
   securityContext:
     runAsNonRoot: true
     runAsUser: 999

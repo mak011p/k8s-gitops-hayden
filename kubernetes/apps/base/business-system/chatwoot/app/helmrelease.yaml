@@ -92,6 +92,13 @@ spec:
     # Web deployment
     web:
       replicaCount: 2
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: web
       resources:
         requests:
           cpu: 250m
@@ -104,6 +111,13 @@ spec:
     # Worker deployment (Sidekiq)
     worker:
       replicaCount: 2
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: worker
       resources:
         requests:
           cpu: 250m

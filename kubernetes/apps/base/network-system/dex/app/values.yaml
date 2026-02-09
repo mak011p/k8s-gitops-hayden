@@ -1,4 +1,11 @@
 replicaCount: 2
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: dex
 image:
   repository: dexidp/dex
   tag: v2.44.0

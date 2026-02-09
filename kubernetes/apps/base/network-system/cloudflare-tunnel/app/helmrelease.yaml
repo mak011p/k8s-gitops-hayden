@@ -83,6 +83,13 @@ spec:
     defaultPodOptions:
       hostNetwork: true # intentional deviation from upstream: required for production gateway access
       dnsPolicy: ClusterFirstWithHostNet
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: cloudflare-tunnel
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

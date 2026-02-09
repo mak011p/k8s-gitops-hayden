@@ -42,6 +42,13 @@ spec:
       namespace: network-system
   values:
     replicaCount: 2
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: oauth2-proxy
     metrics:
       servicemonitor:
         enabled: true

@@ -87,6 +87,13 @@ operator:
       trustCRDsExist: true
   replicas: 2
   rollOutPods: true
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              io.cilium/app: operator
+          topologyKey: kubernetes.io/hostname
 pmtuDiscovery:
   enabled: true
 prometheus:

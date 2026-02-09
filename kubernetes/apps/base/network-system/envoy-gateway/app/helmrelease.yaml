@@ -35,6 +35,8 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
+    deployment:
+      replicas: 2
     config:
       envoyGateway:
         provider:

@@ -254,7 +254,7 @@ The `master` branch is protected with required status checks. Direct pushes are 
 
 **Settings:**
 - Strict mode enabled (branch must be up-to-date with master)
-- Admin bypass disabled (`enforce_admins: true`) - all users must use PRs
+- Admin bypass enabled (`enforce_admins: false`) - push to master for small edits, for larger create PR to inititate checks. 
 - Force pushes and deletions disabled
 
 **Merge strategy: Squash merge**

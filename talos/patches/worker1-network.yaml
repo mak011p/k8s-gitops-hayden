@@ -1,10 +1,11 @@
-# Worker 1 - Network Configuration (New Hardware)
+# Worker 1 - Network Configuration (Control Plane + Worker)
 machine:
   install:
     image: factory.talos.dev/installer/c9078f9419961640c712a8bf2bb9174933dfcf1da383fd8ea2b7dc21493f8bac:v1.11.5
     wipe: true
     diskSelector:
-      size: "<= 500GB"
+      size: '<= 600GB'
+      type: ssd
   network:
     hostname: worker1
     interfaces:
@@ -14,9 +15,13 @@ machine:
         routes:
           - network: 0.0.0.0/0
             gateway: 192.168.50.1
+        vip:
+          ip: 192.168.50.200
     nameservers:
       - 192.168.50.1
   kubelet:
     nodeIP:
       validSubnets:
         - 192.168.50.21/32
+cluster:
+  allowSchedulingOnControlPlanes: true

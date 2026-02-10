@@ -13,11 +13,14 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Envoy Gateway ingress
+    # Envoy Gateway proxy pods (in network-system, not envoy-gateway-system)
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: envoy-gateway-system
+              kubernetes.io/metadata.name: network-system
+          podSelector:
+            matchLabels:
+              gateway.envoyproxy.io/owning-gateway-name: envoy-external
       ports:
         - port: 8080
           protocol: TCP

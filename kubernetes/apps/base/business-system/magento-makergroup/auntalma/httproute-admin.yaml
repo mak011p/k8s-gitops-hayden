@@ -17,7 +17,7 @@ spec:
             type: PathPrefix
             value: /admin_hayden/
       backendRefs:
-        - name: auntalma-app
+        - name: auntalma
           port: 8080
     - matches:
         - path:

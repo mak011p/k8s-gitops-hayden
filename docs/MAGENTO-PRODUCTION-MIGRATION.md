@@ -619,6 +619,102 @@ export MAGENTO_SESSION_REDIS_HOST=$REDIS_IP
 
 ---
 
+### 24. HTTPRoute Backend Service Name Mismatch
+
+**Symptom:** Storefront returns `000` (connection refused). `curl -sk https://auntalma.haydenagencies.com.au/` gets no response at all.
+
+**Root Cause:** HTTPRoute `backendRefs` referenced `auntalma-app` but the bjw-s app-template creates the service as just `auntalma`. Envoy Gateway reported `BackendNotFound`:
+```
+Failed to process route rule 0 backendRef 0: service business-system/auntalma-app not found.
+```
+
+**Fix:** Update `httproute.yaml` and `httproute-admin.yaml`:
+```yaml
+# Before (broken)
+backendRefs:
+  - name: auntalma-app
+    port: 8080
+
+# After (fixed)
+backendRefs:
+  - name: auntalma
+    port: 8080
+```
+
+**How to verify:** Check HTTPRoute status — `ResolvedRefs` should be `True`:
+```bash
+kubectl get httproute auntalma -n business-system -o jsonpath='{.status.parents[0].conditions}' | python3 -m json.tool
+```
+
+---
+
+### 25. Missing external-dns Annotations on HTTPRoute
+
+**Symptom:** DNS doesn't resolve at all for `auntalma.haydenagencies.com.au`. No CNAME record in Cloudflare.
+
+**Root Cause:** External-dns is configured with `--annotation-filter=external-dns.alpha.kubernetes.io/external=true` and `--source=gateway-httproute`. HTTPRoutes without this annotation are ignored. Every other working route (chatwoot, odoo, grafana, etc.) has it.
+
+**Fix:** Add annotations to the HTTPRoute (only needed on the primary route, not the admin route):
+```yaml
+metadata:
+  name: auntalma
+  namespace: business-system
+  annotations:
+    external-dns.alpha.kubernetes.io/external: "true"
+    external-dns.alpha.kubernetes.io/target: external.haydenagencies.com.au
+```
+
+The `target` annotation tells external-dns to create a CNAME pointing to `external.haydenagencies.com.au` (which is the Cloudflare-proxied endpoint that routes through the cloudflare tunnel to envoy-external).
+
+**Verification:** Check external-dns logs for the record creation:
+```bash
+kubectl logs -n network-system -l app.kubernetes.io/name=external-dns --tail=10
+# Should see: Changing record. action=CREATE record=auntalma.haydenagencies.com.au
+```
+
+---
+
+### 26. NetworkPolicy Blocking Envoy Gateway Traffic
+
+**Symptom:** Storefront returns `503` with `upstream connect error or disconnect/reset before headers. reset reason: connection timeout`. Envoy access log shows the request reaching the correct backend IP but timing out after 10 seconds:
+```
+"GET / HTTP/2" 503 UF 0 91 10001 ... "auntalma.haydenagencies.com.au" "10.244.9.122:8080"
+```
+
+Meanwhile, the backend pod is healthy — `health_check.php` returns 200 when tested via `localhost` inside the pod.
+
+**Root Cause:** The `auntalma-app` NetworkPolicy allowed ingress from `envoy-gateway-system` namespace, but the Envoy Gateway proxy pods are actually in the `network-system` namespace:
+```yaml
+# WRONG — envoy proxy pods are NOT in this namespace
+- namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: envoy-gateway-system
+```
+
+**Fix:** Update `networkpolicy.yaml` to target the correct namespace and pods:
+```yaml
+# CORRECT — match envoy proxy pods in network-system
+- from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: network-system
+      podSelector:
+        matchLabels:
+          gateway.envoyproxy.io/owning-gateway-name: envoy-external
+  ports:
+    - port: 8080
+      protocol: TCP
+```
+
+**Key insight:** In this cluster, the Envoy Gateway controller runs in `envoy-gateway-system`, but the data-plane proxy pods (the ones that actually forward traffic) run in `network-system` alongside the Gateway resource. The label `gateway.envoyproxy.io/owning-gateway-name: envoy-external` specifically targets the proxy pods.
+
+**How to debug:** Check which namespace the envoy proxy pods are in:
+```bash
+kubectl get pods -A -l gateway.envoyproxy.io/owning-gateway-name=envoy-external -o wide
+```
+
+---
+
 ## Resolved Blockers
 
 ### ES Config (RESOLVED)
@@ -663,6 +759,14 @@ Static content deploy fails for `en_AU`. Either add the locale pack to the Docke
 
 ### Blocker: Cilium ClusterIP Routing on Some Nodes
 Intermittent — MariaDB ClusterIP unreachable from worker3. May resolve itself or need Cilium pod restart on the affected node. See Issue #18.
+
+### RESOLVED: Networking (Issues #24, #25, #26)
+Three networking issues prevented external traffic from reaching auntalma pods:
+1. **HTTPRoute** referenced wrong service name `auntalma-app` → fixed to `auntalma`
+2. **external-dns** annotations missing → DNS record was never created
+3. **NetworkPolicy** allowed ingress from `envoy-gateway-system` but proxies are in `network-system`
+
+All three fixed and applied. Storefront now responds through Cloudflare tunnel.
 
 ---
 
@@ -761,6 +865,9 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [ ] Add `install.date` to env.php ConfigMap (Issue #15)
 - [ ] Use short service names in helmrelease env vars (Issue #7)
 - [ ] Ensure `log_bin_trust_function_creators=1` in myCnf (Issue #10)
+- [ ] Fix HTTPRoute `backendRefs` to match actual service name (Issue #24)
+- [ ] Add external-dns annotations to HTTPRoute (Issue #25)
+- [ ] Fix NetworkPolicy to allow traffic from `network-system` envoy pods (Issue #26)
 
 ### Pre-flight checks
 - [ ] Verify Galera cluster healthy (`kubectl get mariadb -n business-system`)
@@ -809,10 +916,13 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [x] `setup:di:compile` completed
 - [x] `indexer:reindex` completed (all except Algolia — no API key)
 - [x] `cache:flush` completed
+- [x] HTTPRoute backend name fixed (`auntalma-app` → `auntalma`) (Issue #24)
+- [x] external-dns annotations added to HTTPRoute (Issue #25)
+- [x] NetworkPolicy fixed for envoy-external in `network-system` (Issue #26)
+- [x] Storefront responding (200 on `/customer/account/login/`)
+- [x] Admin panel redirects to OAuth (302 → Dex, working correctly)
 - [ ] Static content deployed (blocked by Issue #16 + #17)
 - [ ] Media files transferred (5.2 GB, deferred)
-- [ ] Storefront verified
-- [ ] Admin panel verified
 
 ---
 

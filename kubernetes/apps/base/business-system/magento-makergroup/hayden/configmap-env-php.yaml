@@ -183,4 +183,7 @@ data:
         'config' => [
             'async' => 0,
         ],
+        'install' => [
+            'date' => 'Sat, 01 Jan 2022 00:00:00 +0000',
+        ],
     ];

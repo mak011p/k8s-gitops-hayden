@@ -109,7 +109,7 @@ spec:
                 value: admin_hayden
               # Store selection
               - name: MAGE_RUN_CODE
-                value: auntalma
+                value: base
               - name: MAGE_RUN_TYPE
                 value: website
               # Encryption key and other secrets

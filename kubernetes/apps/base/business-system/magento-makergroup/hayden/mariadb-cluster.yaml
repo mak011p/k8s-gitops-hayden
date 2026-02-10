@@ -20,11 +20,11 @@ spec:
     enabled: true
     primary:
       podIndex: 0
-      automaticFailover: true
+      autoFailover: true
     sst: mariabackup
     replicaThreads: 1
     agent:
-      image: ghcr.io/mariadb-operator/mariadb-operator:25.10.4
+      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
       gracefulShutdownTimeout: 5s
     recovery:
       enabled: true
@@ -34,7 +34,7 @@ spec:
       podRecoveryTimeout: 5m
       podSyncTimeout: 5m
     initContainer:
-      image: ghcr.io/mariadb-operator/mariadb-operator:25.10.4
+      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
     config:
       reuseStorageVolume: false
     initJob:

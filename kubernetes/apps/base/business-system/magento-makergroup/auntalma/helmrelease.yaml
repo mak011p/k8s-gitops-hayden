@@ -49,7 +49,7 @@ spec:
             env:
               # Database
               - name: MAGENTO_DB_HOST
-                value: auntalma-mariadb-primary.business-system.svc.cluster.local
+                value: auntalma-mariadb-primary
               - name: MAGENTO_DB_PORT
                 value: "3306"
               - name: MAGENTO_DB_NAME
@@ -63,33 +63,33 @@ spec:
                     key: password
               # Redis - Sessions (DB 5)
               - name: MAGENTO_SESSION_REDIS_HOST
-                value: auntalma-redis-master.business-system.svc.cluster.local
+                value: auntalma-redis-master
               - name: MAGENTO_SESSION_REDIS_PORT
                 value: "6379"
               - name: MAGENTO_SESSION_REDIS_DB
                 value: "5"
               # Redis - Cache (DB 6)
               - name: MAGENTO_CACHE_REDIS_HOST
-                value: auntalma-redis-master.business-system.svc.cluster.local
+                value: auntalma-redis-master
               - name: MAGENTO_CACHE_REDIS_PORT
                 value: "6379"
               - name: MAGENTO_CACHE_REDIS_DB
                 value: "6"
               # Redis - Page Cache (DB 1)
               - name: MAGENTO_PAGE_CACHE_REDIS_HOST
-                value: auntalma-redis-master.business-system.svc.cluster.local
+                value: auntalma-redis-master
               - name: MAGENTO_PAGE_CACHE_REDIS_PORT
                 value: "6379"
               - name: MAGENTO_PAGE_CACHE_REDIS_DB
                 value: "1"
               # Elasticsearch (ECK operator)
               - name: MAGENTO_ES_HOST
-                value: auntalma-elasticsearch-es-http.business-system.svc.cluster.local
+                value: auntalma-elasticsearch-es-http
               - name: MAGENTO_ES_PORT
                 value: "9200"
               # RabbitMQ (RabbitMQ Cluster Operator)
               - name: MAGENTO_AMQP_HOST
-                value: auntalma-rabbitmq.business-system.svc.cluster.local
+                value: auntalma-rabbitmq
               - name: MAGENTO_AMQP_PORT
                 value: "5672"
               - name: MAGENTO_AMQP_USER

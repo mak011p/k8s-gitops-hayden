@@ -136,8 +136,48 @@ spec:
     ingress:
       enabled: false
 
-    # Persistence for uploads
-    persistence:
-      enabled: true
-      storageClassName: ceph-block
-      size: 20Gi
+  # Patch rendered deployments to mount shared CephFS storage for uploads
+  # (chart has no native persistence support)
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: chatwoot-web
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: chatwoot-web
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: chatwoot-web
+                        volumeMounts:
+                          - name: chatwoot-storage
+                            mountPath: /app/storage
+                    volumes:
+                      - name: chatwoot-storage
+                        persistentVolumeClaim:
+                          claimName: chatwoot-storage
+          - target:
+              kind: Deployment
+              name: chatwoot-worker
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: chatwoot-worker
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: chatwoot-workers
+                        volumeMounts:
+                          - name: chatwoot-storage
+                            mountPath: /app/storage
+                    volumes:
+                      - name: chatwoot-storage
+                        persistentVolumeClaim:
+                          claimName: chatwoot-storage

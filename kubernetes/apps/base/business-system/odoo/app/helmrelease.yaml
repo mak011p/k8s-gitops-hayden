@@ -40,6 +40,50 @@ spec:
     controllers:
       *app :
         # replicas managed by HPA (minReplicas: 1, maxReplicas: 3)
+        initContainers:
+          auto-upgrade:
+            image:
+              repository: ghcr.io/hayden-agencies/odoo
+              tag: 18.0.20260211.2159-586788b@sha256:1efe1d667d5f659a8a6d3b2426118eb053787b7f9216c64e62ecc3c87faa6d29
+            command: ["sh", "-c"]
+            args:
+              - |
+                cat > /tmp/upgrade.conf << EOF
+                [options]
+                db_host = odoo-pg-rw.business-system.svc.cluster.local
+                db_port = 5432
+                db_user = ${POSTGRES_USER}
+                db_password = ${POSTGRES_PASSWORD}
+                addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
+                data_dir = /var/lib/odoo
+                EOF
+                exec click-odoo-update -c /tmp/upgrade.conf -d "${POSTGRES_DB}"
+            env:
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: odoo-pg-app
+                    key: username
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: odoo-pg-app
+                    key: password
+              - name: POSTGRES_DB
+                valueFrom:
+                  secretKeyRef:
+                    name: odoo-pg-app
+                    key: dbname
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 500m
+                memory: 4Gi
+              limits:
+                memory: 8Gi
         containers:
           app:
             image:

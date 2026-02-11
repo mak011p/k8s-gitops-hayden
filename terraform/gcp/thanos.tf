@@ -27,12 +27,12 @@ resource "google_storage_bucket" "thanos" {
     default_kms_key_name = google_kms_crypto_key.backup_encryption.id
   }
 
-  # Downgrade to Nearline after 30 days (metrics rarely re-read)
+  # Downgrade to Nearline after 14 days (metrics rarely re-read)
   # No delete rule - Thanos compactor manages retention:
-  #   raw: 90d, 5m downsampled: 180d, 1h downsampled: 365d
+  #   raw: 30d, 5m downsampled: 90d, 1h downsampled: 365d
   lifecycle_rule {
     condition {
-      age = 30
+      age = 14
     }
     action {
       type          = "SetStorageClass"

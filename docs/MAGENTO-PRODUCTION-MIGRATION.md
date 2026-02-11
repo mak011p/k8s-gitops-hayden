@@ -42,7 +42,7 @@ initContainer:
 
 ---
 
-### 2. MariaDB 12.1 Incompatible with Magento 2.4.7
+### 2. MariaDB 12.1 Incompatible with Magento 2.4.7 (RESOLVED)
 
 **Symptom:** `setup:upgrade` fails with:
 ```
@@ -52,30 +52,16 @@ Supported versions: MySQL-8, MySQL-5.7, MariaDB-(10.2-10.11)
 
 **Root Cause:** Renovate auto-upgraded `mariadb:10.11` to `mariadb:12.1`. Magento 2.4.7 only supports MariaDB 10.2-10.11.
 
-**Temporary Fix (lost on pod restart):** Patch `app/etc/di.xml` only (not vendor — vendor is read-only in production mode):
-```bash
-kubectl exec $POD -n business-system -c php -- \
-  sed -i '/MariaDB-(10.2-10.11)/a\                <item name="MariaDB-(12.0-12.4)" xsi:type="string">^12\\.[0-4]\\.</item>' \
-  /var/www/html/app/etc/di.xml
-```
+**Fix: Downgrade MariaDB to 10.11 LTS.** Pinned `image: mariadb:10.11` in both `auntalma/mariadb-cluster.yaml` and `hayden/mariadb-cluster.yaml`. Added Renovate `allowedVersions: "/^10\\.11\\./"` rule in `.github/renovate.json5` to prevent future auto-upgrades.
 
-**CRITICAL:** You MUST also clear generated metadata — the compiled DI config caches version patterns:
-```bash
-kubectl exec $POD -n business-system -c php -- bash -c \
-  "rm -rf /var/www/html/generated/code/* /var/www/html/generated/metadata/* /var/www/html/var/cache/* /var/www/html/var/di/*"
-```
+**Downgrade procedure** (12.1 data files are not backward-compatible):
+1. Delete the 3 Galera PVCs (`kubectl delete pvc -n business-system -l app.kubernetes.io/instance=<site>-mariadb`)
+2. Let the mariadb-operator recreate the cluster on 10.11
+3. Re-import production data
 
-Without clearing `generated/metadata/`, the old patterns from the compiled `adminhtml.php`, `frontend.php`, `crontab.php` etc. are used, and MariaDB 12 is still rejected. Using `setup:upgrade --keep-generated` will NOT pick up the di.xml change.
+This is viable because the migration is a fresh import anyway. The alternative (third-party `amadeco/module-db-override` composer module) adds an unnecessary dependency.
 
-**Permanent Fix — composer module (recommended):**
-```bash
-# In Docker image build
-composer require amadeco/module-db-override
-```
-This adds MariaDB 10.2-12.4 + MySQL 5.7-8.4 patterns via a proper Magento module.
-Source: [amadeco/module-db-override](https://packagist.org/packages/amadeco/module-db-override)
-
-**Alternative:** Pin `mariadb:10.11` in `mariadb-cluster.yaml` and add Renovate ignore rule.
+**Note:** MariaDB 10.11 uses `mysql` CLI binary (not `mariadb` as in 12.1). All `kubectl exec` commands in this doc use `mysql` accordingly.
 
 ---
 
@@ -93,9 +79,9 @@ error: unable to upgrade connection: i/o timeout
 # Step 1: Copy dump into pod
 kubectl cp /tmp/auntalma_dump.sql business-system/auntalma-mariadb-0:/tmp/auntalma_dump.sql -c mariadb
 
-# Step 2: Import locally inside the container
+# Step 2: Import locally inside the container (redirect must happen inside the container)
 kubectl exec auntalma-mariadb-0 -n business-system -c mariadb -- \
-  mariadb -u root -p"${ROOT_PW}" magento < /tmp/auntalma_dump.sql
+  bash -c 'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" magento < /tmp/auntalma_dump.sql'
 ```
 
 ---
@@ -122,20 +108,13 @@ sed -i '/^LOCK TABLES/d; /^UNLOCK TABLES/d' /tmp/auntalma_dump.sql
 
 ---
 
-### 5. MariaDB CLI Binary Name Change
+### 5. MariaDB CLI Binary Name Change (N/A after downgrade)
 
 **Symptom:** `mysql` command not found in MariaDB 12.1 container.
 
 **Root Cause:** MariaDB 12.1 renamed the CLI binary from `mysql` to `mariadb`.
 
-**Fix:** Use `mariadb` instead of `mysql` in all exec commands:
-```bash
-# Before (broken on 12.1)
-kubectl exec ... -- mysql -u root ...
-
-# After (works on 12.1)
-kubectl exec ... -- mariadb -u root ...
-```
+**Status:** No longer relevant — MariaDB pinned to 10.11 (Issue #2). The `mysql` binary works on 10.11. Commands in this doc use `mysql` throughout.
 
 ---
 
@@ -459,16 +438,28 @@ cd /var/www/html && php bin/magento setup:static-content:deploy en_US -f
 
 ### 17. `en_AU` Locale Not Installed in Docker Image
 
-**Symptom:** `setup:static-content:deploy` fails with:
+**Symptom:** `setup:static-content:deploy en_AU` fails with:
 ```
 en_AU argument has invalid value, run info:language:list for list of available locales
 ```
 
-**Root Cause:** The Magento Docker image only includes `en_GB` and `en_US` locale packs. The production DB is configured for `en_AU`.
+**Root Cause:** The Docker image is missing `magento/language-en_au`. The VPS production deployment HAS this package installed and deploys `en_AU` via Deployer (`deploy.php` line 14: `set('static_content_locales', 'en_AU')`). The package was installed on the VPS but never added to `composer.json`, so the Docker build doesn't include it.
 
-**Fix options:**
-- **Option A:** Deploy with available locales: `php bin/magento setup:static-content:deploy en_US -f`
-- **Option B:** Install `en_AU` locale in the Docker image build
+**The Dockerfile (`Dockerfile.prod`) incorrectly deploys `en_US` for frontend** (line 76-83) with a misleading comment: *"en_AU falls back to en_US at runtime"*. **This is wrong — Magento does NOT fall back for static files.** The HTML URLs are hardcoded to the store's configured locale (`en_AU`), and missing files return 404.
+
+**Fix (permanent — update Docker image):**
+1. Add `magento/language-en_au` to `composer.json`
+2. Change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU` (matching `deploy.php`)
+
+**Fix (temporary — in running pod, lost on restart):**
+```bash
+# Copy en_US static files to en_AU directory
+kubectl exec $POD -n business-system -c php -- bash -c \
+  "cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \
+   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/"
+```
+
+See also Issue #42 for the related CSS minification problem.
 
 ---
 
@@ -1097,6 +1088,88 @@ kubectl delete networkpolicy auntalma-app -n business-system
 
 ---
 
+### 42. CSS Not Loading — Docker Image Only Has `.min.css`, Store Has Minification Disabled
+
+**Symptom:** All pages load HTML but no CSS/JS. Browser console shows `Refused to apply style from...` errors. Static asset URLs like `/static/version.../frontend/Rival/auntalma/en_AU/css/styles-m.css` return 404.
+
+**Root Cause:** Three compounding issues:
+
+1. **Docker image deploys `en_US` but store uses `en_AU`** (Issue #17): The `pub/static` emptyDir only has files under `en_US/`. Magento generates HTML with `en_AU/` URLs. All `en_AU` static files 404.
+
+2. **Docker image only has `.min.css` files**: The SCD during Docker build runs without a database connection. Without DB access, LESS→CSS compilation is limited. Only `.min.css` files are generated (e.g., `styles-m.min.css`), not the unminified versions (`styles-m.css`).
+
+3. **CSS/JS minification is disabled in `core_config_data`**: With `dev/css/minify_files=0`, Magento generates HTML `<link>` tags referencing `styles-m.css` (non-minified). But only `styles-m.min.css` exists. The VPS has the same setting (minification disabled) but it works because the VPS SCD generates both minified and non-minified files (it has DB access during deploy).
+
+**Diagnosis:**
+```bash
+# Check what locales have static files
+kubectl exec $POD -n business-system -c php -- ls /var/www/html/pub/static/frontend/Rival/auntalma/
+# Result: en_AU en_US — but en_AU only has 2 requirejs files, no CSS
+
+# Check CSS files
+kubectl exec $POD -n business-system -c php -- ls /var/www/html/pub/static/frontend/Rival/auntalma/en_US/css/styles*
+# Result: styles-l.min.css styles-m.min.css — no non-minified versions
+
+# Check minification config
+kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- bash -c \
+  'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
+    SELECT path, value FROM core_config_data WHERE path LIKE '"'"'dev/%/minify%'"'"' OR path LIKE '"'"'dev/%/merge%'"'"';"'
+# Result: all 0 (disabled)
+```
+
+**Fix (temporary — lost on pod restart):**
+```bash
+# 1. Copy en_US files to en_AU
+kubectl exec $POD -n business-system -c php -- bash -c \
+  "cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \
+   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/"
+
+# 2. Enable CSS/JS minification so Magento references .min.css files
+kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- bash -c \
+  'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
+    UPDATE core_config_data SET value = 1 WHERE path = '"'"'dev/css/minify_files'"'"';
+    UPDATE core_config_data SET value = 1 WHERE path = '"'"'dev/js/minify_files'"'"';
+    UPDATE core_config_data SET value = 1 WHERE path = '"'"'dev/css/merge_css_files'"'"';
+    UPDATE core_config_data SET value = 1 WHERE path = '"'"'dev/js/merge_files'"'"';
+  "'
+
+# 3. Flush Magento cache
+kubectl exec $POD -n business-system -c php -- php /var/www/html/bin/magento cache:flush
+
+# 4. Bump deployed_version.txt to bust Cloudflare cached 404s
+kubectl exec $POD -n business-system -c php -- bash -c \
+  "echo \$(date +%s) > /var/www/html/pub/static/deployed_version.txt"
+
+# 5. Flush cache again for new version
+kubectl exec $POD -n business-system -c php -- php /var/www/html/bin/magento cache:flush
+```
+
+**Fix (permanent — Docker image changes):**
+1. Add `magento/language-en_au` to `composer.json`
+2. Update `Dockerfile.prod` frontend SCD: change `en_US` to `en_AU` (line 77)
+3. Optionally: decide whether minification should be enabled in `core_config_data` for K8s (it's disabled on VPS but VPS has full SCD output)
+
+**Key lesson:** `Dockerfile.prod` must match `deploy.php` locale configuration. The VPS deployer (`deploy.php` line 14) deploys `en_AU`; the Dockerfile must do the same. The misleading comment "en_AU falls back to en_US at runtime" is **wrong** — Magento has no static file locale fallback.
+
+---
+
+### 43. Cloudflare Caches 404 Responses for Static Assets
+
+**Symptom:** After fixing static files on disk, HTTP requests still return 404. But requests with a cache-busting query parameter (`?nocache=...`) return 200 with correct content. Response header `cf-cache-status: MISS` confirms Cloudflare bypass.
+
+**Root Cause:** Cloudflare caches 404 responses for static asset URLs. Since Magento uses versioned URLs (`/static/version1769728396/...`), the same URL is requested repeatedly and the cached 404 persists until Cloudflare TTL expires.
+
+**Fix:** Bump `deployed_version.txt` to force new versioned URLs that bypass the cached 404s:
+```bash
+kubectl exec $POD -n business-system -c php -- bash -c \
+  "echo \$(date +%s) > /var/www/html/pub/static/deployed_version.txt"
+kubectl exec $POD -n business-system -c php -- php /var/www/html/bin/magento cache:flush
+```
+
+This is safe because the version number in the URL is only used for cache busting — nginx strips it before serving the file.
+
+---
+
 ## Resolved Blockers
 
 ### ES Config (RESOLVED)
@@ -1128,14 +1201,11 @@ All indexers succeeded except Algolia (expected — no API key configured for K8
 
 ## Remaining Blockers
 
-### Blocker: MariaDB 12 di.xml Patch is Temporary
-The di.xml version bypass is an in-container patch that is lost on every pod restart. Need to either:
-- **Option A (preferred):** Install `amadeco/module-db-override` in the Docker image build — adds MariaDB 10.2-12.4 + MySQL 5.7-8.4 support via a proper Magento module
-- **Option B:** Bake the `sed` patch into a Dockerfile `RUN` step
-- **~~Option C:~~** ~~Pin MariaDB to 10.11~~ — NOT viable, Galera cluster already has 12.1 data files, can't downgrade in-place without data loss
+### RESOLVED: MariaDB 12 Incompatibility (Issue #2)
+Downgraded to MariaDB 10.11 LTS. Pinned in `mariadb-cluster.yaml` + Renovate `allowedVersions` rule. Requires PVC nuke + fresh data import (acceptable since migration is a fresh import anyway). No di.xml patching or third-party modules needed.
 
-### ~~Blocker~~ RESOLVED: `en_AU` Locale (Issue #17)
-Runtime `setup:static-content:deploy en_AU` fails (no locale pack installed). However, the Docker image has `en_AU` static content **baked in at build time**. The init container copies it successfully (13,945 files including `frontend/Rival/auntalma/en_AU/`). This is only a blocker if you need to regenerate static content at runtime.
+### Blocker: `en_AU` Locale Missing from Docker Image (Issue #17, #42)
+The `magento/language-en_au` package is installed on the VPS but NOT in `composer.json`. The Dockerfile deploys `en_US` for frontend (not `en_AU`), and the Docker image only produces `.min.css` files (no DB during build). The VPS `deploy.php` deploys `en_AU` with full LESS compilation. **Fix required:** Add `magento/language-en_au` to `composer.json` and change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU`. Temporary workaround: copy `en_US` to `en_AU` + enable minification in DB (Issue #42).
 
 ### Blocker: K8s NetworkPolicy + Cilium Breaks Pod Networking on Some Nodes
 Any K8s NetworkPolicy (even ingress-only with NO egress rules) triggers Cilium eBPF policy enforcement which breaks the pod's entire datapath on worker2/worker3 — not just DNS, but ALL traffic. Pods on worker1 with identical config work fine. Likely related to `datapathMode: netkit`. See Issue #28.
@@ -1146,8 +1216,8 @@ Any K8s NetworkPolicy (even ingress-only with NO egress rules) triggers Cilium e
 - Test with `datapathMode: veth` (Cilium restart, brief network blip)
 - Wait for Cilium fix / upgrade
 
-### RESOLVED: `pub/static` EmptyDir Init Container (Issue #16)
-Init container `static-copy` added to auntalma HelmRelease. Copies baked-in static files from image to emptyDir using `advancedMounts`. Committed: `9834473f6`. Verified: pod 2/2 Running, 13,945 static files copied including en_AU locale. `deployed_version.txt` present.
+### RESOLVED (with caveat): `pub/static` EmptyDir Init Container (Issue #16)
+Init container `static-copy` added to auntalma HelmRelease. Copies baked-in static files from image to emptyDir using `advancedMounts`. Committed: `9834473f6`. Verified: pod 2/2 Running, `deployed_version.txt` present. **Caveat:** Docker image only deploys `en_US` frontend static files — the `en_AU` directory exists but only contains 2 requirejs config files, no CSS/JS. Must manually copy `en_US` to `en_AU` after each pod restart until Docker image is fixed (Issue #42).
 
 ### RESOLVED: Cilium DNS Proxy Breaks Alpine musl libc (Issue #27)
 Applied `dnsProxy.dnsRejectResponseCode: nameError` to Cilium values.yaml. Changes REFUSED→NXDOMAIN for blocked DNS queries. Committed: `b642d7f5d`. Verified: 10/10 `gethostbyname()` resolutions from Magento PHP pod (musl libc). DNS is no longer a blocker — the remaining ES "No alive nodes" issue on homepage is in the PHP ES client library, not DNS.
@@ -1179,6 +1249,8 @@ This is the all-in-one command that successfully ran `setup:upgrade` on auntalma
 
 **WARNING:** `setup:upgrade` wipes `pub/static/` (Issue #37). After the full sequence, either restart the pod (init container re-copies static files) or run `setup:static-content:deploy` manually.
 
+**WARNING:** After pod restart, the init container only copies `en_US` static files (Docker image doesn't have `en_AU`). You MUST copy `en_US` to `en_AU` after every pod restart until the Docker image is fixed (Issue #42). Also ensure CSS/JS minification is enabled in `core_config_data` (the Docker image only has `.min.css` files).
+
 **CRITICAL:** Pass env overrides via `export` inside `kubectl exec ... bash -c "..."`. NEVER use `kubectl set env` — it modifies the deployment spec and triggers a rollout, destroying all in-container patches (Issue #29).
 
 **CRITICAL:** `app:config:import` and `cache:flush` must run with the pod's **native env vars** (no overrides). The config hash must match what PHP-FPM computes at runtime. Use IP overrides only for `setup:upgrade`, `di:compile`, and `indexer:reindex`. (Issue #40)
@@ -1197,17 +1269,13 @@ ES_IP=$(kubectl get svc <site>-elasticsearch-es-http -n business-system -o jsonp
 AMQP_IP=$(kubectl get svc <site>-rabbitmq -n business-system -o jsonpath='{.spec.clusterIP}')
 
 # 3. Update ES hostname in core_config_data to ClusterIP (DB config overrides env.php — Issue #38)
-kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- bash -c \
-  'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
+kubectl exec <site>-mariadb-0 -n business-system -c mysql -- bash -c \
+  'mysql -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
     UPDATE core_config_data SET value = '"'"''"$ES_IP"''"'"' WHERE path = '"'"'catalog/search/elasticsearch7_server_hostname'"'"';
   "'
 
-# 4. All-in-one: patch, flush, setup:upgrade
+# 4. Clear caches and run setup:upgrade
 kubectl exec $POD -n business-system -c php -- bash -c "
-# Patch di.xml for MariaDB 12 (skip if MariaDB pinned to 10.11)
-sed -i '/MariaDB-(10.2-10.11)/a\\                <item name=\"MariaDB-12\" xsi:type=\"string\">^12\\\.<\\/item>' /var/www/html/vendor/magento/magento2-base/app/etc/di.xml
-sed -i '/MariaDB-(10.2-10.11)/a\\                <item name=\"MariaDB-12\" xsi:type=\"string\">^12\\\.<\\/item>' /var/www/html/app/etc/di.xml
-
 # Clear generated code + caches
 rm -rf /var/www/html/generated/code/* /var/www/html/generated/metadata/* /var/www/html/var/cache/* /var/www/html/var/di/*
 
@@ -1251,6 +1319,19 @@ POD=$(kubectl get pod -n business-system -l app.kubernetes.io/instance=<site> \
 # cd /var/www/html && php bin/magento setup:static-content:deploy en_US en_AU -f
 # "
 
+# 6b. Copy en_US static files to en_AU (Docker image only has en_US — Issue #42)
+kubectl exec $POD -n business-system -c php -- bash -c \
+  "cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \
+   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/"
+
+# 6c. Ensure CSS/JS minification is enabled (Docker image only has .min.css — Issue #42)
+kubectl exec <site>-mariadb-0 -n business-system -c mysql -- bash -c \
+  'mysql -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
+    UPDATE core_config_data SET value = 1 WHERE path IN (
+      '"'"'dev/css/minify_files'"'"', '"'"'dev/js/minify_files'"'"',
+      '"'"'dev/css/merge_css_files'"'"', '"'"'dev/js/merge_files'"'"'
+    );"'
+
 # 7. Sync config hash and flush caches
 # CRITICAL: Do NOT use env overrides here! The config hash must match what PHP-FPM
 # computes at runtime using the pod's native env vars. (Issue #40)
@@ -1270,8 +1351,8 @@ cd /var/www/html && php bin/magento indexer:reindex
 "
 
 # 9. Revert ES core_config_data back to DNS name (ClusterIP may change on service recreation)
-kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- bash -c \
-  'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
+kubectl exec <site>-mariadb-0 -n business-system -c mysql -- bash -c \
+  'mysql -u root -p"$MARIADB_ROOT_PASSWORD" magento -e "
     UPDATE core_config_data SET value = '"'"'<site>-elasticsearch-es-http'"'"' WHERE path = '"'"'catalog/search/elasticsearch7_server_hostname'"'"';
   "'
 kubectl exec $POD -n business-system -c php -- bash -c "
@@ -1292,8 +1373,8 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [x] Fix Cilium DNS proxy for musl compat — add `dnsProxy.dnsRejectResponseCode: nameError` to Cilium values (Issue #27) — **DONE** commit `b642d7f5d`
 - [x] Add init container to HelmRelease for `pub/static` deployment (Issue #16) — **DONE** commit `9834473f6`
 - [x] Set HelmRelease upgrade timeout to 10m (Issue #34) — **DONE** commit `075024db0`
-- [ ] Install `amadeco/module-db-override` in Docker image OR bake di.xml patch into Dockerfile (Issue #2) — cannot pin MariaDB to 10.11, Galera already has 12.1 data
-- [x] ~~Install `en_AU` locale in Docker image~~ — image has en_AU baked in, init container copies it (Issue #17)
+- [x] Pin MariaDB to 10.11 LTS in `mariadb-cluster.yaml` + Renovate `allowedVersions` rule (Issue #2) — **DONE** nuke PVCs + re-import
+- [ ] Add `magento/language-en_au` to `composer.json` + change `Dockerfile.prod` SCD to `en_AU` (Issue #17, #42)
 - [ ] Add `install.date` to env.php ConfigMap (Issue #15)
 - [ ] Use short service names in helmrelease env vars (Issue #7)
 - [ ] Ensure `log_bin_trust_function_creators=1` in myCnf (Issue #10)
@@ -1363,7 +1444,7 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [x] Init container `static-copy` added for `pub/static` — commit `9834473f6`
 - [x] HelmRelease upgrade timeout increased to 10m — commit `075024db0`
 - [x] Helm release history reset (deleted poisoned secrets, fresh install)
-- [x] Static content deployed (`setup:static-content:deploy en_US en_GB -f` — all 16 themes)
+- [x] Static content deployed (`setup:static-content:deploy en_US en_AU -f` — all 16 themes)
 - [x] di.xml MariaDB 12 patch applied + generated code cleared
 - [x] `app:config:import` + `cache:flush` completed on current pod
 - [x] Storefront responding (200 on `/customer/account/login/`)
@@ -1371,7 +1452,7 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [x] Cilium DNS fix verified — 10/10 musl `gethostbyname()` resolutions from Magento pod
 - [x] ES `core_config_data` hostname reverted from ClusterIP to DNS name (DNS now reliable)
 - [x] Init container verified — 13,945 static files copied, pod 2/2 Running, `deployed_version.txt` present
-- [x] `en_AU` locale confirmed baked into Docker image (init container copies it)
+- [x] `en_AU` directory exists in Docker image but incomplete (2 requirejs files only, no CSS/JS) — requires manual `en_US`→`en_AU` copy after each restart (Issue #42)
 - [x] Homepage 404 root cause identified — `ConfigChangeDetector` + stale schema (Issue #32 updated)
 - [x] `setup:upgrade` re-run on fresh pod (v1 install) with IP overrides for ES (Issue #38)
 - [x] `setup:di:compile` completed on fresh pod
@@ -1386,8 +1467,13 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [x] Homepage 404 root cause identified — nginx `try_files $uri/` with split containers (Issue #39)
 - [x] nginx ConfigMap fix applied — removed `$uri/` from `try_files` (Issue #39)
 - [x] Homepage `/` returns 200 (82KB) — nginx `try_files` fix confirmed working
-- **Current state (11 Feb 2026):** HelmRelease suspended, 1 replica on worker1 (2/2 Running, HPA minReplicas=1). All pages working: `/` 200, `/customer/account/login/` 200, `/catalogsearch/` 200, `/contact/` 200, `/admin_hayden/` 302→OAuth. ES config on DNS name. NetworkPolicy deleted.
+- [x] CSS broken — root cause identified: Docker image missing `en_AU` locale + only `.min.css` + minification disabled (Issue #42)
+- [x] Temporary fix applied: copied `en_US` to `en_AU`, enabled CSS/JS minification+merging in DB, bumped `deployed_version.txt` to bust CF cache
+- [x] Cloudflare cached 404s for static assets — fixed by bumping `deployed_version.txt` (Issue #43)
+- **Current state (12 Feb 2026):** HelmRelease suspended, 1 replica on worker1 (2/2 Running, HPA minReplicas=1). All pages working with CSS: `/` 200, `/customer/account/login/` 200 (styled). ES config on DNS name. NetworkPolicy deleted. CSS/JS minification+merging enabled in `core_config_data`. One JS error remaining: `SyntaxError: Bad control character` in `mage/apply/main.min.js` (corrupt minified file in Docker image).
+- [ ] **Docker image fix needed:** Add `magento/language-en_au` to `composer.json`, change `Dockerfile.prod` SCD from `en_US` to `en_AU` (Issue #17, #42)
 - [ ] Commit nginx `try_files` fix to git
+- [ ] Investigate `mage/apply/main.min.js` SyntaxError (corrupt minified JS in Docker image)
 - [ ] Multi-node scaling blocked by Cilium + NetworkPolicy issue (Issue #28)
 - [ ] Media files transferred (5.2 GB, deferred)
 - [ ] Cron jobs verified
@@ -1406,8 +1492,8 @@ HTTPS_PROXY=socks5://127.0.0.1:1234 kubectl ...
 # Get root password
 ROOT_PW=$(kubectl get secret <site>-mariadb-superuser -n business-system -o jsonpath='{.data.password}' | base64 -d)
 
-# MariaDB CLI (12.1 uses 'mariadb' not 'mysql')
-kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- mariadb -u root -p"${ROOT_PW}" magento -e "..."
+# MariaDB CLI (10.11 uses 'mysql')
+kubectl exec <site>-mariadb-0 -n business-system -c mysql -- mysql -u root -p"${ROOT_PW}" magento -e "..."
 
 # Find running app pod
 POD=$(kubectl get pod -n business-system -l app.kubernetes.io/instance=<site> --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}')

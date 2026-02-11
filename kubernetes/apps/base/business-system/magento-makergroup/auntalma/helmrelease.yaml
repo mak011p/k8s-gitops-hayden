@@ -40,6 +40,16 @@ spec:
     controllers:
       *app :
         # replicas managed by HPA (minReplicas: 2, maxReplicas: 5)
+        initContainers:
+          static-copy:
+            image:
+              repository: ghcr.io/hayden-agencies/magento2-makergroup
+              tag: latest
+            command: ["sh", "-c", "cp -a /var/www/html/pub/static/. /static-out/"]
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
         containers:
           # PHP-FPM container
           php:
@@ -272,8 +282,16 @@ spec:
             nginx:
               - path: /var/cache/nginx
               - path: /var/run
-      # Shared docroot volume for nginx to serve static files
+      # Shared docroot volume for nginx to serve static files.
+      # Init container copies baked-in static files from the image into the
+      # emptyDir at /static-out; main containers mount it at the real path.
       docroot:
         type: emptyDir
-        globalMounts:
-          - path: /var/www/html/pub/static
+        advancedMounts:
+          auntalma:
+            static-copy:
+              - path: /static-out
+            php:
+              - path: /var/www/html/pub/static
+            nginx:
+              - path: /var/www/html/pub/static

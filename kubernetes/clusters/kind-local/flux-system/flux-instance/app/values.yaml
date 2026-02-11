@@ -3,7 +3,7 @@
 # Reduced resources and simplified settings for local development
 instance:
   distribution:
-    artifact: oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:v0.39.0
+    artifact: oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:v0.41.1
   components:
     - source-controller
     - kustomize-controller

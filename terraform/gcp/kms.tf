@@ -3,9 +3,7 @@
 # This key ring and key are used by all backup buckets:
 # - hayden-chatwoot-backups
 # - hayden-magento2-backups
-# - hayden-nextcloud-backups
 # - hayden-odoo-backups
-# - hayden-openebs-backups
 # - hayden-thanos-storage
 # - hayden-velero-backups
 

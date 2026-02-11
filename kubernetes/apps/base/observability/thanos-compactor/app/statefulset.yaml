@@ -33,13 +33,13 @@ spec:
           args:
             - compact
             - --wait
-            - --wait-interval=1h
+            - --wait-interval=6h
             - --log.level=warn
             - --log.format=logfmt
             - --data-dir=/var/thanos/compact
             - --objstore.config-file=/etc/thanos/objstore.yaml
-            - --retention.resolution-raw=90d
-            - --retention.resolution-5m=180d
+            - --retention.resolution-raw=30d
+            - --retention.resolution-5m=90d
             - --retention.resolution-1h=365d
             - --consistency-delay=30m
             - --delete-delay=48h

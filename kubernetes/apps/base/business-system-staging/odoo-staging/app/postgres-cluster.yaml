@@ -42,6 +42,17 @@ spec:
       memory: 512Mi
     limits:
       memory: 2Gi
+  managed:
+    roles:
+      - name: kagent_readonly
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+        connectionLimit: 5
+        passwordSecret:
+          name: odoo-pg-kagent-readonly
   postgresql:
     parameters:
       max_connections: "100"

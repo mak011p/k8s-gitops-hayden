@@ -22,6 +22,8 @@ dashboards:
   enabled: true
   annotations:
     grafana_folder: kube-system
+dnsProxy:
+  dnsRejectResponseCode: nameError
 enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true

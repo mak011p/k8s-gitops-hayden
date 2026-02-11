@@ -9,9 +9,12 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: auntalma
+  # NOTE: Egress enforcement disabled — Cilium transparent DNS proxy + K8s
+  # NetworkPolicy port-53 egress rule causes intermittent DNS failures on
+  # some nodes (works on worker1, fails on worker3 with same policy).
+  # TODO: Replace with CiliumNetworkPolicy for reliable egress controls.
   policyTypes:
     - Ingress
-    - Egress
   ingress:
     # Envoy Gateway proxy pods (in network-system, not envoy-gateway-system)
     - from:
@@ -31,52 +34,4 @@ spec:
               kubernetes.io/metadata.name: observability
       ports:
         - port: 8080
-          protocol: TCP
-  egress:
-    # DNS
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
-      ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
-    # MariaDB
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: mariadb
-              app.kubernetes.io/instance: auntalma-mariadb
-      ports:
-        - port: 3306
-          protocol: TCP
-    # Redis
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: redis
-              app.kubernetes.io/instance: auntalma-redis
-      ports:
-        - port: 6379
-          protocol: TCP
-    # Elasticsearch
-    - to:
-        - podSelector:
-            matchLabels:
-              elasticsearch.k8s.elastic.co/cluster-name: auntalma-elasticsearch
-      ports:
-        - port: 9200
-          protocol: TCP
-    # RabbitMQ
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: auntalma-rabbitmq
-      ports:
-        - port: 5672
           protocol: TCP

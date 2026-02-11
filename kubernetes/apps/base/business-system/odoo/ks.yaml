@@ -8,7 +8,7 @@ metadata:
 spec:
   interval: 30m
   retryInterval: 1m
-  timeout: 5m
+  timeout: 15m
   path: "./apps/base/business-system/odoo/app"
   prune: true
   wait: false
@@ -27,3 +27,5 @@ spec:
       namespace: network-system
     - name: onepassword
       namespace: external-secrets
+    - name: odoo-staging
+      namespace: business-system-staging

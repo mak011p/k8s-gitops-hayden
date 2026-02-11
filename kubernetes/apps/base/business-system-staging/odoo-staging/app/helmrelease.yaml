@@ -52,12 +52,12 @@ spec:
                 [options]
                 db_host = odoo-pg-staging-rw.business-system-staging.svc.cluster.local
                 db_port = 5432
-                db_user = ${POSTGRES_USER}
-                db_password = ${POSTGRES_PASSWORD}
+                db_user = $${POSTGRES_USER}
+                db_password = $${POSTGRES_PASSWORD}
                 addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
                 data_dir = /var/lib/odoo
                 EOF
-                exec click-odoo-update -c /tmp/upgrade.conf -d "${POSTGRES_DB}"
+                exec click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}"
             env:
               - name: POSTGRES_USER
                 valueFrom:

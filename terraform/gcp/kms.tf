@@ -4,7 +4,6 @@
 # - hayden-chatwoot-backups
 # - hayden-magento2-backups
 # - hayden-odoo-backups
-# - hayden-thanos-storage
 # - hayden-velero-backups
 
 locals {

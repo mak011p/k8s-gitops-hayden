@@ -6,5 +6,5 @@ metadata:
   namespace: ai-system
 spec:
   description: Read-only PostgreSQL MCP server for Odoo database queries
-  protocol: STREAMABLE_HTTP
-  url: http://postgres-mcp.ai-system:8000/mcp
+  protocol: SSE
+  url: http://postgres-mcp.ai-system:8000/sse

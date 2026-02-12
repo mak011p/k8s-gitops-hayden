@@ -1,0 +1,1065 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="This repo is a declarative implementation of a Kubernetes cluster using GitOps.">
+      
+      
+        <meta name="author" content="Michael Fornaro">
+      
+      
+        <link rel="canonical" href="https://xunholy.github.io/k8s-gitops/ODOO-DUPLICATE-SKU-REMEDIATION/">
+      
+      
+      
+      
+      <link rel="icon" href="https://raspbernetes.github.io/img/logo.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Odoo Duplicate SKU Remediation Tasks - xUnholy | Raspbernetes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../_static/custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#odoo-duplicate-sku-remediation-tasks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="xUnholy | Raspbernetes" class="md-header__button md-logo" aria-label="xUnholy | Raspbernetes" data-md-component="logo">
+      
+  <img src="https://raspbernetes.github.io/img/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            xUnholy | Raspbernetes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Odoo Duplicate SKU Remediation Tasks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/xunholy/k8s-gitops" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    xunholy/k8s-gitops
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="xUnholy | Raspbernetes" class="md-nav__button md-logo" aria-label="xUnholy | Raspbernetes" data-md-component="logo">
+      
+  <img src="https://raspbernetes.github.io/img/logo.svg" alt="logo">
+
+    </a>
+    xUnholy | Raspbernetes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/xunholy/k8s-gitops" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    xunholy/k8s-gitops
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../README.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/api-access/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Access
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/ip-allocation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IP Allocation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/repo-structure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repository Structure
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sponsor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sponsor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#problem-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-1-immediate-order-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      PART 1: Immediate Order Resolution
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART 1: Immediate Order Resolution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-11-mark-failed-queue-jobs-as-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 1.1: Mark Failed Queue Jobs as Done
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-12-resolve-order-100290210-picking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 1.2: Resolve Order 100290210 Picking
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-2-inventory-stock-transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      PART 2: Inventory Stock Transfer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART 2: Inventory Stock Transfer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alternative-fix-mappings-instead-of-transferring-stock" class="md-nav__link">
+    <span class="md-ellipsis">
+      ALTERNATIVE: Fix Mappings Instead of Transferring Stock
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-21-transfer-trapped-stock-from-inactive-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 2.1: Transfer Trapped Stock from Inactive Products
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-22-verify-stock-after-transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 2.2: Verify Stock After Transfer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-3-duplicate-product-cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      PART 3: Duplicate Product Cleanup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART 3: Duplicate Product Cleanup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-31-merge-or-archive-duplicate-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 3.1: Merge or Archive Duplicate Products
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-32-update-magento-product-mappings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 3.2: Update Magento Product Mappings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-4-root-cause-prevention" class="md-nav__link">
+    <span class="md-ellipsis">
+      PART 4: Root Cause Prevention
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART 4: Root Cause Prevention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-41-root-cause-identified" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 4.1: ROOT CAUSE IDENTIFIED ✓
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-42-add-sku-uniqueness-constraint-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 4.2: Add SKU Uniqueness Constraint (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-43-configure-integration-to-prevent-future-duplicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 4.3: Configure Integration to Prevent Future Duplicates
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-5-ongoing-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      PART 5: Ongoing Monitoring
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART 5: Ongoing Monitoring">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-51-create-scheduled-check-for-duplicate-skus" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 5.1: Create Scheduled Check for Duplicate SKUs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-52-monitor-failed-picking-jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task 5.2: Monitor Failed Picking Jobs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-database-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference: Database Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assignee-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Assignee Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="odoo-duplicate-sku-remediation-tasks">Odoo Duplicate SKU Remediation Tasks<a class="headerlink" href="#odoo-duplicate-sku-remediation-tasks" title="Permanent link">&para;</a></h1>
+<p><strong>Created:</strong> 2026-02-05
+<strong>Issue:</strong> Duplicate products with same SKU causing stock mismatches and failed "Validate Picking" jobs</p>
+<h2 id="problem-summary">Problem Summary<a class="headerlink" href="#problem-summary" title="Permanent link">&para;</a></h2>
+<p>The Magento-Odoo integration created duplicate products with identical SKUs. Stock exists on the INACTIVE duplicates while orders reference the ACTIVE products (which have zero stock). This causes "Validate Picking" jobs to fail because Odoo cannot reserve/pick items that have no stock on the active product.</p>
+<p><strong>Root Cause (IDENTIFIED):</strong>
+1. <strong>Oct 14, 2025</strong>: ~18,000 products were bulk imported OUTSIDE the Magento integration (no mappings created)
+2. <strong>Oct 30 - Nov 14, 2025</strong>: Orders arrived from Magento for unmapped products
+3. <strong>Integration behavior</strong>: Matches by Magento product ID, not SKU. With <code>auto_create_products_on_so=true</code>, it created NEW products with proper mappings instead of finding existing ones
+4. <strong>Result</strong>: 18 products exist as duplicates - originals have stock but no mapping, duplicates have mapping but no stock
+5. <strong>Consequence</strong>: Original products deactivated, stock trapped, orders fail</p>
+<hr />
+<h2 id="part-1-immediate-order-resolution">PART 1: Immediate Order Resolution<a class="headerlink" href="#part-1-immediate-order-resolution" title="Permanent link">&para;</a></h2>
+<h3 id="task-11-mark-failed-queue-jobs-as-done">Task 1.1: Mark Failed Queue Jobs as Done<a class="headerlink" href="#task-11-mark-failed-queue-jobs-as-done" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Odoo &gt; Queue &gt; Jobs (filter by State = Failed)</p>
+<p><strong>Steps:</strong>
+1. Navigate to Queue &gt; Jobs in Odoo
+2. Filter: <code>State = Failed</code> AND <code>Name contains "Validate Picking"</code>
+3. Select all 4 failed jobs (including order 100290210)
+4. Click Action &gt; "Set to Done"</p>
+<p><strong>Why:</strong> These are informational jobs that alert users to stock issues. They don't need to be requeued - they just need acknowledgment.</p>
+<p><strong>Affected Jobs:</strong>
+- Job ID 1545341: Order 100290210 - "No Magento shipments to apply"
+- Job ID 1545318: Order 100290210 - "remaining pickings are waiting for stock"
+- (2 other similar jobs)</p>
+<hr />
+<h3 id="task-12-resolve-order-100290210-picking">Task 1.2: Resolve Order 100290210 Picking<a class="headerlink" href="#task-12-resolve-order-100290210-picking" title="Permanent link">&para;</a></h3>
+<p><strong>Order Details:</strong>
+- Order: 100290210 (Odoo sale.order ID: 314341)
+- Pending Picking: TECH/OUT/285655 (state: confirmed)
+- Missing Item: "Lagenda Mini Helium Digital Sizer Inflator" (SKU: MG-09191, product_id: 20532)
+- Quantity Needed: 1 unit</p>
+<p><strong>Option A - Transfer Stock (Recommended):</strong>
+1. Go to Inventory &gt; Operations &gt; Inventory Adjustments
+2. Create new adjustment for product 20532 (active MG-09191)
+3. Add 1 unit to Stock location
+4. Validate the adjustment
+5. Go to picking TECH/OUT/285655 and click "Check Availability"
+6. Process the picking</p>
+<p><strong>Option B - Cancel Backorder:</strong>
+1. If item won't be shipped, go to picking TECH/OUT/285655
+2. Cancel the picking
+3. Update the sale order accordingly
+4. Communicate with customer about partial fulfillment</p>
+<hr />
+<h2 id="part-2-inventory-stock-transfer">PART 2: Inventory Stock Transfer<a class="headerlink" href="#part-2-inventory-stock-transfer" title="Permanent link">&para;</a></h2>
+<h3 id="alternative-fix-mappings-instead-of-transferring-stock">ALTERNATIVE: Fix Mappings Instead of Transferring Stock<a class="headerlink" href="#alternative-fix-mappings-instead-of-transferring-stock" title="Permanent link">&para;</a></h3>
+<p>Instead of transferring stock to duplicate products, you could redirect Magento mappings to the ORIGINAL products (which have stock). This is cleaner if originals have order history.</p>
+<p><strong>Steps:</strong>
+1. Delete the duplicate products (20532, 20557, 20563, 20569, 20591, 20626, 20558)
+2. Update mappings to point to original products
+3. Reactivate original products</p>
+<p><strong>SQL to redirect mappings (BACKUP FIRST):</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Example: Point MG-09191 mapping to original product 9218 instead of duplicate 20532</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">integration_product_product_mapping</span>
+<span class="k">SET</span><span class="w"> </span><span class="n">product_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9218</span><span class="p">,</span><span class="w"> </span><span class="n">write_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">product_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20532</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">integration_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">-- Reactivate original product</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span><span class="p">,</span><span class="w"> </span><span class="n">write_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9218</span><span class="p">;</span>
+
+<span class="c1">-- Archive duplicate (don&#39;t delete - keep for audit)</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="p">,</span><span class="w"> </span><span class="n">default_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;MG-09191-DUP-ARCHIVED&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">write_date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20532</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>WARNING:</strong> Only do this if duplicate products have NO order history. Check first:
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sale_order_line</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">product_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="mi">20532</span><span class="p">,</span><span class="w"> </span><span class="mi">20557</span><span class="p">,</span><span class="w"> </span><span class="mi">20563</span><span class="p">,</span><span class="w"> </span><span class="mi">20569</span><span class="p">,</span><span class="w"> </span><span class="mi">20591</span><span class="p">,</span><span class="w"> </span><span class="mi">20626</span><span class="p">,</span><span class="w"> </span><span class="mi">20558</span><span class="p">);</span>
+</code></pre></div></p>
+<hr />
+<h3 id="task-21-transfer-trapped-stock-from-inactive-products">Task 2.1: Transfer Trapped Stock from Inactive Products<a class="headerlink" href="#task-21-transfer-trapped-stock-from-inactive-products" title="Permanent link">&para;</a></h3>
+<p><strong>Products requiring stock transfer:</strong></p>
+<table>
+<thead>
+<tr>
+<th>SKU</th>
+<th>FROM (Inactive)</th>
+<th>TO (Active)</th>
+<th>Qty to Transfer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MG-09191</td>
+<td>product_id: 9218</td>
+<td>product_id: 20532</td>
+<td>6 units</td>
+</tr>
+<tr>
+<td>MG-15781</td>
+<td>product_id: 20569</td>
+<td>Find active duplicate</td>
+<td>6 units</td>
+</tr>
+<tr>
+<td>MG-15782</td>
+<td>product_id: 20591</td>
+<td>Find active duplicate</td>
+<td>6 units</td>
+</tr>
+<tr>
+<td>MG-15784</td>
+<td>product_id: 20626</td>
+<td>Find active duplicate</td>
+<td>8 units</td>
+</tr>
+<tr>
+<td>MG-18703</td>
+<td>product_id: 20558</td>
+<td>Find active duplicate</td>
+<td>4 units</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Steps for each SKU:</strong>
+1. Go to Inventory &gt; Products, search by SKU
+2. Identify the ACTIVE product variant
+3. Go to Inventory &gt; Operations &gt; Inventory Adjustments
+4. Create adjustment to ADD stock to the active product
+5. Validate
+6. Optionally: Create adjustment to REMOVE stock from inactive product (cleanup)</p>
+<p><strong>SQL to find active product IDs for each SKU:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="n">pp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;MG-15781&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-15782&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-15784&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-18703&#39;</span><span class="p">)</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="task-22-verify-stock-after-transfer">Task 2.2: Verify Stock After Transfer<a class="headerlink" href="#task-22-verify-stock-after-transfer" title="Permanent link">&para;</a></h3>
+<p><strong>Verification Query (run in PostgreSQL):</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">sku</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span><span class="p">,</span>
+<span class="w">       </span><span class="k">COALESCE</span><span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="n">sq</span><span class="p">.</span><span class="n">quantity</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">sl</span><span class="p">.</span><span class="k">usage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;internal&#39;</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">stock</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="n">pp</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">stock_quant</span><span class="w"> </span><span class="n">sq</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sq</span><span class="p">.</span><span class="n">product_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">stock_location</span><span class="w"> </span><span class="n">sl</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sq</span><span class="p">.</span><span class="n">location_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sl</span><span class="p">.</span><span class="n">id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;MG-09191&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-15781&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-15782&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-15784&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;MG-18703&#39;</span><span class="p">)</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>Expected Result:</strong> Active products should have stock, inactive should have 0.</p>
+<hr />
+<h2 id="part-3-duplicate-product-cleanup">PART 3: Duplicate Product Cleanup<a class="headerlink" href="#part-3-duplicate-product-cleanup" title="Permanent link">&para;</a></h2>
+<h3 id="task-31-merge-or-archive-duplicate-products">Task 3.1: Merge or Archive Duplicate Products<a class="headerlink" href="#task-31-merge-or-archive-duplicate-products" title="Permanent link">&para;</a></h3>
+<p><strong>For each duplicate SKU pair, decide:</strong></p>
+<p><strong>Option A - Merge Products (if both have history):</strong>
+1. Export all sale order lines, purchase order lines, stock moves referencing the inactive product
+2. Update references to point to active product
+3. Archive (don't delete) the inactive product</p>
+<p><strong>Option B - Keep Separate (if needed for historical records):</strong>
+1. Rename inactive product SKU to add suffix (e.g., MG-09191-OLD)
+2. This prevents future mapping conflicts</p>
+<p><strong>List of all duplicates to review:</strong>
+<div class="highlight"><pre><span></span><code>MG-09191, MG-11788, MG-12046, MG-15781, MG-15782, MG-15784,
+MG-18703, MG-20344, MG-20476, MG-20483, MG-20489, MG-20490,
+customshippingrate_standard
+</code></pre></div></p>
+<hr />
+<h3 id="task-32-update-magento-product-mappings">Task 3.2: Update Magento Product Mappings<a class="headerlink" href="#task-32-update-magento-product-mappings" title="Permanent link">&para;</a></h3>
+<p><strong>Location:</strong> Odoo &gt; Sales &gt; Integrations &gt; Hayden-Magento2 &gt; Product Mappings</p>
+<p><strong>Steps:</strong>
+1. Search for each affected SKU in the integration mappings
+2. Verify the external Magento product ID maps to the ACTIVE Odoo product
+3. If mapped to inactive product, update the mapping to active product
+4. Test by triggering a product sync from Magento</p>
+<hr />
+<h2 id="part-4-root-cause-prevention">PART 4: Root Cause Prevention<a class="headerlink" href="#part-4-root-cause-prevention" title="Permanent link">&para;</a></h2>
+<h3 id="task-41-root-cause-identified">Task 4.1: ROOT CAUSE IDENTIFIED ✓<a class="headerlink" href="#task-41-root-cause-identified" title="Permanent link">&para;</a></h3>
+<p><strong>Timeline of Events:</strong>
+1. <strong>Oct 12, 2025</strong>: Hayden-Magento2 integration was configured
+2. <strong>Oct 14, 2025</strong>: ~18,000 products bulk imported into Odoo (by thomas@haydenagencies.com.au)
+   - Import was done OUTSIDE the integration (likely via Odoo's standard import or migration script)
+   - Products were created with SKUs but <strong>NO Magento mappings</strong> were created
+3. <strong>Oct 30, 2025</strong>: First Magento product mappings created (integration starts syncing)
+4. <strong>Nov 3-14, 2025</strong>: Orders arrive from Magento for products without mappings
+   - Integration looks for products by Magento product ID (not SKU)
+   - Cannot find mappings for 18 specific products
+   - <code>auto_create_products_on_so = true</code> setting causes creation of duplicate products WITH mappings
+5. <strong>Later</strong>: Original products deactivated (seen as duplicates), but stock remained on them</p>
+<p><strong>Root Cause:</strong> The Oct 14 bulk import bypassed the Magento integration, creating products in Odoo without the corresponding <code>integration_product_product_mapping</code> records. The integration matches by Magento product ID (<code>integration_product_product_external.code</code>), NOT by SKU.</p>
+<p><strong>18 Products Affected (No Magento Mapping):</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Products created Oct 14 without mappings (includes our problem SKUs)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="n">pp</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">integration_product_product_mapping</span><span class="w"> </span><span class="n">ppm</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">ppm</span><span class="p">.</span><span class="n">product_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">id</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">create_date</span><span class="p">::</span><span class="nb">date</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;2025-10-14&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">ppm</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</code></pre></div>
+Result: MG-09191, MG-11617, MG-11618, MG-11710, MG-11711, MG-11712, MG-11788, MG-12046, MG-15781, MG-15782, MG-15784, MG-15833, MG-15836, MG-15837, MG-18703, MG-19901, and 2 blank SKUs.</p>
+<hr />
+<h3 id="task-42-add-sku-uniqueness-constraint-optional">Task 4.2: Add SKU Uniqueness Constraint (Optional)<a class="headerlink" href="#task-42-add-sku-uniqueness-constraint-optional" title="Permanent link">&para;</a></h3>
+<p><strong>Warning:</strong> Only do this after cleaning up duplicates!</p>
+<p><strong>In Odoo:</strong>
+1. Go to Settings &gt; Technical &gt; Database Structure &gt; Models
+2. Find product.product model
+3. Consider adding SQL constraint for unique active SKUs</p>
+<p><strong>Or via SQL:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- First verify no active duplicates exist</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">default_code</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">product_product</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">default_code</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">default_code</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">-- If clean, add partial unique index</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_product_sku_unique_active</span>
+<span class="k">ON</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="p">(</span><span class="n">default_code</span><span class="p">)</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">default_code</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">default_code</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="task-43-configure-integration-to-prevent-future-duplicates">Task 4.3: Configure Integration to Prevent Future Duplicates<a class="headerlink" href="#task-43-configure-integration-to-prevent-future-duplicates" title="Permanent link">&para;</a></h3>
+<p><strong>Current Configuration (Hayden-Magento2):</strong>
+<div class="highlight"><pre><span></span><code>auto_create_products_on_so = TRUE  &lt;-- This caused duplicates
+product_reference_id = 21
+template_reference_id = 15
+</code></pre></div></p>
+<p><strong>Option A - Disable Auto-Create (Recommended for stable catalogs):</strong>
+<div class="highlight"><pre><span></span><code>Location: Odoo &gt; Sales &gt; Integrations &gt; Hayden-Magento2 &gt; Settings
+Set &quot;Auto Create Products on Sales Order&quot; = False
+</code></pre></div>
+This prevents automatic product creation when orders contain unknown products. Orders will fail instead of creating duplicates.</p>
+<p><strong>Option B - Keep Auto-Create but Add SKU Fallback Matching:</strong>
+The integration matches by Magento product ID, not SKU. If products are imported outside the integration:
+1. ALWAYS use the integration's product import feature
+2. OR manually create mappings after external imports</p>
+<p><strong>For Future Imports - CRITICAL:</strong>
+Never bulk import products outside the Magento integration. Always use:
+- Odoo &gt; Sales &gt; Integrations &gt; Hayden-Magento2 &gt; Import Products
+- This creates proper mappings in <code>integration_product_product_mapping</code></p>
+<p><strong>SQL to manually create missing mapping (if needed):</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Example: Link existing Odoo product to Magento product</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">integration_product_product_mapping</span>
+<span class="w">  </span><span class="p">(</span><span class="n">integration_id</span><span class="p">,</span><span class="w"> </span><span class="n">product_id</span><span class="p">,</span><span class="w"> </span><span class="n">external_product_id</span><span class="p">,</span><span class="w"> </span><span class="n">create_uid</span><span class="p">,</span><span class="w"> </span><span class="n">write_uid</span><span class="p">,</span><span class="w"> </span><span class="n">create_date</span><span class="p">,</span><span class="w"> </span><span class="n">write_date</span><span class="p">)</span>
+<span class="k">SELECT</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w">                    </span><span class="c1">-- Hayden-Magento2 integration_id</span>
+<span class="w">  </span><span class="mi">9218</span><span class="p">,</span><span class="w">                 </span><span class="c1">-- Odoo product_product.id (original)</span>
+<span class="w">  </span><span class="n">ppe</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w">               </span><span class="c1">-- external_product_id</span>
+<span class="w">  </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">integration_product_product_external</span><span class="w"> </span><span class="n">ppe</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">ppe</span><span class="p">.</span><span class="n">external_reference</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;MG-09191&#39;</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">ppe</span><span class="p">.</span><span class="n">integration_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div></p>
+<hr />
+<h2 id="part-5-ongoing-monitoring">PART 5: Ongoing Monitoring<a class="headerlink" href="#part-5-ongoing-monitoring" title="Permanent link">&para;</a></h2>
+<h3 id="task-51-create-scheduled-check-for-duplicate-skus">Task 5.1: Create Scheduled Check for Duplicate SKUs<a class="headerlink" href="#task-51-create-scheduled-check-for-duplicate-skus" title="Permanent link">&para;</a></h3>
+<p><strong>Add to regular maintenance:</strong> Run this query weekly to catch new duplicates:</p>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">sku</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">duplicates</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">product_product</span><span class="w"> </span><span class="n">pp</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span>
+<span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pp</span><span class="p">.</span><span class="n">default_code</span>
+<span class="k">HAVING</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<hr />
+<h3 id="task-52-monitor-failed-picking-jobs">Task 5.2: Monitor Failed Picking Jobs<a class="headerlink" href="#task-52-monitor-failed-picking-jobs" title="Permanent link">&para;</a></h3>
+<p><strong>Add alert for:</strong> Queue jobs with name containing "Validate Picking" and state = "failed"</p>
+<p>This catches stock availability issues early before they accumulate.</p>
+<hr />
+<h2 id="quick-reference-database-access">Quick Reference: Database Access<a class="headerlink" href="#quick-reference-database-access" title="Permanent link">&para;</a></h2>
+<p><strong>Connect to Odoo PostgreSQL:</strong>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>odoo-pg-1<span class="w"> </span>--<span class="w"> </span>psql<span class="w"> </span>-U<span class="w"> </span>postgres<span class="w"> </span>-d<span class="w"> </span>prod
+</code></pre></div></p>
+<p><strong>Key Tables:</strong>
+- <code>product_product</code> - Product variants (has SKU in default_code)
+- <code>stock_quant</code> - Current stock levels by location
+- <code>stock_move</code> - Stock movement history
+- <code>sale_order</code> / <code>sale_order_line</code> - Sales orders
+- <code>stock_picking</code> - Delivery orders/pickings
+- <code>queue_job</code> - Background job queue</p>
+<hr />
+<h2 id="assignee-notes">Assignee Notes<a class="headerlink" href="#assignee-notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Priority: HIGH for Part 1 (order resolution) and Part 2 (stock transfer)</li>
+<li>Priority: MEDIUM for Part 3 (cleanup) and Part 4 (prevention)</li>
+<li>Estimated effort: 2-4 hours for immediate fixes, additional time for root cause investigation</li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1-2.1-2M12.5 7v5.2l4 2.4-1 1L11 13V7h1.5M11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2v1.8Z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 12, 2026 05:47:03 UTC">February 12, 2026</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2020 - 2022 Michael Fornaro
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/xunholy" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://hub.docker.com/u/xunholy" target="_blank" rel="noopener" title="hub.docker.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/michael-fornaro-5b756179/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://medium.com/@michaelfornaro" target="_blank" rel="noopener" title="medium.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M180.5 74.262C80.813 74.262 0 155.633 0 256s80.819 181.738 180.5 181.738S361 356.373 361 256 280.191 74.262 180.5 74.262Zm288.25 10.646c-49.845 0-90.245 76.619-90.245 171.095s40.406 171.1 90.251 171.1 90.251-76.619 90.251-171.1H559c0-94.503-40.4-171.095-90.248-171.095Zm139.506 17.821c-17.526 0-31.735 68.628-31.735 153.274s14.2 153.274 31.735 153.274S640 340.631 640 256c0-84.649-14.215-153.271-31.742-153.271Z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["header.autohide", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>

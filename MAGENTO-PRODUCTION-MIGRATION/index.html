@@ -1,0 +1,2169 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="This repo is a declarative implementation of a Kubernetes cluster using GitOps.">
+      
+      
+        <meta name="author" content="Michael Fornaro">
+      
+      
+        <link rel="canonical" href="https://xunholy.github.io/k8s-gitops/MAGENTO-PRODUCTION-MIGRATION/">
+      
+      
+      
+      
+      <link rel="icon" href="https://raspbernetes.github.io/img/logo.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Magento Production Migration Guide - xUnholy | Raspbernetes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../_static/custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#magento-production-migration-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="xUnholy | Raspbernetes" class="md-header__button md-logo" aria-label="xUnholy | Raspbernetes" data-md-component="logo">
+      
+  <img src="https://raspbernetes.github.io/img/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            xUnholy | Raspbernetes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Magento Production Migration Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/xunholy/k8s-gitops" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    xunholy/k8s-gitops
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="xUnholy | Raspbernetes" class="md-nav__button md-logo" aria-label="xUnholy | Raspbernetes" data-md-component="logo">
+      
+  <img src="https://raspbernetes.github.io/img/logo.svg" alt="logo">
+
+    </a>
+    xUnholy | Raspbernetes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/xunholy/k8s-gitops" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    xunholy/k8s-gitops
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../README.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/api-access/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Access
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/ip-allocation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IP Allocation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/repo-structure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Repository Structure
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sponsor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sponsor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-issues-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Known Issues &amp; Solutions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Known Issues & Solutions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-mariadb-galera-crashloopbackoff-after-operator-upgrade" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. MariaDB Galera CrashLoopBackOff After Operator Upgrade
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-mariadb-121-incompatible-with-magento-247" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. MariaDB 12.1 Incompatible with Magento 2.4.7
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-database-import-kubectl-exec-pipe-timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Database Import: kubectl exec Pipe Timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-database-import-lock-tables-error-with-galera" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Database Import: LOCK TABLES Error with Galera
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-mariadb-cli-binary-name-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. MariaDB CLI Binary Name Change
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-mage_run_code-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. MAGE_RUN_CODE Mismatch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-alpinemusl-dns-resolution-failure-local-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Alpine/musl DNS Resolution Failure (.local domains)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-stale-elasticsearch-config-in-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Stale Elasticsearch Config in Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-redis-caching-stale-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Redis Caching Stale Config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-trigger-privilege-error-with-galera-binary-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Trigger Privilege Error with Galera Binary Logging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-flux-rollback-loop-chicken-and-egg" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Flux Rollback Loop (Chicken-and-Egg)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-multi-store-discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Multi-Store Discovery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-setupupgrade-requires-dicompile-afterwards" class="md-nav__link">
+    <span class="md-ellipsis">
+      13. setup:upgrade Requires di:compile Afterwards
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-flux-pods-replaced-mid-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      14. Flux Pods Replaced Mid-Migration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-envphp-missing-installdate-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      15. env.php Missing install.date Key
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-pubstatic-emptydir-no-static-content-on-pod-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      16. pub/static EmptyDir — No Static Content on Pod Start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-en_au-locale-dockerfile-deploys-wrong-locale" class="md-nav__link">
+    <span class="md-ellipsis">
+      17. en_AU Locale — Dockerfile Deploys Wrong Locale
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-cilium-clusterip-routing-broken-on-some-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      18. Cilium ClusterIP Routing Broken on Some Nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-flux-rollback-loop-helmrelease-stuck-at-418-revisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      19. Flux Rollback Loop — HelmRelease Stuck at 418+ Revisions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#20-flux-reverts-manually-applied-configmaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      20. Flux Reverts Manually-Applied ConfigMaps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#21-kubectl-set-env-as-emergency-deployment-patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      21. kubectl set env as Emergency Deployment Patch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-configmap-subpath-mounts-dont-auto-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      22. ConfigMap SubPath Mounts Don't Auto-Update
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-dns-flaky-inside-bash-c-even-with-short-hostnames" class="md-nav__link">
+    <span class="md-ellipsis">
+      23. DNS Flaky Inside bash -c Even With Short Hostnames
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-httproute-backend-service-name-mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      24. HTTPRoute Backend Service Name Mismatch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-missing-external-dns-annotations-on-httproute" class="md-nav__link">
+    <span class="md-ellipsis">
+      25. Missing external-dns Annotations on HTTPRoute
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-networkpolicy-blocking-envoy-gateway-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      26. NetworkPolicy Blocking Envoy Gateway Traffic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-networkpolicy-cilium-dns-proxy-breaks-alpine-musl-libc-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      27. NetworkPolicy + Cilium DNS Proxy Breaks Alpine musl libc DNS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-k8s-networkpolicy-cilium-broken-pod-networking-on-some-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      28. K8s NetworkPolicy + Cilium = Broken Pod Networking on Some Nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-kubectl-set-env-triggers-rollout-loses-all-in-container-patches" class="md-nav__link">
+    <span class="md-ellipsis">
+      29. kubectl set env Triggers Rollout — Loses All In-Container Patches
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#30-appconfigimport-required-after-config-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      30. app:config:import Required After Config Changes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#31-envphp-uses-non-obvious-env-var-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      31. env.php Uses Non-Obvious Env Var Names
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-homepage-404-multiple-overlapping-causes" class="md-nav__link">
+    <span class="md-ellipsis">
+      32. Homepage 404 — Multiple Overlapping Causes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-helm-release-history-poisoning" class="md-nav__link">
+    <span class="md-ellipsis">
+      33. Helm Release History Poisoning
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-helmrelease-upgrade-timeout-must-be-10m-for-magento" class="md-nav__link">
+    <span class="md-ellipsis">
+      34. HelmRelease Upgrade Timeout Must Be 10m+ for Magento
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-setupupgrade-fails-with-es-but-appconfigimport-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      35. setup:upgrade Fails with ES but app:config:import Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-hpa-minreplicas-overrides-manual-kubectl-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      36. HPA MinReplicas Overrides Manual kubectl scale
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-setupupgrade-wipes-pubstatic-init-container-content-lost" class="md-nav__link">
+    <span class="md-ellipsis">
+      37. setup:upgrade Wipes pub/static — Init Container Content Lost
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#38-es-php-client-clusterip-timeouts-core_config_data-overrides-envphp" class="md-nav__link">
+    <span class="md-ellipsis">
+      38. ES PHP Client ClusterIP Timeouts — core_config_data Overrides env.php
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#39-homepage-404-nginx-try_files-uri-with-split-containers" class="md-nav__link">
+    <span class="md-ellipsis">
+      39. Homepage 404 — nginx try_files $uri/ With Split Containers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#40-appconfigimport-must-run-with-pods-native-env-vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      40. app:config:import Must Run With Pod's Native Env Vars
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41-flux-fresh-install-recreates-deleted-networkpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      41. Flux Fresh Install Recreates Deleted NetworkPolicy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-css-not-loading-docker-image-only-has-mincss-store-has-minification-disabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      42. CSS Not Loading — Docker Image Only Has .min.css, Store Has Minification Disabled
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-cloudflare-caches-404-responses-for-static-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      43. Cloudflare Caches 404 Responses for Static Assets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-base-url-scope-override-scope_id1-overrides-scope_id0" class="md-nav__link">
+    <span class="md-ellipsis">
+      44. Base URL Scope Override — scope_id=1 Overrides scope_id=0
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proven-working-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proven Working Workflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-migration-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Migration Checklist
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Migration Checklist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-requisites-fix-before-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pre-requisites (fix BEFORE migration)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-flight-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pre-flight checks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-import" class="md-nav__link">
+    <span class="md-ellipsis">
+      Database import
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#magento-setup-commands-suspend-helmrelease-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      Magento setup commands (suspend HelmRelease first!)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#media" class="md-nav__link">
+    <span class="md-ellipsis">
+      Media
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-commands-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Commands Reference
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="magento-production-migration-guide">Magento Production Migration Guide<a class="headerlink" href="#magento-production-migration-guide" title="Permanent link">&para;</a></h1>
+<p>Reference document for migrating Magento production data from VPS into the Kubernetes cluster.
+Based on the auntalma.com.au migration (Feb 2026).</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><strong>Purpose:</strong> This is a reusable guide for importing Magento production data into the Kubernetes cluster. Do NOT use this document as a progress tracker — it is a reference for future agents and operators to follow when performing a migration.</p>
+<p><strong>Source:</strong> VPS at <code>web@103.21.131.100:22222</code> (SSH key: <code>~/.ssh/rog_laptop_key</code>)
+<strong>Target:</strong> MariaDB Galera cluster + Magento pods in <code>business-system</code> namespace
+<strong>Strategy:</strong> Test with <code>*.haydenagencies.com.au</code> subdomain first, then cutover to production domain</p>
+<h2 id="known-issues-solutions">Known Issues &amp; Solutions<a class="headerlink" href="#known-issues-solutions" title="Permanent link">&para;</a></h2>
+<p>The following issues were discovered during the auntalma.com.au migration (Feb 2026). Each entry documents the symptom, root cause, and fix to prevent re-discovery.</p>
+<h3 id="1-mariadb-galera-crashloopbackoff-after-operator-upgrade">1. MariaDB Galera CrashLoopBackOff After Operator Upgrade<a class="headerlink" href="#1-mariadb-galera-crashloopbackoff-after-operator-upgrade" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> All 3 Galera nodes in CrashLoopBackOff after mariadb-operator upgrade to v25.10.4.</p>
+<p><strong>Root Cause:</strong> Renovate bumped the operator but the CRD field <code>automaticFailover</code> was renamed to <code>autoFailover</code> in the new version.</p>
+<p><strong>Fix:</strong> Update <code>mariadb-cluster.yaml</code>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Before (broken)</span>
+<span class="nt">galera</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">automaticFailover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="c1"># After (fixed)</span>
+<span class="nt">galera</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">primary</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">autoFailover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div></p>
+<p>Also update agent/initContainer images to match operator version:
+<div class="highlight"><pre><span></span><code><span class="nt">agent</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4</span>
+<span class="nt">initContainer</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4</span>
+</code></pre></div></p>
+<p><strong>Resolution:</strong> Nuked PVCs and fresh-started since we were importing production data anyway.</p>
+<hr />
+<h3 id="2-mariadb-121-incompatible-with-magento-247">2. MariaDB 12.1 Incompatible with Magento 2.4.7<a class="headerlink" href="#2-mariadb-121-incompatible-with-magento-247" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails with:
+<div class="highlight"><pre><span></span><code>Current version of RDBMS is not supported. Used Version: 12.1.2-MariaDB-ubu2404.
+Supported versions: MySQL-8, MySQL-5.7, MariaDB-(10.2-10.11)
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Renovate auto-upgraded <code>mariadb:10.11</code> to <code>mariadb:12.1</code>. Magento 2.4.7 only supports MariaDB 10.2-10.11.</p>
+<p><strong>Fix: Downgrade MariaDB to 10.11 LTS.</strong> Pinned <code>image: mariadb:10.11</code> in both <code>auntalma/mariadb-cluster.yaml</code> and <code>hayden/mariadb-cluster.yaml</code>. Added Renovate <code>allowedVersions: "/^10\\.11\\./"</code> rule in <code>.github/renovate.json5</code> to prevent future auto-upgrades.</p>
+<p><strong>Downgrade procedure</strong> (12.1 data files are not backward-compatible):
+1. Delete the 3 Galera PVCs (<code>kubectl delete pvc -n business-system -l app.kubernetes.io/instance=&lt;site&gt;-mariadb</code>)
+2. Let the mariadb-operator recreate the cluster on 10.11
+3. Re-import production data</p>
+<p>This is viable because the migration is a fresh import anyway. The alternative (third-party <code>amadeco/module-db-override</code> composer module) adds an unnecessary dependency.</p>
+<p><strong>Note:</strong> MariaDB 10.11 uses <code>mysql</code> CLI binary (not <code>mariadb</code> as in 12.1). All <code>kubectl exec</code> commands in this doc use <code>mysql</code> accordingly.</p>
+<hr />
+<h3 id="3-database-import-kubectl-exec-pipe-timeout">3. Database Import: kubectl exec Pipe Timeout<a class="headerlink" href="#3-database-import-kubectl-exec-pipe-timeout" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Piping SQL dump (161 MB) through <code>kubectl exec</code> times out:
+<div class="highlight"><pre><span></span><code>error: unable to upgrade connection: i/o timeout
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Streaming large files through the K8s API server is unreliable.</p>
+<p><strong>Fix:</strong> Copy the dump into the pod first, then import locally:
+<div class="highlight"><pre><span></span><code><span class="c1"># Step 1: Copy dump into pod</span>
+kubectl<span class="w"> </span>cp<span class="w"> </span>/tmp/auntalma_dump.sql<span class="w"> </span>business-system/auntalma-mariadb-0:/tmp/auntalma_dump.sql<span class="w"> </span>-c<span class="w"> </span>mariadb
+
+<span class="c1"># Step 2: Import locally inside the container (redirect must happen inside the container)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>auntalma-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;mariadb -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento &lt; /tmp/auntalma_dump.sql&#39;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="4-database-import-lock-tables-error-with-galera">4. Database Import: LOCK TABLES Error with Galera<a class="headerlink" href="#4-database-import-lock-tables-error-with-galera" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Import fails with:
+<div class="highlight"><pre><span></span><code>ERROR 1100 (HY000): Table &#39;rating_option_vote&#39; was not locked with LOCK TABLES
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> mysqldump includes <code>LOCK TABLES</code> / <code>UNLOCK TABLES</code> statements. Galera doesn't support <code>LOCK TABLES</code> in normal transaction flow.</p>
+<p><strong>Fix:</strong> Strip lock statements from the dump before importing:
+<div class="highlight"><pre><span></span><code><span class="c1"># Option A: Pipe through sed</span>
+cat<span class="w"> </span>/tmp/auntalma_dump.sql<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;/^LOCK TABLES/d; /^UNLOCK TABLES/d&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-i<span class="w"> </span>auntalma-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>mariadb<span class="w"> </span>-u<span class="w"> </span>root<span class="w"> </span>-p<span class="s2">&quot;</span><span class="si">${</span><span class="nv">ROOT_PW</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>magento
+
+<span class="c1"># Option B: Clean the file first</span>
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;/^LOCK TABLES/d; /^UNLOCK TABLES/d&#39;</span><span class="w"> </span>/tmp/auntalma_dump.sql
+</code></pre></div></p>
+<hr />
+<h3 id="5-mariadb-cli-binary-name-change">5. MariaDB CLI Binary Name Change<a class="headerlink" href="#5-mariadb-cli-binary-name-change" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>mysql</code> command not found in MariaDB 12.1 container.</p>
+<p><strong>Root Cause:</strong> MariaDB 12.1 renamed the CLI binary from <code>mysql</code> to <code>mariadb</code>.</p>
+<p><strong>Note:</strong> Not relevant when using MariaDB 10.11 (Issue #2). The <code>mysql</code> binary works on 10.11. Commands in this doc use <code>mysql</code> throughout.</p>
+<hr />
+<h3 id="6-mage_run_code-mismatch">6. MAGE_RUN_CODE Mismatch<a class="headerlink" href="#6-mage_run_code-mismatch" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails with:
+<div class="highlight"><pre><span></span><code>website with code auntalma that was requested wasn&#39;t found
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> The HelmRelease had <code>MAGE_RUN_CODE=auntalma</code> but the production database uses <code>base</code> as the website code for Aunt Alma.</p>
+<p><strong>Discovery:</strong> Query the production DB to find actual website codes:
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">website_id</span><span class="p">,</span><span class="w"> </span><span class="n">code</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">store_website</span><span class="p">;</span>
+<span class="c1">-- Results: admin(0), base(1=Aunt Alma), drop_drape_second_site(2)</span>
+
+<span class="k">SELECT</span><span class="w"> </span><span class="n">store_id</span><span class="p">,</span><span class="w"> </span><span class="n">code</span><span class="p">,</span><span class="w"> </span><span class="n">website_id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">store</span><span class="p">;</span>
+<span class="c1">-- Results: admin(0), default(1=Aunt Alma), drop_drape_store_view(2)</span>
+</code></pre></div></p>
+<p><strong>Fix:</strong> Update <code>MAGE_RUN_CODE</code> in helmrelease.yaml to match the production DB:
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MAGE_RUN_CODE</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base</span><span class="w">  </span><span class="c1"># NOT &quot;auntalma&quot; - must match store_website.code</span>
+</code></pre></div></p>
+<p><strong>Lesson:</strong> Always check <code>store_website</code> and <code>store</code> tables after import to find the correct codes.</p>
+<hr />
+<h3 id="7-alpinemusl-dns-resolution-failure-local-domains">7. Alpine/musl DNS Resolution Failure (.local domains)<a class="headerlink" href="#7-alpinemusl-dns-resolution-failure-local-domains" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> PHP can't connect to services:
+<div class="highlight"><pre><span></span><code>php_network_getaddresses: getaddrinfo for auntalma-mariadb-primary.business-system.svc.cluster.local failed: Try again
+</code></pre></div></p>
+<p>But <code>nslookup</code> from the same pod works fine. Short hostnames also work:
+<div class="highlight"><pre><span></span><code><span class="x">gethostbyname(&#39;auntalma-mariadb-primary&#39;);  // Returns 10.110.12.97 (works!)</span>
+<span class="x">gethostbyname(&#39;auntalma-mariadb-primary.business-system.svc.cluster.local&#39;);  // Returns the hostname itself (FAILS!)</span>
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Alpine Linux uses musl libc, which has a known bug with <code>.local</code> TLD. musl treats <code>.local</code> as mDNS and fails to resolve via standard DNS.</p>
+<p><strong>Fix:</strong> Use short service names instead of FQDNs in helmrelease.yaml env vars. Since pods and services are in the same namespace (<code>business-system</code>), the search domain automatically appends the rest:
+<div class="highlight"><pre><span></span><code><span class="c1"># Before (broken on Alpine/musl)</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MAGENTO_DB_HOST</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auntalma-mariadb-primary.business-system.svc.cluster.local</span>
+
+<span class="c1"># After (works on Alpine/musl)</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MAGENTO_DB_HOST</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auntalma-mariadb-primary</span>
+</code></pre></div></p>
+<p>Apply to ALL service hostnames: MariaDB, Redis, Elasticsearch, RabbitMQ.</p>
+<hr />
+<h3 id="8-stale-elasticsearch-config-in-database">8. Stale Elasticsearch Config in Database<a class="headerlink" href="#8-stale-elasticsearch-config-in-database" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails with:
+<div class="highlight"><pre><span></span><code>Could not validate a connection to Elasticsearch. No alive nodes found in your cluster
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> The production database has ES config in <code>core_config_data</code> pointing to the old Elastic Cloud instance (e.g., <code>magento-2-43eba1.es.ap-southeast-2.aws.found.io:9243</code> with auth enabled). This DB-stored config overrides whatever is in <code>env.php</code>.</p>
+<p><strong>Fix:</strong> Update ES config in the database:
+<div class="highlight"><pre><span></span><code><span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;auntalma-elasticsearch-es-http&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;catalog/search/elasticsearch7_server_hostname&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;9200&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;catalog/search/elasticsearch7_server_port&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;0&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;catalog/search/elasticsearch7_enable_auth&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;catalog/search/elasticsearch7_username&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;catalog/search/elasticsearch7_password&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>IMPORTANT:</strong> Also flush Redis after changing DB config (see next issue).</p>
+<p><strong>Note:</strong> <code>env.php</code> sets ES config via <code>getenv('MAGENTO_ES_HOST')</code> under the <code>system.default.catalog.search</code> key, but the DB-stored <code>core_config_data</code> takes precedence for already-configured instances.</p>
+<hr />
+<h3 id="9-redis-caching-stale-config">9. Redis Caching Stale Config<a class="headerlink" href="#9-redis-caching-stale-config" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After updating ES config in the DB, <code>setup:upgrade</code> still fails with the old Elastic Cloud hostname.</p>
+<p><strong>Root Cause:</strong> Magento caches its configuration in Redis. The stale ES config is served from Redis cache, not from the DB.</p>
+<p><strong>Fix:</strong> Flush the relevant Redis databases:
+<div class="highlight"><pre><span></span><code><span class="c1"># From the PHP pod:</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">\$r = new Redis();</span>
+<span class="s2">\$r-&gt;connect(&#39;auntalma-redis-master&#39;, 6379);</span>
+<span class="s2">\$r-&gt;select(6); \$r-&gt;flushDB();  // DB 6 = Magento cache</span>
+<span class="s2">\$r-&gt;select(1); \$r-&gt;flushDB();  // DB 1 = Page cache</span>
+<span class="s2">echo &#39;Flushed Redis DBs 6 and 1&#39;;</span>
+<span class="s2">&quot;</span>
+</code></pre></div></p>
+<p><strong>Lesson:</strong> Always flush Redis after changing any <code>core_config_data</code> values.</p>
+<hr />
+<h3 id="10-trigger-privilege-error-with-galera-binary-logging">10. Trigger Privilege Error with Galera Binary Logging<a class="headerlink" href="#10-trigger-privilege-error-with-galera-binary-logging" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails during schema updates:
+<div class="highlight"><pre><span></span><code>SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled
+(you *might* want to use the less safe log_bin_trust_function_creators variable),
+query was: DROP TRIGGER IF EXISTS `trg_catalog_category_entity_after_insert`
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Galera uses <code>binlog_format=ROW</code> for replication. Creating/dropping triggers requires SUPER privilege or <code>log_bin_trust_function_creators=1</code>.</p>
+<p><strong>Fix:</strong> Add to <code>mariadb-cluster.yaml</code> myCnf (permanent):
+<div class="highlight"><pre><span></span><code><span class="nt">myCnf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">  </span><span class="no">[mariadb]</span>
+<span class="w">  </span><span class="no">...</span>
+<span class="w">  </span><span class="no">log_bin_trust_function_creators=1</span>
+</code></pre></div></p>
+<p>Also set at runtime (immediate, doesn't require MariaDB restart):
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>auntalma-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>mariadb<span class="w"> </span>-u<span class="w"> </span>root<span class="w"> </span>-p<span class="s2">&quot;</span><span class="si">${</span><span class="nv">ROOT_PW</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;SET GLOBAL log_bin_trust_function_creators=1;&quot;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="11-flux-rollback-loop-chicken-and-egg">11. Flux Rollback Loop (Chicken-and-Egg)<a class="headerlink" href="#11-flux-rollback-loop-chicken-and-egg" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Flux deploys new pods with updated env vars, but Magento fails health checks (because <code>setup:upgrade</code> hasn't run), so Flux rolls back to the old template.</p>
+<p><strong>Root Cause:</strong> Magento can't serve HTTP until the DB schema is up to date. But the new pods need to serve HTTP to pass health checks. And you can't run <code>setup:upgrade</code> on old pods with new env vars easily.</p>
+<p><strong>Workaround:</strong> Run <code>setup:upgrade</code> on the current (old) pod with env var overrides:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">export MAGENTO_DB_HOST=auntalma-mariadb-primary</span>
+<span class="s2">export MAGENTO_SESSION_REDIS_HOST=auntalma-redis-master</span>
+<span class="s2">export MAGENTO_CACHE_REDIS_HOST=auntalma-redis-master</span>
+<span class="s2">export MAGENTO_PAGE_CACHE_REDIS_HOST=auntalma-redis-master</span>
+<span class="s2">export MAGENTO_ES_HOST=auntalma-elasticsearch-es-http</span>
+<span class="s2">export MAGENTO_AMQP_HOST=auntalma-rabbitmq</span>
+<span class="s2">export MAGE_RUN_CODE=base</span>
+<span class="s2">cd /var/www/html &amp;&amp; php bin/magento setup:upgrade</span>
+<span class="s2">&quot;</span>
+</code></pre></div></p>
+<p>Once setup:upgrade completes, the schema is updated in the DB, and new pods deployed by Flux will be able to serve.</p>
+<p><strong>Alternative:</strong> Suspend the HelmRelease temporarily:
+<div class="highlight"><pre><span></span><code>flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>auntalma<span class="w"> </span>-n<span class="w"> </span>business-system
+<span class="c1"># ... run setup:upgrade ...</span>
+flux<span class="w"> </span>resume<span class="w"> </span>helmrelease<span class="w"> </span>auntalma<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div></p>
+<hr />
+<h3 id="12-multi-store-discovery">12. Multi-Store Discovery<a class="headerlink" href="#12-multi-store-discovery" title="Permanent link">&para;</a></h3>
+<p><strong>Finding:</strong> The production database contains multiple stores:
+- <strong>website 1 (code: <code>base</code>)</strong>: auntalma.com.au
+- <strong>website 2 (code: <code>drop_drape_second_site</code>)</strong>: magento.toemass.com / dropdrape.com.au</p>
+<p>The K8s deployment is single-store (<code>MAGE_RUN_CODE=base</code>, nginx <code>server_name _</code>). Multi-store requires:
+- Nginx hostname-to-store-code mapping
+- env.php changes to read store code from HTTP headers
+- Separate DNS entries and HTTPRoutes
+- Deferred to follow-up task</p>
+<h3 id="13-setupupgrade-requires-dicompile-afterwards">13. setup:upgrade Requires di:compile Afterwards<a class="headerlink" href="#13-setupupgrade-requires-dicompile-afterwards" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After <code>setup:upgrade</code> succeeds, <code>indexer:reindex</code> fails with:
+<div class="highlight"><pre><span></span><code>There are no commands defined in the &quot;indexer&quot; namespace.
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> <code>setup:upgrade</code> clears the generated DI code and outputs:
+<div class="highlight"><pre><span></span><code>Please re-run Magento compile command. Use the command &quot;setup:di:compile&quot;
+</code></pre></div></p>
+<p>Without compiled DI, most Magento CLI commands are unavailable.</p>
+<p><strong>Fix:</strong> Always run <code>setup:di:compile</code> after <code>setup:upgrade</code>:
+<div class="highlight"><pre><span></span><code>php<span class="w"> </span>bin/magento<span class="w"> </span>setup:di:compile
+</code></pre></div></p>
+<p><strong>Note:</strong> <code>di:compile</code> takes several minutes and is CPU-intensive. It regenerates all interceptors/proxies/factories in <code>generated/code/</code>.</p>
+<hr />
+<h3 id="14-flux-pods-replaced-mid-migration">14. Flux Pods Replaced Mid-Migration<a class="headerlink" href="#14-flux-pods-replaced-mid-migration" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> While running manual setup commands via <code>kubectl exec</code>, the target pod disappears:
+<div class="highlight"><pre><span></span><code>Error from server (NotFound): pods &quot;auntalma-xxxxx&quot; not found
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Flux HelmRelease reconciliation replaces pods on every cycle (rollback, upgrade, or config change). Your exec session is killed mid-operation.</p>
+<p><strong>Workaround:</strong> Suspend the HelmRelease before starting manual migration steps:
+<div class="highlight"><pre><span></span><code>flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>auntalma<span class="w"> </span>-n<span class="w"> </span>business-system
+<span class="c1"># ... run all setup commands ...</span>
+flux<span class="w"> </span>resume<span class="w"> </span>helmrelease<span class="w"> </span>auntalma<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div></p>
+<p><strong>Alternative:</strong> Work fast and re-apply patches each time pods rotate. The DB changes (schema, config) persist across pod restarts — only the di.xml patch and generated code are lost.</p>
+<hr />
+<h3 id="15-envphp-missing-installdate-key">15. env.php Missing <code>install.date</code> Key<a class="headerlink" href="#15-envphp-missing-installdate-key" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After <code>di:compile</code> succeeds, <code>indexer:reindex</code> fails with:
+<div class="highlight"><pre><span></span><code>There are no commands defined in the &quot;indexer&quot; namespace.
+</code></pre></div></p>
+<p><code>setup:db:status</code> reports: "No information is available: the Magento application is not installed."</p>
+<p>Only base commands (setup, admin, module, etc.) appear in <code>php bin/magento list</code> — no <code>indexer</code>, <code>cache</code>, <code>cron</code>, <code>catalog</code>, etc.</p>
+<p><strong>Root Cause:</strong> The env.php ConfigMap was missing the <code>install</code> key. Magento checks <code>install/date</code> in <code>env.php</code> to determine if the application is installed. Without it, most module CLI commands are not registered.</p>
+<p><strong>Fix:</strong> Add to the env.php ConfigMap:
+<div class="highlight"><pre><span></span><code><span class="x">&#39;install&#39; =&gt; [</span>
+<span class="x">    &#39;date&#39; =&gt; &#39;Sat, 01 Jan 2022 00:00:00 +0000&#39;,</span>
+<span class="x">],</span>
+</code></pre></div></p>
+<p><strong>Important:</strong> env.php is a read-only ConfigMap subPath mount — you CANNOT modify it in-container. You must update the ConfigMap resource, then restart the pod.</p>
+<hr />
+<h3 id="16-pubstatic-emptydir-no-static-content-on-pod-start">16. <code>pub/static</code> EmptyDir — No Static Content on Pod Start<a class="headerlink" href="#16-pubstatic-emptydir-no-static-content-on-pod-start" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Storefront returns Magento 404 page. Exception log shows:
+<div class="highlight"><pre><span></span><code>Unable to retrieve deployment version of static files from the file system.
+</code></pre></div></p>
+<p><code>pub/static/deployed_version.txt</code> does not exist. <code>pub/static/</code> is empty.</p>
+<p><strong>Root Cause:</strong> The HelmRelease mounts <code>pub/static</code> as an <code>emptyDir</code> volume (shared between PHP and nginx containers for static file serving). This <strong>hides the Docker image's baked-in static content</strong> with an empty directory. There is no init container to copy or regenerate the static files.</p>
+<p><strong>Fix needed:</strong> Add an init container to the HelmRelease that copies pre-built static content from the image to the emptyDir. The key is using <code>advancedMounts</code> so the init container sees the image's original files (not the empty mount):</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># In HelmRelease values:</span>
+<span class="nt">controllers</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">&lt;site&gt;</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">initContainers</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">copy-static</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/hayden-agencies/magento2-makergroup</span>
+<span class="w">          </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latest</span>
+<span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;/bin/sh&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-c</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">            </span><span class="no">echo &quot;[init] Copying static content to shared volume...&quot;</span>
+<span class="w">            </span><span class="no">if [ -d /var/www/html/pub/static ] &amp;&amp; [ &quot;$(ls -A /var/www/html/pub/static 2&gt;/dev/null)&quot; ]; then</span>
+<span class="w">              </span><span class="no">cp -a /var/www/html/pub/static/. /shared-static/</span>
+<span class="w">              </span><span class="no">echo &quot;[init] Done ($(find /shared-static -type f | wc -l) files)&quot;</span>
+<span class="w">            </span><span class="no">else</span>
+<span class="w">              </span><span class="no">echo &quot;[init] WARNING: No static content in image — need to add SCD to Dockerfile&quot;</span>
+<span class="w">            </span><span class="no">fi</span>
+<span class="w">        </span><span class="nt">securityContext</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">allowPrivilegeEscalation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">          </span><span class="nt">readOnlyRootFilesystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">          </span><span class="nt">capabilities</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> drop</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;ALL&quot;</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> cpu</span><span class="p">:</span><span class="w"> </span><span class="nv">100m</span><span class="p p-Indicator">,</span><span class="nt"> memory</span><span class="p">:</span><span class="w"> </span><span class="nv">256Mi</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">          </span><span class="nt">limits</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> cpu</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p p-Indicator">,</span><span class="nt"> memory</span><span class="p">:</span><span class="w"> </span><span class="nv">1Gi</span><span class="w"> </span><span class="p p-Indicator">}</span>
+
+<span class="nt">persistence</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">docroot</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emptyDir</span>
+<span class="w">    </span><span class="nt">advancedMounts</span><span class="p">:</span><span class="w">          </span><span class="c1"># NOT globalMounts — critical!</span>
+<span class="w">      </span><span class="nt">&lt;site&gt;</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">copy-static</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/shared-static</span><span class="w">    </span><span class="c1"># Different path so image content is visible</span>
+<span class="w">        </span><span class="nt">php</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/www/html/pub/static</span>
+<span class="w">        </span><span class="nt">nginx</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/www/html/pub/static</span>
+</code></pre></div>
+<p><strong>Why <code>advancedMounts</code>?</strong> With <code>globalMounts</code>, the emptyDir mounts at <code>/var/www/html/pub/static</code> in the init container too — hiding the image's static files. With <code>advancedMounts</code>, the init container mounts at <code>/shared-static</code> (the emptyDir) while its <code>/var/www/html/pub/static</code> remains the image's original content.</p>
+<p><strong>Pre-requisite:</strong> The Docker image must have static content baked in. Verify:
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--entrypoint<span class="w"> </span>/bin/sh<span class="w"> </span>ghcr.io/hayden-agencies/magento2-makergroup:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="s2">&quot;ls /var/www/html/pub/static/ | head -10&quot;</span>
+</code></pre></div>
+If empty, you need to add <code>setup:static-content:deploy</code> to the Dockerfile build phase.</p>
+<p><strong>For immediate manual testing</strong> (lost on pod restart):
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;</span>
+<span class="s1">cd /var/www/html &amp;&amp; php bin/magento setup:static-content:deploy en_US -f</span>
+<span class="s1">&#39;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="17-en_au-locale-dockerfile-deploys-wrong-locale">17. <code>en_AU</code> Locale — Dockerfile Deploys Wrong Locale<a class="headerlink" href="#17-en_au-locale-dockerfile-deploys-wrong-locale" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> All <code>en_AU</code> static asset URLs return 404. Only <code>en_US</code> files exist under <code>pub/static/frontend/</code>. Pages load without CSS/JS.</p>
+<p><strong>Root Cause:</strong> <code>Dockerfile.prod</code> line 77 deploys <code>en_US</code> for frontend themes with a misleading comment: <em>"en_AU falls back to en_US at runtime"</em>. <strong>This is wrong — Magento does NOT fall back for static files.</strong> The HTML URLs are hardcoded to the store's configured locale (<code>en_AU</code>), and missing files return 404.</p>
+<p><strong>Note:</strong> The <code>magento/language-en_au</code> composer package is NOT required for SCD. That package only provides UI string translations (csv files). SCD locale validation uses the ICU library + Magento's hardcoded allowlist (<code>Magento\Framework\Locale\Config::$_allowedLocales</code>), which already includes <code>en_AU</code>. The <code>php:8.3-fpm-alpine</code> image installs <code>intl</code> (ICU) so <code>en_AU</code> is a valid SCD locale out of the box.</p>
+<p><strong>Fix (permanent — update Docker image):</strong>
+1. Change <code>Dockerfile.prod</code> frontend SCD from <code>en_US</code> to <code>en_AU</code> (line 77, matching <code>deploy.php</code>)</p>
+<p><strong>Fix (temporary — in running pod, lost on restart):</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Copy en_US static files to en_AU directory</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \</span>
+<span class="s2">   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/&quot;</span>
+</code></pre></div></p>
+<p>See also Issue #42 for the related CSS minification problem.</p>
+<hr />
+<h3 id="18-cilium-clusterip-routing-broken-on-some-nodes">18. Cilium ClusterIP Routing Broken on Some Nodes<a class="headerlink" href="#18-cilium-clusterip-routing-broken-on-some-nodes" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> MariaDB connection times out even when using the ClusterIP directly:
+<div class="highlight"><pre><span></span><code>SQLSTATE[HY000] [2002] Operation timed out
+</code></pre></div></p>
+<p>Pod-to-pod direct IP works, but ClusterIP does not. Affects specific worker nodes (worker2/worker3 in our case). Other services (Redis) work fine via ClusterIP from the same pod. The worker2 pod was persistently crashlooping (1/2 Ready, 11+ restarts) while worker1 was fine.</p>
+<p><strong>Root Cause:</strong> Cilium's eBPF service routing on the affected node doesn't have the correct endpoint map for the MariaDB service. This is a node-level Cilium issue, not a DNS or Magento problem.</p>
+<p><strong>Workaround:</strong> Use pod IPs or ClusterIPs directly to bypass DNS entirely. Get all IPs up front:
+<div class="highlight"><pre><span></span><code><span class="c1"># Get all service ClusterIPs</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&lt;site&gt;-redis-master<span class="w"> </span>&lt;site&gt;-mariadb-primary<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span>&lt;site&gt;-rabbitmq<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{range .items[*]}{.metadata.name}={.spec.clusterIP}{&quot;\n&quot;}{end}&#39;</span>
+
+<span class="c1"># If ClusterIP also fails, fall back to pod IP</span>
+<span class="nv">DB_POD_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.podIP}&#39;</span><span class="k">)</span>
+</code></pre></div></p>
+<p><strong>Diagnosis:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># From the affected pod — ClusterIP fails:</span>
+<span class="nb">echo</span><span class="w"> </span>quit<span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>-w<span class="w"> </span><span class="m">3</span><span class="w"> </span>&lt;ClusterIP&gt;<span class="w"> </span><span class="m">3306</span><span class="w">    </span><span class="c1"># TCP FAIL</span>
+
+<span class="c1"># Direct pod IP works:</span>
+<span class="nb">echo</span><span class="w"> </span>quit<span class="w"> </span><span class="p">|</span><span class="w"> </span>nc<span class="w"> </span>-w<span class="w"> </span><span class="m">3</span><span class="w"> </span>&lt;PodIP&gt;<span class="w"> </span><span class="m">3306</span><span class="w">        </span><span class="c1"># TCP OK</span>
+</code></pre></div></p>
+<hr />
+<h3 id="19-flux-rollback-loop-helmrelease-stuck-at-418-revisions">19. Flux Rollback Loop — HelmRelease Stuck at 418+ Revisions<a class="headerlink" href="#19-flux-rollback-loop-helmrelease-stuck-at-418-revisions" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>flux get helmrelease auntalma</code> shows:
+<div class="highlight"><pre><span></span><code>Helm rollback to previous release business-system/auntalma.v4 ... failed: context deadline exceeded
+</code></pre></div></p>
+<p><code>helm history auntalma -n business-system</code> shows hundreds of failed revisions, all rolling back to v4 (the pre-migration release).</p>
+<p><strong>Root Cause:</strong> Cascading chicken-and-egg:
+1. Flux upgrades the HelmRelease with new env vars/config
+2. New pods start but can't pass health checks (Magento needs <code>setup:upgrade</code> first, static content is empty, etc.)
+3. Helm timeout → Flux rolls back to v4 (old working config... which also doesn't work with imported DB)
+4. Repeat every 15 minutes</p>
+<p><strong>Status:</strong> The actual DB migration is done (setup:upgrade, di:compile, indexer:reindex all succeeded). But new pods from Flux can't serve because:
+- <code>pub/static</code> emptyDir is empty (no init container — Issue #16)
+- MariaDB 12 di.xml patch isn't baked in (Issue #2)
+- Pods on some workers can't reach MariaDB via ClusterIP (Issue #18)</p>
+<p><strong>Fix plan:</strong>
+1. Pin MariaDB to 10.11 OR bake di.xml patch into Docker image
+2. Add init container for static content deploy to HelmRelease
+3. Fix the <code>en_AU</code> locale (add to Docker image or configure stores for <code>en_US</code>)
+4. Once those are in place, reset Helm release history and let Flux reconcile cleanly</p>
+<p><strong>Cleaning up Helm history</strong> (after fixing all blockers):
+<div class="highlight"><pre><span></span><code><span class="c1"># Option A: Uninstall and let Flux reinstall</span>
+flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+helm<span class="w"> </span>uninstall<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+flux<span class="w"> </span>resume<span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+<span class="c1"># Flux will do a fresh install with revision 1</span>
+
+<span class="c1"># Option B: If you need to keep the release</span>
+helm<span class="w"> </span>rollback<span class="w"> </span>&lt;site&gt;<span class="w"> </span><span class="m">4</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w">   </span><span class="c1"># Roll back to last known good</span>
+</code></pre></div></p>
+<hr />
+<h3 id="20-flux-reverts-manually-applied-configmaps">20. Flux Reverts Manually-Applied ConfigMaps<a class="headerlink" href="#20-flux-reverts-manually-applied-configmaps" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> You <code>kubectl apply</code> a ConfigMap fix (e.g., adding <code>install.date</code> to env.php), restart pods, confirm it works — then Flux reconciles and the fix disappears.</p>
+<p><strong>Root Cause:</strong> Flux Kustomization reconciles all manifests from the OCI source every interval. If your change isn't committed and pushed to git (and built into the OCI image), Flux overwrites it with the old version.</p>
+<p><strong>Lesson:</strong> <code>kubectl apply</code> is only a temporary hotfix. You MUST commit, push, and wait for the OCI build before Flux will persist the change. If Flux is suspended, the manual apply sticks until you resume.</p>
+<hr />
+<h3 id="21-kubectl-set-env-as-emergency-deployment-patch">21. <code>kubectl set env</code> as Emergency Deployment Patch<a class="headerlink" href="#21-kubectl-set-env-as-emergency-deployment-patch" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Flux is in a rollback loop. Your git changes (short hostnames, MAGE_RUN_CODE) are committed but Flux keeps rolling back to the old Helm release (v4). New pods never get the correct env vars.</p>
+<p><strong>Workaround:</strong> Bypass Helm/Flux entirely by patching the Deployment directly:
+<div class="highlight"><pre><span></span><code><span class="c1"># Suspend Flux first</span>
+flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+
+<span class="c1"># Patch all env vars in one command</span>
+<span class="nv">HTTPS_PROXY</span><span class="o">=</span>socks5://127.0.0.1:1234<span class="w"> </span>kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>env<span class="w"> </span>deployment/&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGE_RUN_CODE</span><span class="o">=</span>base<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_DB_HOST</span><span class="o">=</span>&lt;site&gt;-mariadb-primary<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_SESSION_REDIS_HOST</span><span class="o">=</span>&lt;site&gt;-redis-master<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_CACHE_REDIS_HOST</span><span class="o">=</span>&lt;site&gt;-redis-master<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_PAGE_CACHE_REDIS_HOST</span><span class="o">=</span>&lt;site&gt;-redis-master<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_ES_HOST</span><span class="o">=</span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MAGENTO_AMQP_HOST</span><span class="o">=</span>&lt;site&gt;-rabbitmq
+</code></pre></div></p>
+<p>This triggers a new rollout with the correct env vars. Pods restart automatically.</p>
+<p><strong>Important:</strong> This is a manual override — when you resume Flux, it will revert to whatever the HelmRelease specifies.</p>
+<hr />
+<h3 id="22-configmap-subpath-mounts-dont-auto-update">22. ConfigMap SubPath Mounts Don't Auto-Update<a class="headerlink" href="#22-configmap-subpath-mounts-dont-auto-update" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> You update a ConfigMap (<code>kubectl apply</code>), but the running pod still has the old content.</p>
+<p><strong>Root Cause:</strong> ConfigMap volumes mounted via <code>subPath</code> are a one-time copy at pod creation. Unlike regular ConfigMap mounts (which update via symlink), subPath mounts never update.</p>
+<p><strong>Fix:</strong> Restart the pod after updating the ConfigMap:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment/&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div></p>
+<hr />
+<h3 id="23-dns-flaky-inside-bash-c-even-with-short-hostnames">23. DNS Flaky Inside <code>bash -c</code> Even With Short Hostnames<a class="headerlink" href="#23-dns-flaky-inside-bash-c-even-with-short-hostnames" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>php -r "echo gethostbyname('auntalma-redis-master');"</code> resolves fine when run directly via <code>kubectl exec</code>. But the same hostname fails inside <code>bash -c '...'</code>:
+<div class="highlight"><pre><span></span><code>php_network_getaddresses: getaddrinfo for auntalma-redis-master failed: Try again
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Intermittent DNS resolution failure in Alpine/musl. Rapid sequential DNS lookups from shell subprocesses seem to trigger it. Not 100% reproducible — works sometimes, fails other times.</p>
+<p><strong>Workaround:</strong> For migration commands, resolve all service IPs up front and use them directly:
+<div class="highlight"><pre><span></span><code><span class="c1"># Get IPs before exec-ing into the pod</span>
+<span class="nv">REDIS_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-redis-master<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+<span class="nv">DB_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.podIP}&#39;</span><span class="k">)</span>
+<span class="nv">ES_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+<span class="nv">AMQP_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-rabbitmq<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+
+<span class="c1"># Then use IPs in the exec command</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">export MAGENTO_DB_HOST=</span><span class="nv">$DB_IP</span>
+<span class="s2">export MAGENTO_SESSION_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">...&quot;</span>
+</code></pre></div></p>
+<p><strong>Note:</strong> Use pod IP for MariaDB if ClusterIP also fails (Issue #18).</p>
+<hr />
+<h3 id="24-httproute-backend-service-name-mismatch">24. HTTPRoute Backend Service Name Mismatch<a class="headerlink" href="#24-httproute-backend-service-name-mismatch" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Storefront returns <code>000</code> (connection refused). <code>curl -sk https://auntalma.haydenagencies.com.au/</code> gets no response at all.</p>
+<p><strong>Root Cause:</strong> HTTPRoute <code>backendRefs</code> referenced <code>auntalma-app</code> but the bjw-s app-template creates the service as just <code>auntalma</code>. Envoy Gateway reported <code>BackendNotFound</code>:
+<div class="highlight"><pre><span></span><code>Failed to process route rule 0 backendRef 0: service business-system/auntalma-app not found.
+</code></pre></div></p>
+<p><strong>Fix:</strong> Update <code>httproute.yaml</code> and <code>httproute-admin.yaml</code>:
+<div class="highlight"><pre><span></span><code><span class="c1"># Before (broken)</span>
+<span class="nt">backendRefs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auntalma-app</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+
+<span class="c1"># After (fixed)</span>
+<span class="nt">backendRefs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auntalma</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+</code></pre></div></p>
+<p><strong>How to verify:</strong> Check HTTPRoute status — <code>ResolvedRefs</code> should be <code>True</code>:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>get<span class="w"> </span>httproute<span class="w"> </span>auntalma<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.parents[0].conditions}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>json.tool
+</code></pre></div></p>
+<hr />
+<h3 id="25-missing-external-dns-annotations-on-httproute">25. Missing external-dns Annotations on HTTPRoute<a class="headerlink" href="#25-missing-external-dns-annotations-on-httproute" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> DNS doesn't resolve at all for <code>auntalma.haydenagencies.com.au</code>. No CNAME record in Cloudflare.</p>
+<p><strong>Root Cause:</strong> External-dns is configured with <code>--annotation-filter=external-dns.alpha.kubernetes.io/external=true</code> and <code>--source=gateway-httproute</code>. HTTPRoutes without this annotation are ignored. Every other working route (chatwoot, odoo, grafana, etc.) has it.</p>
+<p><strong>Fix:</strong> Add annotations to the HTTPRoute (only needed on the primary route, not the admin route):
+<div class="highlight"><pre><span></span><code><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auntalma</span>
+<span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">business-system</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/external</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+<span class="w">    </span><span class="nt">external-dns.alpha.kubernetes.io/target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">external.haydenagencies.com.au</span>
+</code></pre></div></p>
+<p>The <code>target</code> annotation tells external-dns to create a CNAME pointing to <code>external.haydenagencies.com.au</code> (which is the Cloudflare-proxied endpoint that routes through the cloudflare tunnel to envoy-external).</p>
+<p><strong>Verification:</strong> Check external-dns logs for the record creation:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>network-system<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/name<span class="o">=</span>external-dns<span class="w"> </span>--tail<span class="o">=</span><span class="m">10</span>
+<span class="c1"># Should see: Changing record. action=CREATE record=auntalma.haydenagencies.com.au</span>
+</code></pre></div></p>
+<hr />
+<h3 id="26-networkpolicy-blocking-envoy-gateway-traffic">26. NetworkPolicy Blocking Envoy Gateway Traffic<a class="headerlink" href="#26-networkpolicy-blocking-envoy-gateway-traffic" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Storefront returns <code>503</code> with <code>upstream connect error or disconnect/reset before headers. reset reason: connection timeout</code>. Envoy access log shows the request reaching the correct backend IP but timing out after 10 seconds:
+<div class="highlight"><pre><span></span><code>&quot;GET / HTTP/2&quot; 503 UF 0 91 10001 ... &quot;auntalma.haydenagencies.com.au&quot; &quot;10.244.9.122:8080&quot;
+</code></pre></div></p>
+<p>Meanwhile, the backend pod is healthy — <code>health_check.php</code> returns 200 when tested via <code>localhost</code> inside the pod.</p>
+<p><strong>Root Cause:</strong> The <code>auntalma-app</code> NetworkPolicy allowed ingress from <code>envoy-gateway-system</code> namespace, but the Envoy Gateway proxy pods are actually in the <code>network-system</code> namespace:
+<div class="highlight"><pre><span></span><code><span class="c1"># WRONG — envoy proxy pods are NOT in this namespace</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">namespaceSelector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">kubernetes.io/metadata.name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy-gateway-system</span>
+</code></pre></div></p>
+<p><strong>Fix:</strong> Update <code>networkpolicy.yaml</code> to target the correct namespace and pods:
+<div class="highlight"><pre><span></span><code><span class="c1"># CORRECT — match envoy proxy pods in network-system</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">from</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">namespaceSelector</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">kubernetes.io/metadata.name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">network-system</span>
+<span class="w">      </span><span class="nt">podSelector</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">gateway.envoyproxy.io/owning-gateway-name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy-external</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
+</code></pre></div></p>
+<p><strong>Key insight:</strong> In this cluster, the Envoy Gateway controller runs in <code>envoy-gateway-system</code>, but the data-plane proxy pods (the ones that actually forward traffic) run in <code>network-system</code> alongside the Gateway resource. The label <code>gateway.envoyproxy.io/owning-gateway-name: envoy-external</code> specifically targets the proxy pods.</p>
+<p><strong>How to debug:</strong> Check which namespace the envoy proxy pods are in:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A<span class="w"> </span>-l<span class="w"> </span>gateway.envoyproxy.io/owning-gateway-name<span class="o">=</span>envoy-external<span class="w"> </span>-o<span class="w"> </span>wide
+</code></pre></div></p>
+<hr />
+<h3 id="27-networkpolicy-cilium-dns-proxy-breaks-alpine-musl-libc-dns">27. NetworkPolicy + Cilium DNS Proxy Breaks Alpine musl libc DNS<a class="headerlink" href="#27-networkpolicy-cilium-dns-proxy-breaks-alpine-musl-libc-dns" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> PHP-FPM health check times out → nginx container enters CrashLoopBackOff (139+ restarts). Magento can't connect to Redis/MariaDB:
+<div class="highlight"><pre><span></span><code>php_network_getaddresses: getaddrinfo for auntalma-redis-master failed: Try again
+</code></pre></div></p>
+<p>DNS works via <code>nslookup</code> and PHP's <code>dns_get_record()</code>, but fails via <code>gethostbyname()</code> and <code>getaddrinfo()</code> (used by PDO, fsockopen, Redis).</p>
+<p><strong>Root Cause:</strong> Three-way incompatibility:
+1. <strong>Alpine musl libc</strong> sends A and AAAA DNS queries simultaneously on the same UDP socket
+2. <strong>Cilium transparent DNS proxy</strong> (<code>enable-l7-proxy: true</code>, <code>dnsproxy-enable-transparent-mode: true</code>) intercepts DNS when ANY NetworkPolicy (K8s or Cilium) is applied to a pod
+3. The proxy re-orders or delays responses, causing musl's parallel query logic to fail intermittently</p>
+<p><strong>Key findings:</strong>
+- Without any NetworkPolicy: DNS works 100% reliably
+- With K8s NetworkPolicy (even ingress-only, no egress rules): DNS fails intermittently
+- With CiliumNetworkPolicy (with or without <code>dns</code> L7 rules): DNS also fails
+- Non-Alpine pods (e.g., Chatwoot/Ruby) with the same NetworkPolicy pattern work fine
+- TCP DNS to kube-dns ClusterIP is blocked even when explicitly allowed (Cilium can't match service VIPs to pod selectors after DNAT)</p>
+<p><strong>Tested and failed:</strong>
+- K8s NetworkPolicy with pod selector for kube-dns (original)
+- K8s NetworkPolicy with ipBlock for kube-dns ClusterIP
+- K8s NetworkPolicy with port-only DNS rule (no destination)
+- K8s NetworkPolicy with ingress-only (no egress policyType)
+- CiliumNetworkPolicy with <code>dns: [{matchPattern: "*"}]</code> L7 rules
+- CiliumNetworkPolicy without L7 rules</p>
+<p><strong>Current fix:</strong> NetworkPolicy removed entirely for auntalma pods. All other egress restrictions are removed.</p>
+<p><strong>UPDATE:</strong> DNS fails intermittently even WITHOUT NetworkPolicy (~60% failure rate on <code>gethostbyname</code>/<code>getaddrinfo</code>). Cilium 1.18.6 has <code>dnsproxy-enable-transparent-mode: true</code> by default, meaning the DNS proxy intercepts ALL DNS traffic regardless of whether policies exist.</p>
+<p><strong>Permanent fix — Cilium config change (recommended):</strong></p>
+<p>Add to <code>kubernetes/apps/base/kube-system/cilium/app/values.yaml</code>:
+<div class="highlight"><pre><span></span><code><span class="nt">dnsProxy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">dnsRejectResponseCode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nameError</span>
+</code></pre></div></p>
+<p>This changes Cilium from returning <code>REFUSED</code> (musl aborts on this) to <code>NXDOMAIN</code> (musl handles correctly and continues searching). Cluster-wide fix, no image changes needed.</p>
+<p>Source: <a href="https://farcaller.net/2024/cilium-dns-policies-and-the-glibc-resolver/">Cilium DNS + glibc resolver</a>, <a href="https://github.com/cilium/cilium/issues/33144">cilium/cilium#33144</a></p>
+<p><strong>Other options (if Cilium fix insufficient):</strong>
+- <strong>Option A:</strong> Switch from Alpine to Debian-based PHP image (glibc handles DNS correctly)
+- <strong>Option B:</strong> Add <code>dnsConfig</code> to pod spec — note: <code>single-request-reopen</code> is glibc-only, musl only supports <code>ndots</code>, <code>timeout</code>, <code>attempts</code>
+- <strong>Option C:</strong> Use <code>hostAliases</code> in pod spec to bypass DNS entirely (fragile — ClusterIPs can change)</p>
+<hr />
+<h3 id="28-k8s-networkpolicy-cilium-broken-pod-networking-on-some-nodes">28. K8s NetworkPolicy + Cilium = Broken Pod Networking on Some Nodes<a class="headerlink" href="#28-k8s-networkpolicy-cilium-broken-pod-networking-on-some-nodes" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Pods on worker2/worker3 have <strong>zero network connectivity</strong> — can't ping kube-dns ClusterIP, can't reach any pod IP, can't resolve DNS. But worker1 pods with the same spec work fine. Cilium endpoint shows <code>ready</code>. Plain Alpine pods without NetworkPolicy work fine on the same nodes.</p>
+<p><strong>Root Cause:</strong> Kubernetes NetworkPolicy (even ingress-only with NO egress rules) triggers Cilium to attach eBPF programs for policy enforcement. On some nodes, these programs break the pod's entire datapath — not just DNS, but ALL traffic. The issue is node-specific and non-deterministic.</p>
+<p><strong>Key findings:</strong>
+- Removing the NetworkPolicy entirely restores networking immediately
+- The issue is NOT related to egress rules — even <code>policyTypes: [Ingress]</code> with no egress section triggers it
+- Restarting the cilium agent on the affected node does NOT fix it
+- Deleting and recreating the pod does NOT fix it (new pod on same node also broken)
+- Plain pods (no NetworkPolicy matching them) work fine on the same nodes
+- This is likely a Cilium bug with <code>datapathMode: netkit</code> (eBPF-based datapath)</p>
+<p><strong>Current fix:</strong> NetworkPolicy changed to ingress-only (egress enforcement removed). But on some nodes, even this triggers the issue.</p>
+<p><strong>Workaround for affected deployments:</strong>
+1. Scale to 1 replica pinned to a working node
+2. Or remove NetworkPolicy entirely until Cilium fix is available</p>
+<p><strong>Related:</strong> Issue #27 (DNS-specific symptoms were actually this broader networking issue)</p>
+<hr />
+<h3 id="29-kubectl-set-env-triggers-rollout-loses-all-in-container-patches">29. <code>kubectl set env</code> Triggers Rollout — Loses All In-Container Patches<a class="headerlink" href="#29-kubectl-set-env-triggers-rollout-loses-all-in-container-patches" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After using <code>kubectl set env</code> to add IP-based env vars (bypassing DNS), all pages go 500 with "Unable to retrieve deployment version of static files" or "The configuration file has changed."</p>
+<p><strong>Root Cause:</strong> <code>kubectl set env</code> modifies the deployment spec, triggering a pod rollout. New pods start from the original Docker image, losing:
+- di.xml MariaDB 12 patch
+- Compiled DI code (<code>generated/metadata/</code> and <code>generated/code/</code>)
+- Static content deployed to emptyDir
+- Any <code>app:config:import</code> state</p>
+<p><strong>Lesson:</strong> NEVER use <code>kubectl set env</code> during migration. Instead, pass env var overrides via <code>kubectl exec ... bash -c "export VAR=val &amp;&amp; php bin/magento ..."</code>. This runs commands with overridden env vars WITHOUT modifying the deployment spec or triggering a rollout.</p>
+<p><strong>If you already did it:</strong> You need to re-run the full Magento post-migration sequence (di.xml patch, clear generated, setup:upgrade, di:compile, static-content:deploy, indexer:reindex, cache:flush) on the new pods.</p>
+<hr />
+<h3 id="30-appconfigimport-required-after-config-changes">30. <code>app:config:import</code> Required After Config Changes<a class="headerlink" href="#30-appconfigimport-required-after-config-changes" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> All pages return 500 with:
+<div class="highlight"><pre><span></span><code>The configuration file has changed. Run the &quot;app:config:import&quot; or the &quot;setup:upgrade&quot; command to synchronize the configuration.
+</code></pre></div></p>
+<p><strong>Root Cause:</strong> Magento's <code>ConfigChangeDetector</code> compares a hash of <code>config.php</code> + <code>env.php</code> against a stored hash in the DB. If they differ (e.g., after env var changes, ConfigMap updates, or import operations), all requests are blocked.</p>
+<p><strong>Fix:</strong>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>app:config:import
+</code></pre></div></p>
+<p><strong>Important:</strong> This command itself can trigger the static content version error (Issue #16) because it updates the config version hash. After running it, you may need to redeploy static content.</p>
+<hr />
+<h3 id="31-envphp-uses-non-obvious-env-var-names">31. env.php Uses Non-Obvious Env Var Names<a class="headerlink" href="#31-envphp-uses-non-obvious-env-var-names" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Setting <code>MAGENTO_ELASTICSEARCH_HOST</code> or <code>MAGENTO_REDIS_HOST</code> has no effect — Magento still uses default <code>localhost</code>.</p>
+<p><strong>Root Cause:</strong> The env.php ConfigMap reads specific env var names that don't match intuitive guesses:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Correct Env Var</th>
+<th>Wrong Guess</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Elasticsearch</td>
+<td><code>MAGENTO_ES_HOST</code></td>
+<td><code>MAGENTO_ELASTICSEARCH_HOST</code></td>
+</tr>
+<tr>
+<td>Session Redis</td>
+<td><code>MAGENTO_SESSION_REDIS_HOST</code></td>
+<td><code>MAGENTO_REDIS_HOST</code></td>
+</tr>
+<tr>
+<td>Cache Redis</td>
+<td><code>MAGENTO_CACHE_REDIS_HOST</code></td>
+<td><code>MAGENTO_REDIS_HOST</code></td>
+</tr>
+<tr>
+<td>Page Cache Redis</td>
+<td><code>MAGENTO_PAGE_CACHE_REDIS_HOST</code></td>
+<td><code>MAGENTO_REDIS_HOST</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lesson:</strong> Always check <code>configmap-env-php.yaml</code> for the exact <code>getenv()</code> calls before setting env vars. Each Redis instance (session, cache, page cache) has its own host/port/db env vars.</p>
+<hr />
+<h3 id="32-homepage-404-multiple-overlapping-causes">32. Homepage 404 — Multiple Overlapping Causes<a class="headerlink" href="#32-homepage-404-multiple-overlapping-causes" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Homepage <code>/</code> returns static 404 (659 bytes) while all other pages work (customer login 200/83KB, search 200, contact 200, cart 200).</p>
+<p><strong>Root Cause (updated Feb 11):</strong> This was misdiagnosed as a pure ES PHP client issue. Investigation revealed <strong>three overlapping causes</strong>, each producing the same 404 symptom:</p>
+<ol>
+<li>
+<p><strong><code>ConfigChangeDetector</code> blocking all requests</strong> (primary cause): After Helm release history was nuked and Flux did a fresh install, the new pods had a DB schema mismatch (<code>setup:db:status</code> → "Declarative Schema is not up to date"). Magento's <code>ConfigChangeDetector</code> intercepts ALL requests and throws <code>LocalizedException</code> before any routing occurs. The error handler renders the static 404 page. The exception log deduplicates identical exceptions, so subsequent hits don't log new entries — making it look like "no error is thrown."</p>
+</li>
+<li>
+<p><strong>ES PHP client intermittent ClusterIP timeouts</strong> (secondary cause): Even with DNS working, PHP's <code>curl_init()</code> to the ES ClusterIP intermittently times out (10s). The ES <code>elasticsearch/elasticsearch</code> library built on top of curl also fails. However, the same ClusterIP works via <code>curl</code> CLI from the same pod — the issue is specific to PHP's curl extension/socket handling on Alpine. Setting the ClusterIP directly in <code>core_config_data</code> AND env var overrides together was needed to bypass this (see Issue #38).</p>
+</li>
+<li>
+<p><strong><code>setup:upgrade</code> wipes static content</strong> (tertiary cause): After running <code>setup:upgrade</code> to fix cause #1, it clears <code>pub/static/</code> (including <code>deployed_version.txt</code> copied by the init container), breaking ALL pages with "Unable to retrieve deployment version of static files" (see Issue #37).</p>
+</li>
+</ol>
+<p><strong>Diagnosis flow:</strong>
+<div class="highlight"><pre><span></span><code>Initial symptom: homepage 404 (659 bytes)
+├─ CMS config? → No: /home returns 200, cms_home_page=home, page_id 2 exists
+├─ ES PHP client? → Yes, partially: exception log shows &quot;No alive nodes&quot;
+│   └─ But: DNS works (gethostbyname resolves), curl works → PHP curl timeout issue
+├─ ConfigChangeDetector? → YES: setup:db:status shows schema out of date
+│   └─ Fix: setup:upgrade + di:compile + app:config:import
+└─ After fix: setup:upgrade wipes pub/static → need SCD or pod restart
+</code></pre></div></p>
+<p><strong>Key lesson:</strong> When Magento returns a static 404 page (from <code>pub/errors/</code>), check <code>var/report/</code> for error details — the exception log may be deduplicating. The <code>ConfigChangeDetector</code> error is silent after the first log entry and blocks ALL routes before any CMS/catalog logic runs.</p>
+<hr />
+<h3 id="33-helm-release-history-poisoning">33. Helm Release History Poisoning<a class="headerlink" href="#33-helm-release-history-poisoning" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> HelmRelease stuck in upgrade/rollback loop. <code>helm history</code> shows 400+ failed revisions, all rolling back to the same old revision. New upgrades fail with <code>context deadline exceeded</code> before pods even start.</p>
+<p><strong>Root Cause:</strong> Each failed upgrade + automatic rollback creates 2 Helm release secrets. After hundreds of cycles, Helm spends most of its timeout just loading release history. The release never cleans up because every attempt fails.</p>
+<p><strong>Fix:</strong> Delete all Helm release secrets to force a fresh install:
+<div class="highlight"><pre><span></span><code><span class="c1"># Suspend Flux first</span>
+flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+
+<span class="c1"># Delete ALL helm release history (forces fresh install on next reconcile)</span>
+kubectl<span class="w"> </span>delete<span class="w"> </span>secrets<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-l<span class="w"> </span><span class="nv">owner</span><span class="o">=</span>helm,name<span class="o">=</span>&lt;site&gt;
+
+<span class="c1"># Resume Flux — will do a fresh install (revision 1)</span>
+flux<span class="w"> </span>resume<span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div></p>
+<p><strong>Warning:</strong> This is a nuclear option — Helm loses all rollback history. Only use when the release is already broken beyond repair. Make sure your HelmRelease values are correct before resuming.</p>
+<hr />
+<h3 id="34-helmrelease-upgrade-timeout-must-be-10m-for-magento">34. HelmRelease Upgrade Timeout Must Be 10m+ for Magento<a class="headerlink" href="#34-helmrelease-upgrade-timeout-must-be-10m-for-magento" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> HelmRelease upgrade completes successfully (pods reach 2/2 Ready) but Helm still rolls back. <code>helm history</code> shows the upgrade as <code>failed</code> despite pods being healthy.</p>
+<p><strong>Root Cause:</strong> Magento pods have long <code>initialDelaySeconds</code> on probes (120s for liveness, 30s for readiness). The default Helm upgrade timeout is 5 minutes. With init containers (static-copy ~30s) + readiness delay (30s) + actual startup time, pods can take 3-4 minutes to become Ready. On slower nodes or with image pulls, this exceeds 5 minutes. Helm marks the upgrade as failed and rolls back.</p>
+<p><strong>Fix:</strong> Add explicit upgrade timeout to the HelmRelease:
+<div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">upgrade</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10m</span>
+</code></pre></div></p>
+<p><strong>Note:</strong> This timeout covers the entire upgrade operation including waiting for all pods to become Ready, not just the Helm template rendering. For Magento with 2+ replicas, 10 minutes is a safe buffer.</p>
+<hr />
+<h3 id="35-setupupgrade-fails-with-es-but-appconfigimport-works">35. <code>setup:upgrade</code> Fails with ES but <code>app:config:import</code> Works<a class="headerlink" href="#35-setupupgrade-fails-with-es-but-appconfigimport-works" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails with:
+<div class="highlight"><pre><span></span><code>No alive nodes found in your cluster
+</code></pre></div>
+Even though <code>curl http://auntalma-elasticsearch-es-http:9200</code> returns a healthy response from the same pod.</p>
+<p><strong>Root Cause:</strong> Magento's <code>setup:upgrade</code> validates Elasticsearch connectivity using the PHP <code>elasticsearch/elasticsearch</code> client library, which performs its own DNS resolution and connection pooling. The PHP ES client may fail where raw HTTP succeeds due to:
+- musl DNS flakiness in the PHP runtime (different socket behavior than curl)
+- Connection timeout defaults in the PHP ES client
+- The client performing a "sniff" operation that resolves to unreachable node IPs</p>
+<p><strong>Workaround:</strong> Use <code>app:config:import</code> instead of <code>setup:upgrade</code> when you only need to sync the config version hash (i.e., after env.php or config.php changes). <code>app:config:import</code> doesn't validate ES connectivity:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>app:config:import
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+</code></pre></div></p>
+<p><strong>When to use which:</strong>
+- <code>setup:upgrade</code>: Required after DB schema changes, module install/upgrade, or major version bumps
+- <code>app:config:import</code>: Sufficient when only config files (env.php, config.php) have changed — syncs the config version hash in the DB</p>
+<hr />
+<h3 id="36-hpa-minreplicas-overrides-manual-kubectl-scale">36. HPA MinReplicas Overrides Manual <code>kubectl scale</code><a class="headerlink" href="#36-hpa-minreplicas-overrides-manual-kubectl-scale" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> You scale the deployment to 1 replica with <code>kubectl scale --replicas=1</code>, but within seconds it scales back up to 2.</p>
+<p><strong>Root Cause:</strong> The HorizontalPodAutoscaler (HPA) has <code>minReplicas: 2</code> configured. HPA continuously reconciles and overrides any manual scaling that drops below its minimum.</p>
+<p><strong>Fix:</strong> Patch the HPA's minReplicas to allow single-replica operation:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>patch<span class="w"> </span>hpa<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>--type<span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-p<span class="o">=</span><span class="s1">&#39;[{&quot;op&quot;: &quot;replace&quot;, &quot;path&quot;: &quot;/spec/minReplicas&quot;, &quot;value&quot;: 1}]&#39;</span>
+</code></pre></div></p>
+<p><strong>Important:</strong> Remember to restore minReplicas when multi-node operation is fixed. This is a temporary workaround for the Cilium + NetworkPolicy issue (Issue #28) that prevents pods on worker2/worker3 from having network connectivity.</p>
+<hr />
+<h3 id="37-setupupgrade-wipes-pubstatic-init-container-content-lost">37. <code>setup:upgrade</code> Wipes <code>pub/static</code> — Init Container Content Lost<a class="headerlink" href="#37-setupupgrade-wipes-pubstatic-init-container-content-lost" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After running <code>setup:upgrade</code>, ALL pages break with "Unable to retrieve deployment version of static files" or render without CSS/JS.</p>
+<p><strong>Root Cause:</strong> <code>setup:upgrade</code> runs file system cleanup that deletes:
+<div class="highlight"><pre><span></span><code>/var/www/html/pub/static/adminhtml
+/var/www/html/pub/static/deployed_version.txt
+/var/www/html/pub/static/frontend
+/var/www/html/var/view_preprocessed/pub
+</code></pre></div></p>
+<p>The init container (<code>static-copy</code>) copies baked-in static files at pod startup, but <code>setup:upgrade</code> wipes them. Since <code>pub/static</code> is an emptyDir, there's no image content to fall back to.</p>
+<p><strong>Fix:</strong> After running <code>setup:upgrade</code>, you MUST either:
+- <strong>Option A:</strong> Restart the pod (triggers init container to re-copy static files)
+- <strong>Option B:</strong> Run <code>setup:static-content:deploy</code> manually:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">cd /var/www/html &amp;&amp; php bin/magento setup:static-content:deploy en_US en_AU -f</span>
+<span class="s2">&quot;</span>
+</code></pre></div></p>
+<p><strong>Important:</strong> This means the full post-migration sequence is: <code>setup:upgrade</code> → <code>di:compile</code> → pod restart (or SCD) → <code>app:config:import</code> → <code>cache:flush</code>. The pod restart is needed between <code>di:compile</code> and <code>app:config:import</code> to restore static content from the init container.</p>
+<hr />
+<h3 id="38-es-php-client-clusterip-timeouts-core_config_data-overrides-envphp">38. ES PHP Client ClusterIP Timeouts — <code>core_config_data</code> Overrides env.php<a class="headerlink" href="#38-es-php-client-clusterip-timeouts-core_config_data-overrides-envphp" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> <code>setup:upgrade</code> fails with "No alive nodes found in your cluster" even when:
+- DNS resolves correctly (<code>gethostbyname</code> returns correct IP)
+- <code>curl</code> to ES service works from the same pod
+- env var <code>MAGENTO_ES_HOST</code> is set to the ClusterIP</p>
+<p><strong>Root Cause:</strong> Two issues compound:</p>
+<ol>
+<li>
+<p><strong><code>core_config_data</code> overrides <code>system.default</code> in env.php</strong> for already-configured stores. Setting <code>MAGENTO_ES_HOST</code> env var only populates <code>system.default.catalog.search.elasticsearch7_server_hostname</code> in env.php. But if the DB already has <code>catalog/search/elasticsearch7_server_hostname</code> in <code>core_config_data</code>, the DB value takes precedence at runtime.</p>
+</li>
+<li>
+<p><strong>PHP curl to ClusterIP intermittently times out on Alpine</strong>: Raw <code>curl_init()</code> to the ES ClusterIP from PHP times out (10s) even when CLI <code>curl</code> works. The ES PHP client library (<code>elasticsearch/elasticsearch</code>) uses PHP curl internally. The issue is intermittent and may be related to musl's socket handling or Cilium's eBPF datapath.</p>
+</li>
+</ol>
+<p><strong>Fix:</strong> Update BOTH the env var AND the <code>core_config_data</code>:
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Set ClusterIP in core_config_data</span>
+<span class="nv">ES_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mariadb -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    UPDATE core_config_data SET value = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;&#39;</span><span class="s2">&quot;</span><span class="nv">$ES_IP</span><span class="s2">&quot;</span><span class="s1">&#39;&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;catalog/search/elasticsearch7_server_hostname&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">  &quot;&#39;</span>
+
+<span class="c1"># 2. Flush Redis after DB config change</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">\$r = new Redis(); \$r-&gt;connect(&#39;</span><span class="nv">$REDIS_IP</span><span class="s2">&#39;, 6379);</span>
+<span class="s2">\$r-&gt;select(6); \$r-&gt;flushDB(); \$r-&gt;select(1); \$r-&gt;flushDB();&quot;</span>
+
+<span class="c1"># 3. Pass env var override in setup:upgrade command</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">MAGENTO_ES_HOST</span><span class="o">=</span><span class="nv">$ES_IP</span>
+</code></pre></div></p>
+<p><strong>Note:</strong> After resolving ES connectivity, revert <code>core_config_data</code> back to the DNS name for ongoing runtime use — the ClusterIP can change if the service is recreated.</p>
+<hr />
+<h3 id="39-homepage-404-nginx-try_files-uri-with-split-containers">39. Homepage 404 — nginx <code>try_files $uri/</code> With Split Containers<a class="headerlink" href="#39-homepage-404-nginx-try_files-uri-with-split-containers" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> Homepage <code>/</code> returns a static 404 (659 bytes from <code>pub/errors/default/</code>). ALL other Magento routes work (<code>/customer/account/login/</code> 200, <code>/catalogsearch/result/?q=test</code> 200, <code>/contact/</code> 200, <code>/home</code> 200). No Magento error report is generated.</p>
+<p><strong>Root Cause:</strong> nginx error log reveals:
+<div class="highlight"><pre><span></span><code>directory index of &quot;/var/www/html/pub/&quot; is forbidden
+</code></pre></div></p>
+<p>In this bjw-s app-template architecture, nginx and PHP-FPM are separate containers. The nginx container is a plain <code>nginx:alpine</code> image that does NOT contain the Magento codebase. Only <code>pub/static</code> and <code>pub/media</code> are shared via emptyDir/PVC mounts. Crucially, <code>pub/index.php</code> does NOT exist in the nginx container's filesystem.</p>
+<p>The standard Magento nginx config has:
+<div class="highlight"><pre><span></span><code><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="s">/index.php</span><span class="nv">$is_args$args</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>For <code>GET /</code>, nginx evaluates <code>try_files</code> left to right:
+1. <code>$uri</code> → <code>/</code> → checks <code>/var/www/html/pub/</code> as a file → it's a directory, skip
+2. <code>$uri/</code> → <code>/</code> → checks <code>/var/www/html/pub/</code> as a directory → <strong>exists</strong> → nginx tries <code>index index.php</code> directive → <code>pub/index.php</code> doesn't exist on nginx filesystem → <strong>403 forbidden</strong> → <code>error_page 404 403 = /errors/404.php</code> → static 404
+3. <code>/index.php$is_args$args</code> → <strong>never reached</strong></p>
+<p>Other URLs like <code>/customer/account/login/</code> work because that directory doesn't exist on the nginx filesystem, so step 2 fails and step 3 (the PHP fallback) is reached.</p>
+<p><strong>Fix:</strong> Remove <code>$uri/</code> from <code>try_files</code> in the nginx ConfigMap:
+<div class="highlight"><pre><span></span><code><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="s">/index.php</span><span class="nv">$is_args$args</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>This is safe because:
+- Static files (<code>pub/static/</code>, <code>pub/media/</code>) are served by their own location blocks
+- All other requests should go to PHP-FPM via <code>index.php</code>
+- Directory listing is never needed in a Magento deployment</p>
+<p><strong>Key lesson:</strong> Standard Magento nginx configs assume nginx and PHP share the same filesystem. In Kubernetes split-container deployments (separate nginx + PHP-FPM containers), <code>try_files $uri/</code> breaks for the root URL because <code>pub/</code> exists as a directory but <code>pub/index.php</code> doesn't. Any Magento nginx config for split containers must remove <code>$uri/</code> from <code>try_files</code>.</p>
+<hr />
+<h3 id="40-appconfigimport-must-run-with-pods-native-env-vars">40. <code>app:config:import</code> Must Run With Pod's Native Env Vars<a class="headerlink" href="#40-appconfigimport-must-run-with-pods-native-env-vars" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After running <code>app:config:import</code> with IP-overridden env vars (<code>export MAGENTO_DB_HOST=10.x.x.x &amp;&amp; php bin/magento app:config:import</code>), it reports "Nothing to import." But the web process (PHP-FPM) still shows the <code>ConfigChangeDetector</code> error: "The configuration file has changed."</p>
+<p><strong>Root Cause:</strong> Magento's <code>ConfigChangeDetector</code> computes a hash of the <strong>evaluated</strong> configuration — not the raw file content, but the resolved array including all <code>getenv()</code> values. When you run <code>app:config:import</code> with overridden env vars, the stored hash reflects those IPs. But PHP-FPM uses the pod's actual env vars (DNS hostnames), producing a different hash → mismatch → all requests blocked.</p>
+<p><strong>Fix:</strong> Run <code>app:config:import</code> via plain <code>kubectl exec</code> WITHOUT any <code>bash -c "export ... &amp;&amp;"</code> wrappers:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>app:config:import
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+</code></pre></div></p>
+<p>This uses the pod's native env vars, producing a hash that matches what PHP-FPM computes at runtime.</p>
+<p><strong>Important:</strong> Use IP overrides only for <code>setup:upgrade</code> and <code>setup:di:compile</code> (which need reliable ES/DB connections). Always run <code>app:config:import</code> and <code>cache:flush</code> with native env vars as the FINAL step.</p>
+<p><strong>Updated workflow order:</strong>
+1. <code>setup:upgrade</code> (with IP overrides — ES connectivity required)
+2. <code>setup:di:compile</code> (with IP overrides)
+3. Pod restart (restores <code>pub/static</code> via init container)
+4. <code>app:config:import</code> (<strong>native env vars</strong> — no overrides)
+5. <code>cache:flush</code> (<strong>native env vars</strong>)
+6. <code>indexer:reindex</code> (with IP overrides if needed for ES)</p>
+<hr />
+<h3 id="41-flux-fresh-install-recreates-deleted-networkpolicy">41. Flux Fresh Install Recreates Deleted NetworkPolicy<a class="headerlink" href="#41-flux-fresh-install-recreates-deleted-networkpolicy" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After deleting the NetworkPolicy to work around Issue #28, Flux does a fresh install (after Helm history reset) and the NetworkPolicy comes back, breaking networking on worker2/worker3 again.</p>
+<p><strong>Root Cause:</strong> The NetworkPolicy is part of the HelmRelease template. Any Flux reconciliation (install, upgrade) recreates it. <code>kubectl delete</code> is only a temporary fix that lasts until the next reconcile.</p>
+<p><strong>Workaround:</strong> After each Flux reconcile, immediately delete the NetworkPolicy:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>delete<span class="w"> </span>networkpolicy<span class="w"> </span>auntalma-app<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div></p>
+<p><strong>Permanent fix needed:</strong> Either disable the NetworkPolicy in HelmRelease values, or resolve the Cilium + K8s NetworkPolicy compatibility issue (Issue #28).</p>
+<hr />
+<h3 id="42-css-not-loading-docker-image-only-has-mincss-store-has-minification-disabled">42. CSS Not Loading — Docker Image Only Has <code>.min.css</code>, Store Has Minification Disabled<a class="headerlink" href="#42-css-not-loading-docker-image-only-has-mincss-store-has-minification-disabled" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> All pages load HTML but no CSS/JS. Browser console shows <code>Refused to apply style from...</code> errors. Static asset URLs like <code>/static/version.../frontend/Rival/auntalma/en_AU/css/styles-m.css</code> return 404.</p>
+<p><strong>Root Cause:</strong> Three compounding issues:</p>
+<ol>
+<li>
+<p><strong>Docker image deploys <code>en_US</code> but store uses <code>en_AU</code></strong> (Issue #17): The <code>pub/static</code> emptyDir only has files under <code>en_US/</code>. Magento generates HTML with <code>en_AU/</code> URLs. All <code>en_AU</code> static files 404.</p>
+</li>
+<li>
+<p><strong>Docker image only has <code>.min.css</code> files</strong>: The SCD during Docker build runs without a database connection. Without DB access, LESS→CSS compilation is limited. Only <code>.min.css</code> files are generated (e.g., <code>styles-m.min.css</code>), not the unminified versions (<code>styles-m.css</code>).</p>
+</li>
+<li>
+<p><strong>CSS/JS minification is disabled in <code>core_config_data</code></strong>: With <code>dev/css/minify_files=0</code>, Magento generates HTML <code>&lt;link&gt;</code> tags referencing <code>styles-m.css</code> (non-minified). But only <code>styles-m.min.css</code> exists. The VPS has the same setting (minification disabled) but it works because the VPS SCD generates both minified and non-minified files (it has DB access during deploy).</p>
+</li>
+</ol>
+<p><strong>Diagnosis:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check what locales have static files</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>ls<span class="w"> </span>/var/www/html/pub/static/frontend/Rival/auntalma/
+<span class="c1"># Result: en_AU en_US — but en_AU only has 2 requirejs files, no CSS</span>
+
+<span class="c1"># Check CSS files</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>ls<span class="w"> </span>/var/www/html/pub/static/frontend/Rival/auntalma/en_US/css/styles*
+<span class="c1"># Result: styles-l.min.css styles-m.min.css — no non-minified versions</span>
+
+<span class="c1"># Check minification config</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mariadb -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    SELECT path, value FROM core_config_data WHERE path LIKE &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/%/minify%&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; OR path LIKE &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/%/merge%&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;&quot;&#39;</span>
+<span class="c1"># Result: all 0 (disabled)</span>
+</code></pre></div></p>
+<p><strong>Fix (temporary — lost on pod restart):</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Copy en_US files to en_AU</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \</span>
+<span class="s2">   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/&quot;</span>
+
+<span class="c1"># 2. Enable CSS/JS minification so Magento references .min.css files</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mariadb<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mariadb -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    UPDATE core_config_data SET value = 1 WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/css/minify_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">    UPDATE core_config_data SET value = 1 WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/js/minify_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">    UPDATE core_config_data SET value = 1 WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/css/merge_css_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">    UPDATE core_config_data SET value = 1 WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/js/merge_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">  &quot;&#39;</span>
+
+<span class="c1"># 3. Flush Magento cache</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+
+<span class="c1"># 4. Bump deployed_version.txt to bust Cloudflare cached 404s</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;echo \$(date +%s) &gt; /var/www/html/pub/static/deployed_version.txt&quot;</span>
+
+<span class="c1"># 5. Flush cache again for new version</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+</code></pre></div></p>
+<p><strong>Fix (permanent — Docker image change):</strong>
+1. Update <code>Dockerfile.prod</code> frontend SCD: change <code>en_US</code> to <code>en_AU</code> (line 77). No composer changes needed — <code>en_AU</code> is a valid ICU locale and doesn't require a language pack for SCD (see Issue #17).
+2. Optionally: decide whether minification should be enabled in <code>core_config_data</code> for K8s (it's disabled on VPS but VPS has full SCD output)</p>
+<p><strong>Key lesson:</strong> <code>Dockerfile.prod</code> must match <code>deploy.php</code> locale configuration. The VPS deployer (<code>deploy.php</code> line 14) deploys <code>en_AU</code>; the Dockerfile must do the same. The misleading comment "en_AU falls back to en_US at runtime" is <strong>wrong</strong> — Magento has no static file locale fallback.</p>
+<hr />
+<h3 id="43-cloudflare-caches-404-responses-for-static-assets">43. Cloudflare Caches 404 Responses for Static Assets<a class="headerlink" href="#43-cloudflare-caches-404-responses-for-static-assets" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After fixing static files on disk, HTTP requests still return 404. But requests with a cache-busting query parameter (<code>?nocache=...</code>) return 200 with correct content. Response header <code>cf-cache-status: MISS</code> confirms Cloudflare bypass.</p>
+<p><strong>Root Cause:</strong> Cloudflare caches 404 responses for static asset URLs. Since Magento uses versioned URLs (<code>/static/version1769728396/...</code>), the same URL is requested repeatedly and the cached 404 persists until Cloudflare TTL expires.</p>
+<p><strong>Fix:</strong> Bump <code>deployed_version.txt</code> to force new versioned URLs that bypass the cached 404s:
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;echo \$(date +%s) &gt; /var/www/html/pub/static/deployed_version.txt&quot;</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+</code></pre></div></p>
+<p>This is safe because the version number in the URL is only used for cache busting — nginx strips it before serving the file.</p>
+<hr />
+<h3 id="44-base-url-scope-override-scope_id1-overrides-scope_id0">44. Base URL Scope Override — <code>scope_id=1</code> Overrides <code>scope_id=0</code><a class="headerlink" href="#44-base-url-scope-override-scope_id1-overrides-scope_id0" title="Permanent link">&para;</a></h3>
+<p><strong>Symptom:</strong> After updating base URLs in <code>core_config_data</code> (scope_id=0) to the test domain, all pages still redirect 302 to the production domain (<code>https://www.auntalma.com.au/</code>). Internal curl from the pod also redirects.</p>
+<p><strong>Root Cause:</strong> Magento's <code>core_config_data</code> has scoped values. When <code>MAGE_RUN_CODE=base</code> is set, Magento runs as <strong>website ID 1</strong> (scope <code>websites</code>, scope_id=1). If scope_id=1 has its own <code>web/unsecure/base_url</code> and <code>web/secure/base_url</code> entries, they <strong>override</strong> the default scope (scope_id=0).</p>
+<p>The production database has base URLs at both scopes:
+<div class="highlight"><pre><span></span><code><span class="c1">-- scope_id=0 (default) — updated during migration ✓</span>
+<span class="n">web</span><span class="o">/</span><span class="n">unsecure</span><span class="o">/</span><span class="n">base_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">auntalma</span><span class="p">.</span><span class="n">haydenagencies</span><span class="p">.</span><span class="n">com</span><span class="p">.</span><span class="n">au</span><span class="o">/</span>
+<span class="n">web</span><span class="o">/</span><span class="n">secure</span><span class="o">/</span><span class="n">base_url</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">auntalma</span><span class="p">.</span><span class="n">haydenagencies</span><span class="p">.</span><span class="n">com</span><span class="p">.</span><span class="n">au</span><span class="o">/</span>
+
+<span class="c1">-- scope_id=1 (website &quot;base&quot;) — NOT updated, still points to production ✗</span>
+<span class="n">web</span><span class="o">/</span><span class="n">unsecure</span><span class="o">/</span><span class="n">base_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="p">.</span><span class="n">auntalma</span><span class="p">.</span><span class="n">com</span><span class="p">.</span><span class="n">au</span><span class="o">/</span>
+<span class="n">web</span><span class="o">/</span><span class="n">secure</span><span class="o">/</span><span class="n">base_url</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="p">.</span><span class="n">auntalma</span><span class="p">.</span><span class="n">com</span><span class="p">.</span><span class="n">au</span><span class="o">/</span>
+</code></pre></div></p>
+<p><strong>Diagnosis:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">config_id</span><span class="p">,</span><span class="w"> </span><span class="k">scope</span><span class="p">,</span><span class="w"> </span><span class="n">scope_id</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">value</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">core_config_data</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;web/%/base_url&#39;</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">scope_id</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>Fix:</strong> Update base URLs for ALL scopes, not just the default:
+<div class="highlight"><pre><span></span><code><span class="c1">-- Update scope_id=0 (default)</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://&lt;test-domain&gt;/&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;web/unsecure/base_url&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;web/secure/base_url&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">scope_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">-- Update scope_id=1 (website scope for MAGE_RUN_CODE)</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">core_config_data</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;https://&lt;test-domain&gt;/&#39;</span>
+<span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;web/unsecure/base_url&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;web/secure/base_url&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">scope_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>Key lesson:</strong> Always query ALL scopes for base URLs after import. The website-level scope (matching <code>MAGE_RUN_CODE</code>) takes precedence over the default scope. Multi-store setups may have additional scopes (scope_id=2, 3, etc.) that also need updating.</p>
+<p><strong>Important:</strong> Flush Redis (DB 6 + DB 1) and run <code>cache:flush</code> after updating base URLs — Magento caches config values aggressively.</p>
+<hr />
+<h2 id="proven-working-workflow">Proven Working Workflow<a class="headerlink" href="#proven-working-workflow" title="Permanent link">&para;</a></h2>
+<p>All-in-one command sequence for running <code>setup:upgrade</code> and completing a Magento migration. Replace <code>&lt;site&gt;</code> with the actual site name (e.g., <code>auntalma</code>, <code>hayden</code>).</p>
+<p><strong>Note:</strong> After applying the Cilium DNS fix (Issue #27, commit <code>b642d7f5d</code>), short hostnames resolve reliably for most operations. However, <code>setup:upgrade</code> ES validation still intermittently fails with DNS hostnames — <strong>IP overrides for ES are required</strong> (see Issue #38). You must also update <code>core_config_data</code> to use the ES ClusterIP, since DB config overrides env.php.</p>
+<p><strong>WARNING:</strong> <code>setup:upgrade</code> wipes <code>pub/static/</code> (Issue #37). After the full sequence, either restart the pod (init container re-copies static files) or run <code>setup:static-content:deploy</code> manually.</p>
+<p><strong>WARNING:</strong> After pod restart, the init container only copies <code>en_US</code> static files (Dockerfile deploys <code>en_US</code> instead of <code>en_AU</code>). You MUST copy <code>en_US</code> to <code>en_AU</code> after every pod restart until <code>Dockerfile.prod</code> is fixed to deploy <code>en_AU</code> (Issue #17, #42). Also ensure CSS/JS minification is enabled in <code>core_config_data</code> (the Docker image only has <code>.min.css</code> files).</p>
+<p><strong>CRITICAL:</strong> Pass env overrides via <code>export</code> inside <code>kubectl exec ... bash -c "..."</code>. NEVER use <code>kubectl set env</code> — it modifies the deployment spec and triggers a rollout, destroying all in-container patches (Issue #29).</p>
+<p><strong>CRITICAL:</strong> <code>app:config:import</code> and <code>cache:flush</code> must run with the pod's <strong>native env vars</strong> (no overrides). The config hash must match what PHP-FPM computes at runtime. Use IP overrides only for <code>setup:upgrade</code>, <code>di:compile</code>, and <code>indexer:reindex</code>. (Issue #40)</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Suspend Flux to prevent pod replacement during migration</span>
+flux<span class="w"> </span><span class="nb">suspend</span><span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+
+<span class="c1"># 2. Get pod name and resolve service IPs</span>
+<span class="nv">POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>&lt;site&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--field-selector<span class="o">=</span>status.phase<span class="o">=</span>Running<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span>
+
+<span class="nv">REDIS_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-redis-master<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+<span class="nv">DB_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.podIP}&#39;</span><span class="k">)</span><span class="w">  </span><span class="c1"># pod IP — ClusterIP unreliable</span>
+<span class="nv">ES_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+<span class="nv">AMQP_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>&lt;site&gt;-rabbitmq<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.clusterIP}&#39;</span><span class="k">)</span>
+
+<span class="c1"># 3. Update ES hostname in core_config_data to ClusterIP (DB config overrides env.php — Issue #38)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mysql<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mysql -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    UPDATE core_config_data SET value = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;&#39;</span><span class="s2">&quot;</span><span class="nv">$ES_IP</span><span class="s2">&quot;</span><span class="s1">&#39;&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;catalog/search/elasticsearch7_server_hostname&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">  &quot;&#39;</span>
+
+<span class="c1"># 4. Clear caches and run setup:upgrade</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2"># Clear generated code + caches</span>
+<span class="s2">rm -rf /var/www/html/generated/code/* /var/www/html/generated/metadata/* /var/www/html/var/cache/* /var/www/html/var/di/*</span>
+
+<span class="s2"># Flush Redis using IP</span>
+<span class="s2">php -r \&quot;\\\$r = new Redis(); \\\$r-&gt;connect(&#39;</span><span class="nv">$REDIS_IP</span><span class="s2">&#39;, 6379); \\\$r-&gt;select(6); \\\$r-&gt;flushDB(); \\\$r-&gt;select(1); \\\$r-&gt;flushDB();\&quot;</span>
+
+<span class="s2"># Override env vars with IPs and run setup:upgrade</span>
+<span class="s2">export MAGENTO_DB_HOST=</span><span class="nv">$DB_IP</span>
+<span class="s2">export MAGENTO_SESSION_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_PAGE_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_ES_HOST=</span><span class="nv">$ES_IP</span>
+<span class="s2">export MAGENTO_AMQP_HOST=</span><span class="nv">$AMQP_IP</span>
+<span class="s2">export MAGE_RUN_CODE=base</span>
+<span class="s2">cd /var/www/html &amp;&amp; php bin/magento setup:upgrade</span>
+<span class="s2">&quot;</span>
+
+<span class="c1"># 5. Run di:compile (required after setup:upgrade)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">export MAGENTO_DB_HOST=</span><span class="nv">$DB_IP</span>
+<span class="s2">export MAGENTO_SESSION_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_PAGE_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_ES_HOST=</span><span class="nv">$ES_IP</span>
+<span class="s2">export MAGENTO_AMQP_HOST=</span><span class="nv">$AMQP_IP</span>
+<span class="s2">export MAGE_RUN_CODE=base</span>
+<span class="s2">cd /var/www/html &amp;&amp; php bin/magento setup:di:compile</span>
+<span class="s2">&quot;</span>
+
+<span class="c1"># 6. Restore static content (setup:upgrade wipes pub/static — Issue #37)</span>
+<span class="c1"># Option A: Restart pod to trigger init container (recommended)</span>
+kubectl<span class="w"> </span>delete<span class="w"> </span>pod<span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system
+<span class="c1"># Wait for new pod to be ready</span>
+kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">condition</span><span class="o">=</span>Ready<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>&lt;site&gt;<span class="w"> </span>--timeout<span class="o">=</span>5m
+<span class="c1"># Re-resolve pod name after restart</span>
+<span class="nv">POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>&lt;site&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--field-selector<span class="o">=</span>status.phase<span class="o">=</span>Running<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span>
+
+<span class="c1"># Option B: OR deploy static content manually (slower, but no pod restart)</span>
+<span class="c1"># kubectl exec $POD -n business-system -c php -- bash -c &quot;</span>
+<span class="c1"># cd /var/www/html &amp;&amp; php bin/magento setup:static-content:deploy en_US en_AU -f</span>
+<span class="c1"># &quot;</span>
+
+<span class="c1"># 6b. Copy en_US static files to en_AU (Docker image only has en_US — Issue #42)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;cp -a /var/www/html/pub/static/frontend/Rival/auntalma/en_US/* \</span>
+<span class="s2">   /var/www/html/pub/static/frontend/Rival/auntalma/en_AU/&quot;</span>
+
+<span class="c1"># 6c. Ensure CSS/JS minification is enabled (Docker image only has .min.css — Issue #42)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mysql<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mysql -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    UPDATE core_config_data SET value = 1 WHERE path IN (</span>
+<span class="s1">      &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/css/minify_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;, &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/js/minify_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;,</span>
+<span class="s1">      &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/css/merge_css_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;, &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;dev/js/merge_files&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;</span>
+<span class="s1">    );&quot;&#39;</span>
+
+<span class="c1"># 7. Sync config hash and flush caches</span>
+<span class="c1"># CRITICAL: Do NOT use env overrides here! The config hash must match what PHP-FPM</span>
+<span class="c1"># computes at runtime using the pod&#39;s native env vars. (Issue #40)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>app:config:import
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>/var/www/html/bin/magento<span class="w"> </span>cache:flush
+
+<span class="c1"># 8. Run indexer</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">export MAGENTO_DB_HOST=</span><span class="nv">$DB_IP</span>
+<span class="s2">export MAGENTO_SESSION_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_PAGE_CACHE_REDIS_HOST=</span><span class="nv">$REDIS_IP</span>
+<span class="s2">export MAGENTO_ES_HOST=</span><span class="nv">$ES_IP</span>
+<span class="s2">export MAGENTO_AMQP_HOST=</span><span class="nv">$AMQP_IP</span>
+<span class="s2">export MAGE_RUN_CODE=base</span>
+<span class="s2">cd /var/www/html &amp;&amp; php bin/magento indexer:reindex</span>
+<span class="s2">&quot;</span>
+
+<span class="c1"># 9. Revert ES core_config_data back to DNS name (ClusterIP may change on service recreation)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mysql<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;mysql -u root -p&quot;$MARIADB_ROOT_PASSWORD&quot; magento -e &quot;</span>
+<span class="s1">    UPDATE core_config_data SET value = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;&lt;site&gt;-elasticsearch-es-http&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39; WHERE path = &#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;catalog/search/elasticsearch7_server_hostname&#39;</span><span class="s2">&quot;&#39;&quot;</span><span class="s1">&#39;;</span>
+<span class="s1">  &quot;&#39;</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<span class="s2">php -r \&quot;\\\$r = new Redis(); \\\$r-&gt;connect(&#39;</span><span class="nv">$REDIS_IP</span><span class="s2">&#39;, 6379); \\\$r-&gt;select(6); \\\$r-&gt;flushDB(); \\\$r-&gt;select(1); \\\$r-&gt;flushDB();\&quot;</span>
+<span class="s2">&quot;</span>
+
+<span class="c1"># 10. Resume Flux</span>
+flux<span class="w"> </span>resume<span class="w"> </span>helmrelease<span class="w"> </span>&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system
+</code></pre></div>
+<hr />
+<h2 id="complete-migration-checklist">Complete Migration Checklist<a class="headerlink" href="#complete-migration-checklist" title="Permanent link">&para;</a></h2>
+<p>For each Magento site (auntalma, hayden, toemass/dropdrape):</p>
+<h3 id="pre-requisites-fix-before-migration">Pre-requisites (fix BEFORE migration)<a class="headerlink" href="#pre-requisites-fix-before-migration" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Fix Cilium DNS proxy for musl compat — add <code>dnsProxy.dnsRejectResponseCode: nameError</code> to Cilium values (Issue #27)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Add init container to HelmRelease for <code>pub/static</code> deployment (Issue #16)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Set HelmRelease upgrade timeout to 10m (Issue #34)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Pin MariaDB to 10.11 LTS in <code>mariadb-cluster.yaml</code> + Renovate <code>allowedVersions</code> rule (Issue #2)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Change <code>Dockerfile.prod</code> frontend SCD from <code>en_US</code> to <code>en_AU</code> (Issue #17, #42)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Add <code>install.date</code> to env.php ConfigMap (Issue #15)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Use short service names in helmrelease env vars (Issue #7)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ensure <code>log_bin_trust_function_creators=1</code> in myCnf (Issue #10)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Fix HTTPRoute <code>backendRefs</code> to match actual service name (Issue #24)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Add external-dns annotations to HTTPRoute (Issue #25)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Fix NetworkPolicy to allow traffic from <code>network-system</code> envoy pods (Issue #26)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Verify env var names match <code>configmap-env-php.yaml</code> <code>getenv()</code> calls (Issue #31)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Resolve Cilium + K8s NetworkPolicy multi-node networking issue (Issue #28) — or remove NetworkPolicy</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Fix nginx <code>try_files</code> for split-container architecture — remove <code>$uri/</code> (Issue #39)</li>
+</ul>
+<h3 id="pre-flight-checks">Pre-flight checks<a class="headerlink" href="#pre-flight-checks" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Verify Galera cluster healthy (<code>kubectl get mariadb -n business-system</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Verify ES, Redis, RabbitMQ running</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Verify pre-requisites above are all in place</li>
+</ul>
+<h3 id="database-import">Database import<a class="headerlink" href="#database-import" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Dump production DB from VPS</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Strip <code>LOCK TABLES</code> / <code>UNLOCK TABLES</code> from dump</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>kubectl cp</code> dump into MariaDB pod, import locally</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Query <code>store_website</code> and <code>store</code> tables for correct codes</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Update <code>MAGE_RUN_CODE</code> in helmrelease to match DB</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Update base URLs in <code>core_config_data</code> for test domain — <strong>ALL scopes</strong> (scope_id=0 AND website-specific scope_id, Issue #44)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Update ES config in <code>core_config_data</code> to local cluster ES</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Update crypt key in SOPS secret to match production</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Flush Redis after any <code>core_config_data</code> changes</li>
+</ul>
+<h3 id="magento-setup-commands-suspend-helmrelease-first">Magento setup commands (suspend HelmRelease first!)<a class="headerlink" href="#magento-setup-commands-suspend-helmrelease-first" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> <code>flux suspend helmrelease &lt;site&gt; -n business-system</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Delete NetworkPolicy if present (Issue #41 — Flux recreates it on install)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Update ES <code>core_config_data</code> to ClusterIP (Issue #38 — DB config overrides env.php)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Clear generated code: <code>rm -rf generated/code/* generated/metadata/* var/cache/* var/di/*</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Flush Redis (DB 6 + DB 1)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Run <code>setup:upgrade</code> (with IP env overrides — especially <code>MAGENTO_ES_HOST</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Run <code>setup:di:compile</code> (with IP env overrides)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Restore <code>pub/static</code> — restart pod (init container re-copies) OR run SCD (Issue #37)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Run <code>app:config:import</code> (<strong>native env vars — NO overrides</strong> — Issue #40)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Run <code>cache:flush</code> (<strong>native env vars — NO overrides</strong>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Run <code>indexer:reindex</code> (with IP env overrides if needed for ES)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Revert ES <code>core_config_data</code> back to DNS name + flush Redis</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>flux resume helmrelease &lt;site&gt; -n business-system</code></li>
+</ul>
+<h3 id="media">Media<a class="headerlink" href="#media" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Stream media files from VPS: <code>ssh ... tar | kubectl exec ... tar</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Fix ownership: <code>chown -R 1000:1000 /var/www/html/pub/media/</code></li>
+</ul>
+<h3 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> <code>curl -I https://&lt;test-domain&gt;/</code> returns 200</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Admin panel accessible at <code>/admin_hayden/</code></li>
+<li class="task-list-item"><input type="checkbox" disabled/> Product pages load with CSS/JS (static content working)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Cron jobs not erroring</li>
+</ul>
+<hr />
+<h2 id="key-commands-reference">Key Commands Reference<a class="headerlink" href="#key-commands-reference" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Remote access (when not on local network)</span>
+<span class="c1"># Requires cloudflared tunnel running: cloudflared access tcp --hostname api.haydenagencies.com.au --url 127.0.0.1:1234 &amp;</span>
+<span class="c1"># Prefix all kubectl/flux/helm commands with:</span>
+<span class="nv">HTTPS_PROXY</span><span class="o">=</span>socks5://127.0.0.1:1234<span class="w"> </span>kubectl<span class="w"> </span>...
+
+<span class="c1"># Get root password</span>
+<span class="nv">ROOT_PW</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>&lt;site&gt;-mariadb-superuser<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.password}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="k">)</span>
+
+<span class="c1"># MariaDB CLI (10.11 uses &#39;mysql&#39;)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;site&gt;-mariadb-0<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>mysql<span class="w"> </span>--<span class="w"> </span>mysql<span class="w"> </span>-u<span class="w"> </span>root<span class="w"> </span>-p<span class="s2">&quot;</span><span class="si">${</span><span class="nv">ROOT_PW</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>magento<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;...&quot;</span>
+
+<span class="c1"># Find running app pod</span>
+<span class="nv">POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/instance<span class="o">=</span>&lt;site&gt;<span class="w"> </span>--field-selector<span class="o">=</span>status.phase<span class="o">=</span>Running<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.items[0].metadata.name}&#39;</span><span class="k">)</span>
+
+<span class="c1"># Get all service IPs (use when DNS is flaky — Issue #23)</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>&lt;site&gt;-redis-master<span class="w"> </span>&lt;site&gt;-mariadb-primary<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&lt;site&gt;-elasticsearch-es-http<span class="w"> </span>&lt;site&gt;-rabbitmq<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{range .items[*]}{.metadata.name}={.spec.clusterIP}{&quot;\n&quot;}{end}&#39;</span>
+
+<span class="c1"># Flush Redis</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$POD</span><span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span>--<span class="w"> </span>php<span class="w"> </span>-r<span class="w"> </span><span class="s2">&quot;\$r = new Redis(); \$r-&gt;connect(&#39;&lt;site&gt;-redis-master&#39;, 6379); \$r-&gt;select(6); \$r-&gt;flushDB(); \$r-&gt;select(1); \$r-&gt;flushDB();&quot;</span>
+
+<span class="c1"># Emergency env var patch (bypasses Flux/Helm — Issue #21)</span>
+kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>env<span class="w"> </span>deployment/&lt;site&gt;<span class="w"> </span>-n<span class="w"> </span>business-system<span class="w"> </span>-c<span class="w"> </span>php<span class="w"> </span><span class="nv">MAGE_RUN_CODE</span><span class="o">=</span>base<span class="w"> </span><span class="nv">MAGENTO_DB_HOST</span><span class="o">=</span>&lt;site&gt;-mariadb-primary<span class="w"> </span>...
+
+<span class="c1"># Force Flux reconcile</span>
+kubectl<span class="w"> </span>annotate<span class="w"> </span>kustomization<span class="w"> </span>cluster<span class="w"> </span>-n<span class="w"> </span>flux-system<span class="w"> </span>reconcile.fluxcd.io/requestedAt<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span>--overwrite
+</code></pre></div>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1-2.1-2M12.5 7v5.2l4 2.4-1 1L11 13V7h1.5M11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2v1.8Z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 12, 2026 05:47:03 UTC">February 12, 2026</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2020 - 2022 Michael Fornaro
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/xunholy" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://hub.docker.com/u/xunholy" target="_blank" rel="noopener" title="hub.docker.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/michael-fornaro-5b756179/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://medium.com/@michaelfornaro" target="_blank" rel="noopener" title="medium.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M180.5 74.262C80.813 74.262 0 155.633 0 256s80.819 181.738 180.5 181.738S361 356.373 361 256 280.191 74.262 180.5 74.262Zm288.25 10.646c-49.845 0-90.245 76.619-90.245 171.095s40.406 171.1 90.251 171.1 90.251-76.619 90.251-171.1H559c0-94.503-40.4-171.095-90.248-171.095Zm139.506 17.821c-17.526 0-31.735 68.628-31.735 153.274s14.2 153.274 31.735 153.274S640 340.631 640 256c0-84.649-14.215-153.271-31.742-153.271Z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["header.autohide", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>

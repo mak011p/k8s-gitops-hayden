@@ -91,7 +91,7 @@ spec:
           exporter:
             image:
               repository: oliver006/redis_exporter
-              tag: v1.80.2
+              tag: v1.81.0
             args:
               - --redis.addr=redis://localhost:6379
             securityContext:

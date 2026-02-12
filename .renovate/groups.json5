@@ -96,5 +96,29 @@
       },
       minimumGroupSize: 2,
     },
+    {
+      description: "Odoo Staging - auto-merge to staging for validation before production",
+      groupName: "odoo-staging",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
+      matchFileNames: ["kubernetes/apps/base/business-system-staging/**"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: true,
+      group: {
+        commitMessageTopic: "{{{groupName}}} image",
+      },
+    },
+    {
+      description: "Odoo Production - manual merge required after staging validation",
+      groupName: "odoo-production",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
+      matchFileNames: ["kubernetes/apps/base/business-system/odoo/**"],
+      automerge: false,
+      group: {
+        commitMessageTopic: "{{{groupName}}} image",
+      },
+    },
   ],
 }

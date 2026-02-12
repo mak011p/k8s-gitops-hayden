@@ -5,11 +5,15 @@ Based on the auntalma.com.au migration (Feb 2026).
 
 ## Overview
 
+**Purpose:** This is a reusable guide for importing Magento production data into the Kubernetes cluster. Do NOT use this document as a progress tracker — it is a reference for future agents and operators to follow when performing a migration.
+
 **Source:** VPS at `web@103.21.131.100:22222` (SSH key: `~/.ssh/rog_laptop_key`)
 **Target:** MariaDB Galera cluster + Magento pods in `business-system` namespace
 **Strategy:** Test with `*.haydenagencies.com.au` subdomain first, then cutover to production domain
 
-## Issues Encountered & Resolutions
+## Known Issues & Solutions
+
+The following issues were discovered during the auntalma.com.au migration (Feb 2026). Each entry documents the symptom, root cause, and fix to prevent re-discovery.
 
 ### 1. MariaDB Galera CrashLoopBackOff After Operator Upgrade
 
@@ -42,7 +46,7 @@ initContainer:
 
 ---
 
-### 2. MariaDB 12.1 Incompatible with Magento 2.4.7 (RESOLVED)
+### 2. MariaDB 12.1 Incompatible with Magento 2.4.7
 
 **Symptom:** `setup:upgrade` fails with:
 ```
@@ -108,13 +112,13 @@ sed -i '/^LOCK TABLES/d; /^UNLOCK TABLES/d' /tmp/auntalma_dump.sql
 
 ---
 
-### 5. MariaDB CLI Binary Name Change (N/A after downgrade)
+### 5. MariaDB CLI Binary Name Change
 
 **Symptom:** `mysql` command not found in MariaDB 12.1 container.
 
 **Root Cause:** MariaDB 12.1 renamed the CLI binary from `mysql` to `mariadb`.
 
-**Status:** No longer relevant — MariaDB pinned to 10.11 (Issue #2). The `mysql` binary works on 10.11. Commands in this doc use `mysql` throughout.
+**Note:** Not relevant when using MariaDB 10.11 (Issue #2). The `mysql` binary works on 10.11. Commands in this doc use `mysql` throughout.
 
 ---
 
@@ -436,20 +440,16 @@ cd /var/www/html && php bin/magento setup:static-content:deploy en_US -f
 
 ---
 
-### 17. `en_AU` Locale Not Installed in Docker Image
+### 17. `en_AU` Locale — Dockerfile Deploys Wrong Locale
 
-**Symptom:** `setup:static-content:deploy en_AU` fails with:
-```
-en_AU argument has invalid value, run info:language:list for list of available locales
-```
+**Symptom:** All `en_AU` static asset URLs return 404. Only `en_US` files exist under `pub/static/frontend/`. Pages load without CSS/JS.
 
-**Root Cause:** The Docker image is missing `magento/language-en_au`. The VPS production deployment HAS this package installed and deploys `en_AU` via Deployer (`deploy.php` line 14: `set('static_content_locales', 'en_AU')`). The package was installed on the VPS but never added to `composer.json`, so the Docker build doesn't include it.
+**Root Cause:** `Dockerfile.prod` line 77 deploys `en_US` for frontend themes with a misleading comment: *"en_AU falls back to en_US at runtime"*. **This is wrong — Magento does NOT fall back for static files.** The HTML URLs are hardcoded to the store's configured locale (`en_AU`), and missing files return 404.
 
-**The Dockerfile (`Dockerfile.prod`) incorrectly deploys `en_US` for frontend** (line 76-83) with a misleading comment: *"en_AU falls back to en_US at runtime"*. **This is wrong — Magento does NOT fall back for static files.** The HTML URLs are hardcoded to the store's configured locale (`en_AU`), and missing files return 404.
+**Note:** The `magento/language-en_au` composer package is NOT required for SCD. That package only provides UI string translations (csv files). SCD locale validation uses the ICU library + Magento's hardcoded allowlist (`Magento\Framework\Locale\Config::$_allowedLocales`), which already includes `en_AU`. The `php:8.3-fpm-alpine` image installs `intl` (ICU) so `en_AU` is a valid SCD locale out of the box.
 
 **Fix (permanent — update Docker image):**
-1. Add `magento/language-en_au` to `composer.json`
-2. Change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU` (matching `deploy.php`)
+1. Change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU` (line 77, matching `deploy.php`)
 
 **Fix (temporary — in running pod, lost on restart):**
 ```bash
@@ -1144,10 +1144,9 @@ kubectl exec $POD -n business-system -c php -- bash -c \
 kubectl exec $POD -n business-system -c php -- php /var/www/html/bin/magento cache:flush
 ```
 
-**Fix (permanent — Docker image changes):**
-1. Add `magento/language-en_au` to `composer.json`
-2. Update `Dockerfile.prod` frontend SCD: change `en_US` to `en_AU` (line 77)
-3. Optionally: decide whether minification should be enabled in `core_config_data` for K8s (it's disabled on VPS but VPS has full SCD output)
+**Fix (permanent — Docker image change):**
+1. Update `Dockerfile.prod` frontend SCD: change `en_US` to `en_AU` (line 77). No composer changes needed — `en_AU` is a valid ICU locale and doesn't require a language pack for SCD (see Issue #17).
+2. Optionally: decide whether minification should be enabled in `core_config_data` for K8s (it's disabled on VPS but VPS has full SCD output)
 
 **Key lesson:** `Dockerfile.prod` must match `deploy.php` locale configuration. The VPS deployer (`deploy.php` line 14) deploys `en_AU`; the Dockerfile must do the same. The misleading comment "en_AU falls back to en_US at runtime" is **wrong** — Magento has no static file locale fallback.
 
@@ -1170,86 +1169,59 @@ This is safe because the version number in the URL is only used for cache bustin
 
 ---
 
-## Resolved Blockers
+### 44. Base URL Scope Override — `scope_id=1` Overrides `scope_id=0`
 
-### ES Config (RESOLVED)
-The `core_config_data` ES config was updated to point to the local cluster Elasticsearch. Run this for each site after DB import:
-```bash
-ROOT_PW=$(kubectl get secret <site>-mariadb-superuser -n business-system -o jsonpath='{.data.password}' | base64 -d) && \
-kubectl exec <site>-mariadb-0 -n business-system -c mariadb -- \
-  mariadb -u root -p"${ROOT_PW}" magento -e "
-    UPDATE core_config_data SET value = '<site>-elasticsearch-es-http' WHERE path = 'catalog/search/elasticsearch7_server_hostname';
-    UPDATE core_config_data SET value = '9200' WHERE path = 'catalog/search/elasticsearch7_server_port';
-    UPDATE core_config_data SET value = '0' WHERE path = 'catalog/search/elasticsearch7_enable_auth';
-    UPDATE core_config_data SET value = '' WHERE path LIKE 'catalog/search/elasticsearch7_username';
-    UPDATE core_config_data SET value = '' WHERE path LIKE 'catalog/search/elasticsearch7_password';
-  "
+**Symptom:** After updating base URLs in `core_config_data` (scope_id=0) to the test domain, all pages still redirect 302 to the production domain (`https://www.auntalma.com.au/`). Internal curl from the pod also redirects.
+
+**Root Cause:** Magento's `core_config_data` has scoped values. When `MAGE_RUN_CODE=base` is set, Magento runs as **website ID 1** (scope `websites`, scope_id=1). If scope_id=1 has its own `web/unsecure/base_url` and `web/secure/base_url` entries, they **override** the default scope (scope_id=0).
+
+The production database has base URLs at both scopes:
+```sql
+-- scope_id=0 (default) — updated during migration ✓
+web/unsecure/base_url = https://auntalma.haydenagencies.com.au/
+web/secure/base_url   = https://auntalma.haydenagencies.com.au/
+
+-- scope_id=1 (website "base") — NOT updated, still points to production ✗
+web/unsecure/base_url = https://www.auntalma.com.au/
+web/secure/base_url   = https://www.auntalma.com.au/
 ```
 
-**Important:** Use short service names (not FQDNs) due to Alpine/musl DNS bug (Issue #7).
+**Diagnosis:**
+```sql
+SELECT config_id, scope, scope_id, path, value
+FROM core_config_data
+WHERE path LIKE 'web/%/base_url'
+ORDER BY path, scope_id;
+```
 
-### setup:upgrade (RESOLVED)
-Successfully completed after applying all fixes (di.xml patch, clear generated code, flush Redis, ES config update, short hostnames, log_bin_trust_function_creators). See "Proven Working Workflow" below.
+**Fix:** Update base URLs for ALL scopes, not just the default:
+```sql
+-- Update scope_id=0 (default)
+UPDATE core_config_data SET value = 'https://<test-domain>/'
+  WHERE path IN ('web/unsecure/base_url', 'web/secure/base_url')
+  AND scope_id = 0;
 
-### di:compile (RESOLVED)
-Succeeded after adding `install.date` to env.php ConfigMap (Issue #15).
+-- Update scope_id=1 (website scope for MAGE_RUN_CODE)
+UPDATE core_config_data SET value = 'https://<test-domain>/'
+  WHERE path IN ('web/unsecure/base_url', 'web/secure/base_url')
+  AND scope_id = 1;
+```
 
-### indexer:reindex (RESOLVED)
-All indexers succeeded except Algolia (expected — no API key configured for K8s). Catalog Search indexer required updating ES hostname in `core_config_data` to a ClusterIP (because short hostname DNS failed on the worker node due to Issue #18).
+**Key lesson:** Always query ALL scopes for base URLs after import. The website-level scope (matching `MAGE_RUN_CODE`) takes precedence over the default scope. Multi-store setups may have additional scopes (scope_id=2, 3, etc.) that also need updating.
 
----
-
-## Remaining Blockers
-
-### RESOLVED: MariaDB 12 Incompatibility (Issue #2)
-Downgraded to MariaDB 10.11 LTS. Pinned in `mariadb-cluster.yaml` + Renovate `allowedVersions` rule. Requires PVC nuke + fresh data import (acceptable since migration is a fresh import anyway). No di.xml patching or third-party modules needed.
-
-### Blocker: `en_AU` Locale Missing from Docker Image (Issue #17, #42)
-The `magento/language-en_au` package is installed on the VPS but NOT in `composer.json`. The Dockerfile deploys `en_US` for frontend (not `en_AU`), and the Docker image only produces `.min.css` files (no DB during build). The VPS `deploy.php` deploys `en_AU` with full LESS compilation. **Fix required:** Add `magento/language-en_au` to `composer.json` and change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU`. Temporary workaround: copy `en_US` to `en_AU` + enable minification in DB (Issue #42).
-
-### Blocker: K8s NetworkPolicy + Cilium Breaks Pod Networking on Some Nodes
-Any K8s NetworkPolicy (even ingress-only with NO egress rules) triggers Cilium eBPF policy enforcement which breaks the pod's entire datapath on worker2/worker3 — not just DNS, but ALL traffic. Pods on worker1 with identical config work fine. Likely related to `datapathMode: netkit`. See Issue #28.
-
-**Current state:** Auntalma running 1 replica on worker1 only. HPA minReplicas set to 1 temporarily. Cannot scale to multi-node until this is resolved. Options:
-- Remove NetworkPolicy entirely (current workaround)
-- Switch to CiliumNetworkPolicy (may have same issue)
-- Test with `datapathMode: veth` (Cilium restart, brief network blip)
-- Wait for Cilium fix / upgrade
-
-### RESOLVED (with caveat): `pub/static` EmptyDir Init Container (Issue #16)
-Init container `static-copy` added to auntalma HelmRelease. Copies baked-in static files from image to emptyDir using `advancedMounts`. Committed: `9834473f6`. Verified: pod 2/2 Running, `deployed_version.txt` present. **Caveat:** Docker image only deploys `en_US` frontend static files — the `en_AU` directory exists but only contains 2 requirejs config files, no CSS/JS. Must manually copy `en_US` to `en_AU` after each pod restart until Docker image is fixed (Issue #42).
-
-### RESOLVED: Cilium DNS Proxy Breaks Alpine musl libc (Issue #27)
-Applied `dnsProxy.dnsRejectResponseCode: nameError` to Cilium values.yaml. Changes REFUSED→NXDOMAIN for blocked DNS queries. Committed: `b642d7f5d`. Verified: 10/10 `gethostbyname()` resolutions from Magento PHP pod (musl libc). DNS is no longer a blocker — the remaining ES "No alive nodes" issue on homepage is in the PHP ES client library, not DNS.
-
-### RESOLVED: Cilium ClusterIP Routing on Some Nodes (Issue #18)
-Likely related to the broader NetworkPolicy + Cilium eBPF issue (Issue #28). With NetworkPolicy removed and single-replica on worker1, ClusterIP routing works fine.
-
-### RESOLVED: Networking (Issues #24, #25, #26)
-Three networking issues prevented external traffic from reaching auntalma pods:
-1. **HTTPRoute** referenced wrong service name `auntalma-app` → fixed to `auntalma`
-2. **external-dns** annotations missing → DNS record was never created
-3. **NetworkPolicy** allowed ingress from `envoy-gateway-system` but proxies are in `network-system`
-
-All three fixed and applied. Storefront now responds through Cloudflare tunnel.
-
-### RESOLVED: Homepage 404 — nginx `try_files` (Issue #39)
-Root URL `/` returned static 404 while all other Magento routes worked. Caused by `try_files $uri $uri/ /index.php$is_args$args` — the `$uri/` check matches the `pub/` directory on nginx's filesystem, but `pub/index.php` doesn't exist in the nginx container (split-container architecture). Fixed by removing `$uri/` → `try_files $uri /index.php$is_args$args`.
-
-### RESOLVED: `app:config:import` Hash Mismatch (Issue #40)
-Running `app:config:import` with IP-overridden env vars stores a config hash that doesn't match what PHP-FPM computes with the pod's native DNS-based env vars. Fix: always run `app:config:import` and `cache:flush` without env overrides as the final step.
+**Important:** Flush Redis (DB 6 + DB 1) and run `cache:flush` after updating base URLs — Magento caches config values aggressively.
 
 ---
 
 ## Proven Working Workflow
 
-This is the all-in-one command that successfully ran `setup:upgrade` on auntalma. Use this as the template for future migrations.
+All-in-one command sequence for running `setup:upgrade` and completing a Magento migration. Replace `<site>` with the actual site name (e.g., `auntalma`, `hayden`).
 
 **Note:** After applying the Cilium DNS fix (Issue #27, commit `b642d7f5d`), short hostnames resolve reliably for most operations. However, `setup:upgrade` ES validation still intermittently fails with DNS hostnames — **IP overrides for ES are required** (see Issue #38). You must also update `core_config_data` to use the ES ClusterIP, since DB config overrides env.php.
 
 **WARNING:** `setup:upgrade` wipes `pub/static/` (Issue #37). After the full sequence, either restart the pod (init container re-copies static files) or run `setup:static-content:deploy` manually.
 
-**WARNING:** After pod restart, the init container only copies `en_US` static files (Docker image doesn't have `en_AU`). You MUST copy `en_US` to `en_AU` after every pod restart until the Docker image is fixed (Issue #42). Also ensure CSS/JS minification is enabled in `core_config_data` (the Docker image only has `.min.css` files).
+**WARNING:** After pod restart, the init container only copies `en_US` static files (Dockerfile deploys `en_US` instead of `en_AU`). You MUST copy `en_US` to `en_AU` after every pod restart until `Dockerfile.prod` is fixed to deploy `en_AU` (Issue #17, #42). Also ensure CSS/JS minification is enabled in `core_config_data` (the Docker image only has `.min.css` files).
 
 **CRITICAL:** Pass env overrides via `export` inside `kubectl exec ... bash -c "..."`. NEVER use `kubectl set env` — it modifies the deployment spec and triggers a rollout, destroying all in-container patches (Issue #29).
 
@@ -1370,11 +1342,11 @@ flux resume helmrelease <site> -n business-system
 For each Magento site (auntalma, hayden, toemass/dropdrape):
 
 ### Pre-requisites (fix BEFORE migration)
-- [x] Fix Cilium DNS proxy for musl compat — add `dnsProxy.dnsRejectResponseCode: nameError` to Cilium values (Issue #27) — **DONE** commit `b642d7f5d`
-- [x] Add init container to HelmRelease for `pub/static` deployment (Issue #16) — **DONE** commit `9834473f6`
-- [x] Set HelmRelease upgrade timeout to 10m (Issue #34) — **DONE** commit `075024db0`
-- [x] Pin MariaDB to 10.11 LTS in `mariadb-cluster.yaml` + Renovate `allowedVersions` rule (Issue #2) — **DONE** nuke PVCs + re-import
-- [ ] Add `magento/language-en_au` to `composer.json` + change `Dockerfile.prod` SCD to `en_AU` (Issue #17, #42)
+- [ ] Fix Cilium DNS proxy for musl compat — add `dnsProxy.dnsRejectResponseCode: nameError` to Cilium values (Issue #27)
+- [ ] Add init container to HelmRelease for `pub/static` deployment (Issue #16)
+- [ ] Set HelmRelease upgrade timeout to 10m (Issue #34)
+- [ ] Pin MariaDB to 10.11 LTS in `mariadb-cluster.yaml` + Renovate `allowedVersions` rule (Issue #2)
+- [ ] Change `Dockerfile.prod` frontend SCD from `en_US` to `en_AU` (Issue #17, #42)
 - [ ] Add `install.date` to env.php ConfigMap (Issue #15)
 - [ ] Use short service names in helmrelease env vars (Issue #7)
 - [ ] Ensure `log_bin_trust_function_creators=1` in myCnf (Issue #10)
@@ -1396,7 +1368,7 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [ ] `kubectl cp` dump into MariaDB pod, import locally
 - [ ] Query `store_website` and `store` tables for correct codes
 - [ ] Update `MAGE_RUN_CODE` in helmrelease to match DB
-- [ ] Update base URLs in `core_config_data` for test domain
+- [ ] Update base URLs in `core_config_data` for test domain — **ALL scopes** (scope_id=0 AND website-specific scope_id, Issue #44)
 - [ ] Update ES config in `core_config_data` to local cluster ES
 - [ ] Update crypt key in SOPS secret to match production
 - [ ] Flush Redis after any `core_config_data` changes
@@ -1425,59 +1397,6 @@ For each Magento site (auntalma, hayden, toemass/dropdrape):
 - [ ] Admin panel accessible at `/admin_hayden/`
 - [ ] Product pages load with CSS/JS (static content working)
 - [ ] Cron jobs not erroring
-
-### auntalma.com.au progress
-- [x] Database imported
-- [x] Store codes identified (`base` for auntalma, `drop_drape_second_site` for toemass)
-- [x] Base URLs updated for test domain
-- [x] ES config updated in `core_config_data`
-- [x] Crypt key updated in SOPS secret
-- [x] `setup:upgrade` completed
-- [x] `setup:di:compile` completed
-- [x] `indexer:reindex` completed (all except Algolia — no API key)
-- [x] `cache:flush` completed
-- [x] HTTPRoute backend name fixed (`auntalma-app` → `auntalma`) (Issue #24)
-- [x] external-dns annotations added to HTTPRoute (Issue #25)
-- [x] NetworkPolicy fixed for envoy-external in `network-system` (Issue #26)
-- [x] NetworkPolicy egress removed — Cilium eBPF + K8s NetworkPolicy incompatible (Issue #27, #28)
-- [x] Cilium DNS proxy fix applied (`dnsRejectResponseCode: nameError`) — commit `b642d7f5d`
-- [x] Init container `static-copy` added for `pub/static` — commit `9834473f6`
-- [x] HelmRelease upgrade timeout increased to 10m — commit `075024db0`
-- [x] Helm release history reset (deleted poisoned secrets, fresh install)
-- [x] Static content deployed (`setup:static-content:deploy en_US en_AU -f` — all 16 themes)
-- [x] di.xml MariaDB 12 patch applied + generated code cleared
-- [x] `app:config:import` + `cache:flush` completed on current pod
-- [x] Storefront responding (200 on `/customer/account/login/`)
-- [x] Admin panel redirects to OAuth (302 → Dex, working correctly)
-- [x] Cilium DNS fix verified — 10/10 musl `gethostbyname()` resolutions from Magento pod
-- [x] ES `core_config_data` hostname reverted from ClusterIP to DNS name (DNS now reliable)
-- [x] Init container verified — 13,945 static files copied, pod 2/2 Running, `deployed_version.txt` present
-- [x] `en_AU` directory exists in Docker image but incomplete (2 requirejs files only, no CSS/JS) — requires manual `en_US`→`en_AU` copy after each restart (Issue #42)
-- [x] Homepage 404 root cause identified — `ConfigChangeDetector` + stale schema (Issue #32 updated)
-- [x] `setup:upgrade` re-run on fresh pod (v1 install) with IP overrides for ES (Issue #38)
-- [x] `setup:di:compile` completed on fresh pod
-- [x] ES `core_config_data` temporarily set to ClusterIP for `setup:upgrade` (Issue #38)
-- [x] `pub/static` restored via pod restart (init container re-copied 13,943 files + `deployed_version.txt`)
-- [x] `app:config:import` run with **native env vars** (Issue #40 — IP overrides cause hash mismatch)
-- [x] `cache:flush` completed with native env vars
-- [x] `indexer:reindex` completed on fresh pod (all succeeded except Algolia lock — expected)
-- [x] ES `core_config_data` reverted from ClusterIP back to DNS name + Redis flushed
-- [x] NetworkPolicy deleted (Flux fresh install recreated it — Issue #41)
-- [x] Storefront pages working: `/customer/account/login/` 200, `/catalogsearch/result/?q=test` 200, `/contact/` 200, `/home` 200
-- [x] Homepage 404 root cause identified — nginx `try_files $uri/` with split containers (Issue #39)
-- [x] nginx ConfigMap fix applied — removed `$uri/` from `try_files` (Issue #39)
-- [x] Homepage `/` returns 200 (82KB) — nginx `try_files` fix confirmed working
-- [x] CSS broken — root cause identified: Docker image missing `en_AU` locale + only `.min.css` + minification disabled (Issue #42)
-- [x] Temporary fix applied: copied `en_US` to `en_AU`, enabled CSS/JS minification+merging in DB, bumped `deployed_version.txt` to bust CF cache
-- [x] Cloudflare cached 404s for static assets — fixed by bumping `deployed_version.txt` (Issue #43)
-- **Current state (12 Feb 2026):** HelmRelease suspended, 1 replica on worker1 (2/2 Running, HPA minReplicas=1). All pages working with CSS: `/` 200, `/customer/account/login/` 200 (styled). ES config on DNS name. NetworkPolicy deleted. CSS/JS minification+merging enabled in `core_config_data`. One JS error remaining: `SyntaxError: Bad control character` in `mage/apply/main.min.js` (corrupt minified file in Docker image).
-- [ ] **Docker image fix needed:** Add `magento/language-en_au` to `composer.json`, change `Dockerfile.prod` SCD from `en_US` to `en_AU` (Issue #17, #42)
-- [ ] Commit nginx `try_files` fix to git
-- [ ] Investigate `mage/apply/main.min.js` SyntaxError (corrupt minified JS in Docker image)
-- [ ] Multi-node scaling blocked by Cilium + NetworkPolicy issue (Issue #28)
-- [ ] Media files transferred (5.2 GB, deferred)
-- [ ] Cron jobs verified
-- [ ] Go-live (DNS cutover to production domain)
 
 ---
 

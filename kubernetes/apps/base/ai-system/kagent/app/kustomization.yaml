@@ -8,6 +8,7 @@ resources:
   - helmrelease.yaml
   - ocirepository.yaml
   - httproute.yaml
+  - backendtrafficpolicy.yaml
   - securitypolicy.yaml
   - modelconfig.yaml
   - agent-flux-troubleshooter.yaml

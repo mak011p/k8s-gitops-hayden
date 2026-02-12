@@ -42,6 +42,9 @@ spec:
       | Inventory | `stock_picking`, `stock_move`, `stock_move_line`, `stock_quant`, `stock_warehouse`, `stock_location`, `stock_lot` |
       | Projects | `project_project`, `project_task` |
       | Purchasing | `purchase_order`, `purchase_order_line` |
+      | Queue Jobs | `queue_job`, `queue_job_channel`, `queue_job_function` |
+      | Integration | `external_integration_line`, `external_integration_tag`, `external_order_field_mapping`, `external_order_fulfillment`, `external_order_fulfillment_line`, `external_order_transaction` |
+      | Logs | `ir_logging` |
       | Reference | `uom_uom`, `res_currency`, `res_currency_rate`, `res_company`, `delivery_carrier`, `res_country`, `res_country_state` |
 
       #### Blocked Data (no access)
@@ -70,6 +73,21 @@ spec:
       - Useful for searching with Odoo domain filters
       - Reading computed fields that don't exist in raw SQL
       - Accessing Odoo-specific business logic (e.g., available stock considering reservations)
+
+      ### 3. Kubernetes Tools (read-only)
+      Use these to inspect cluster resources and read application logs for debugging.
+      - `k8s_get_pod_logs` — Read Odoo/connector pod logs. Namespace: `business-system-staging`.
+      - `k8s_get_resources` — List pods, services, deployments.
+      - `k8s_describe_resource` — Describe pods for events, status, restart reasons.
+      - `k8s_get_events` — Check namespace events for errors.
+      - `k8s_get_resource_yaml` — Inspect deployed resource specs.
+
+      #### Integration Debugging Tips
+      - **Queue job failures**: Query `queue_job` WHERE `state = 'failed'` — the `exc_info` column has the full traceback.
+      - **Stuck jobs**: `state = 'started'` for longer than expected usually means a timeout killed the worker.
+      - **Magento sync**: Check `external_order_fulfillment` for fulfillment sync status.
+      - **Odoo logs**: Use `k8s_get_pod_logs` on pods in `business-system-staging` namespace, or query `ir_logging` table for application-level logs.
+      - **Pod crashes**: Use `k8s_describe_resource` to check pod events and restart counts.
 
       ## Response Guidelines
 
@@ -109,6 +127,20 @@ spec:
             - get_record
             - list_models
             - list_resource_templates
+        type: McpServer
+      # Kubernetes read-only tools (pod logs, describe, events)
+      - mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames:
+            - k8s_get_pod_logs
+            - k8s_get_resources
+            - k8s_describe_resource
+            - k8s_get_events
+            - k8s_get_resource_yaml
+            - k8s_get_available_api_resources
+            - k8s_check_service_connectivity
         type: McpServer
   description: >-
     Odoo business data assistant for Hayden Agencies. Answers questions about

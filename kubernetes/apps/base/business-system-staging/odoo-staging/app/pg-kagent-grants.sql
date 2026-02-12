@@ -9,6 +9,12 @@
 --   kubectl exec -it odoo-pg-staging-1 -n business-system-staging -c postgres -- \
 --     psql -U postgres -d prod -c "$(cat pg-kagent-grants.sql)"
 
+-- Anti-extraction: role-level resource limits
+ALTER ROLE kagent_readonly SET statement_timeout = '30s';
+ALTER ROLE kagent_readonly SET lock_timeout = '5s';
+ALTER ROLE kagent_readonly SET work_mem = '4MB';
+ALTER ROLE kagent_readonly SET temp_file_limit = '50MB';
+
 -- Schema access
 GRANT USAGE ON SCHEMA public TO kagent_readonly;
 
@@ -35,6 +41,17 @@ GRANT SELECT ON project_project, project_task TO kagent_readonly;
 
 -- Purchasing
 GRANT SELECT ON purchase_order, purchase_order_line TO kagent_readonly;
+
+-- Queue jobs (integration debugging)
+GRANT SELECT ON queue_job, queue_job_channel, queue_job_function TO kagent_readonly;
+
+-- External integration (Magento connector)
+GRANT SELECT ON external_integration_line, external_integration_tag TO kagent_readonly;
+GRANT SELECT ON external_order_field_mapping, external_order_fulfillment TO kagent_readonly;
+GRANT SELECT ON external_order_fulfillment_line, external_order_transaction TO kagent_readonly;
+
+-- Application logs
+GRANT SELECT ON ir_logging TO kagent_readonly;
 
 -- Reference data
 GRANT SELECT ON uom_uom, res_currency, res_currency_rate TO kagent_readonly;

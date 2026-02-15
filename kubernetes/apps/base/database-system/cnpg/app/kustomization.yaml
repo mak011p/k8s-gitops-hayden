@@ -6,3 +6,4 @@ kind: Kustomization
 resources:
   - helmrelease.yaml
   - helmrepository.yaml
+  - prometheusrule.yaml

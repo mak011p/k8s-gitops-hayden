@@ -193,16 +193,12 @@ spec:
           protocol: TCP
         - port: 8000
           protocol: TCP
-    # GCS backups (external HTTPS)
+    # MinIO backups (TrueNAS LAN)
     - to:
         - ipBlock:
-            cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
+            cidr: 192.168.50.17/32
       ports:
-        - port: 443
+        - port: 9000
           protocol: TCP
 ---
 # CiliumNetworkPolicy for CNPG pods - Kubernetes API access

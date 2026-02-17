@@ -1,9 +1,7 @@
 # Shared KMS Infrastructure for GCS Bucket Encryption
 #
 # This key ring and key are used by all backup buckets:
-# - hayden-chatwoot-backups
 # - hayden-magento2-backups
-# - hayden-odoo-backups
 # - hayden-velero-backups
 
 locals {

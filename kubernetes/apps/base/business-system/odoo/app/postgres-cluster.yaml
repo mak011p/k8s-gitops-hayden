@@ -19,7 +19,7 @@ spec:
     enablePodMonitor: true
   bootstrap:
     initdb:
-      database: odoo
+      database: prod
       owner: odoo
       secret:
         name: odoo-pg-app

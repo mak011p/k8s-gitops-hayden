@@ -181,7 +181,7 @@ data "google_compute_default_service_account" "default" {
 
 resource "google_billing_budget" "monthly_cap" {
   billing_account = var.billing_account
-  display_name    = "GCS Cost Cap - Kill at 300AUD"
+  display_name    = "GCS Cost Cap - Kill at 350AUD"
 
   budget_filter {
     projects = ["projects/${var.project_id}"]
@@ -190,7 +190,7 @@ resource "google_billing_budget" "monthly_cap" {
   amount {
     specified_amount {
       currency_code = "AUD"
-      units         = "300"
+      units         = "350"
     }
   }
 

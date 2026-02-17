@@ -5,7 +5,9 @@ kind: Kustomization
 
 resources:
   - helmrepository.yaml
+  - secret-cnpg-minio.enc.age.yaml
   - cnpg-cluster.yaml
+  - scheduledbackup.yaml
   - helmrelease.yaml
   - secret.enc.age.yaml
   - httproute.yaml

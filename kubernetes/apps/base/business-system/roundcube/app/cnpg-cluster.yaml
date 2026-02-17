@@ -29,5 +29,23 @@ spec:
       database: roundcube
       owner: roundcube
 
+  backup:
+    retentionPolicy: "7d"
+    barmanObjectStore:
+      destinationPath: s3://cnpg-roundcube/
+      endpointURL: http://192.168.50.17:9000
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-minio-credentials
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-minio-credentials
+          key: SECRET_ACCESS_KEY
+      wal:
+        compression: gzip
+        maxParallel: 2
+      data:
+        compression: gzip
+
   monitoring:
     enablePodMonitor: true

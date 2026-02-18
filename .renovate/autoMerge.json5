@@ -18,13 +18,11 @@
       ignoreTests: true
     },
     {
-      description: "Auto-merge staging container images directly (no PR)",
+      description: "Disable automerge for production Odoo image (require manual merge)",
       matchDatasources: ["docker"],
-      matchFileNames: ["kubernetes/apps/base/business-system-staging/**"],
-      automerge: true,
-      automergeType: "branch",
-      matchUpdateTypes: ["minor", "patch", "digest"],
-      ignoreTests: true
+      matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
+      matchFileNames: ["kubernetes/apps/base/business-system/odoo/**"],
+      automerge: false
     }
   ]
 }

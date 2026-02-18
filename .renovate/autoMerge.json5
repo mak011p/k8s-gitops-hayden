@@ -16,6 +16,15 @@
       automergeType: "pr",
       matchUpdateTypes: ["patch"],
       ignoreTests: true
+    },
+    {
+      description: "Auto-merge staging container images directly (no PR)",
+      matchDatasources: ["docker"],
+      matchFileNames: ["kubernetes/apps/base/business-system-staging/**"],
+      automerge: true,
+      automergeType: "branch",
+      matchUpdateTypes: ["minor", "patch", "digest"],
+      ignoreTests: true
     }
   ]
 }

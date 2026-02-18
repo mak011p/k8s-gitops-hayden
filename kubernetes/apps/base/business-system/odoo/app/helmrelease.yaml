@@ -39,6 +39,7 @@ spec:
   values:
     controllers:
       *app :
+        strategy: Recreate
         # replicas managed by HPA (minReplicas: 1, maxReplicas: 3)
         initContainers:
           auto-upgrade:

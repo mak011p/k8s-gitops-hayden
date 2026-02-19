@@ -39,7 +39,7 @@ spec:
     controllers:
       *app :
         replicas: 1
-        strategy: Recreate
+        strategy: RollingUpdate
         containers:
           app:
             image:
@@ -91,7 +91,7 @@ spec:
           exporter:
             image:
               repository: oliver006/redis_exporter
-              tag: v1.80.2
+              tag: v1.81.0
             args:
               - --redis.addr=redis://localhost:6379
             securityContext:
@@ -126,8 +126,8 @@ spec:
       data:
         enabled: true
         type: persistentVolumeClaim
-        storageClass: ceph-block
+        storageClass: ceph-filesystem
         size: 5Gi
-        accessMode: ReadWriteOnce
+        accessMode: ReadWriteMany
         globalMounts:
           - path: /data

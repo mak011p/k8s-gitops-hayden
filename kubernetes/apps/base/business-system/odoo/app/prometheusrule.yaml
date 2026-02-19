@@ -41,7 +41,7 @@ spec:
             summary: "Odoo PostgreSQL backup failure (recent)"
             description: >
               CloudNativePG reported a failed backup for {{ $labels.cluster }} within the last 6 hours.
-              Check Barman logs and GCS access to restore healthy backups.
+              Check Barman logs and MinIO access to restore healthy backups.
         - alert: OdooPgBackupsStale
           expr: |
             max by (cluster) (cnpg_collector_last_available_backup_timestamp{cluster="odoo-pg"}) > 0
@@ -54,7 +54,7 @@ spec:
             summary: "Odoo PostgreSQL backups are stale"
             description: >
               No successful backup for {{ $labels.cluster }} in over 8 days (weekly schedule with buffer).
-              Investigate scheduledbackup job, CNPG logs, and GCS bucket writes.
+              Investigate scheduledbackup job, CNPG logs, and MinIO bucket writes.
         - alert: OdooPgBackupNeverSucceeded
           expr: |
             max by (cluster) (cnpg_collector_last_available_backup_timestamp{cluster="odoo-pg"}) == 0
@@ -66,4 +66,4 @@ spec:
             summary: "Odoo PostgreSQL backup has never completed"
             description: >
               No successful backup detected for {{ $labels.cluster }}.
-              Ensure the ScheduledBackup is running and the GCS service account credentials are valid.
+              Ensure the ScheduledBackup is running and the MinIO credentials are valid.

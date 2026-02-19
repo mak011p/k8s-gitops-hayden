@@ -45,7 +45,7 @@ spec:
           auto-upgrade:
             image:
               repository: ghcr.io/hayden-agencies/odoo
-              tag: 18.0.20260218.0959-db800e4@sha256:c3e265f62131a1e33c06e53abb59f3a539c85b70d9e277398ef276bedfdd23fc
+              tag: 18.0.20260219.0258-ddcb51c@sha256:dd0f35f43b6320f414f67b4974e657af444bc8021281a2bbddbfeaf88390f354
             command: ["sh", "-c"]
             args:
               - |
@@ -89,7 +89,7 @@ spec:
           app:
             image:
               repository: ghcr.io/hayden-agencies/odoo
-              tag: 18.0.20260218.0959-db800e4@sha256:c3e265f62131a1e33c06e53abb59f3a539c85b70d9e277398ef276bedfdd23fc
+              tag: 18.0.20260219.0258-ddcb51c@sha256:dd0f35f43b6320f414f67b4974e657af444bc8021281a2bbddbfeaf88390f354
             env:
               - name: POSTGRES_HOST
                 value: odoo-pg-rw.business-system.svc.cluster.local

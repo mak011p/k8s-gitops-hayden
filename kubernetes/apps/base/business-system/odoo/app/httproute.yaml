@@ -26,6 +26,34 @@ spec:
           namespace: network-system
           port: 80
           weight: 100
+    # Default route to main port
+    # Odoo official nginx recommendation: proxy_read_timeout 720s (exceeds limit_time_real 120s).
+    - timeouts:
+        request: 720s
+        backendRequest: 720s
+      backendRefs:
+        - name: odoo
+          port: 8071
+          weight: 100
+---
+# Separate HTTPRoute for WebSocket/longpolling — NOT targeted by SecurityPolicy (odoo-auth).
+# Envoy ext_authz rejects WebSocket upgrade requests with 302 redirects that WS clients can't
+# follow (https://github.com/envoyproxy/envoy/issues/19578). Odoo authenticates WebSocket
+# connections via its own session cookies internally.
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: odoo-websocket
+  namespace: business-system
+spec:
+  parentRefs:
+    - name: envoy-external
+      namespace: network-system
+      sectionName: https
+  hostnames:
+    - 'odoo.${CLUSTER_DOMAIN}'
+  rules:
     # WebSocket/longpolling routes to gevent port
     # These are long-lived connections for Odoo's real-time bus (chat, notifications).
     # Disable request timeout (0s) so Envoy doesn't kill them prematurely.
@@ -42,15 +70,6 @@ spec:
       backendRefs:
         - name: odoo
           port: 8072
-          weight: 100
-    # Default route to main port
-    # Odoo official nginx recommendation: proxy_read_timeout 720s (exceeds limit_time_real 120s).
-    - timeouts:
-        request: 720s
-        backendRequest: 720s
-      backendRefs:
-        - name: odoo
-          port: 8071
           weight: 100
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json

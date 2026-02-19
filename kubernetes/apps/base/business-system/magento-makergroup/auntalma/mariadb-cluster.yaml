@@ -6,8 +6,9 @@ metadata:
   name: auntalma-mariadb
   namespace: business-system
 spec:
-  # MariaDB 10.6 for Magento 2.4.7 compatibility
-  image: mariadb:12.1
+  # MariaDB 10.11 LTS — max version supported by Magento 2.4.7 (supports 10.2-10.11)
+  # Pinned to 10.11 + Renovate ignorePath to prevent auto-upgrade (12.x breaks setup:upgrade)
+  image: mariadb:10.11
 
   # Root password from secret
   rootPasswordSecretKeyRef:

@@ -1,0 +1,64 @@
+---
+# NetworkPolicy to restrict access to MCP servers
+# Only kagent pods can communicate with MCP servers
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: odoo-mcp-isolation
+  namespace: ai-system
+  labels:
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: odoo-mcp
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from kagent helm release pods (controller, ui, etc)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kagent
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow traffic from kagent-managed agent pods (odoo-assistant, flux-troubleshooter)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: kagent
+      ports:
+        - protocol: TCP
+          port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-mcp-isolation
+  namespace: ai-system
+  labels:
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-mcp
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from kagent helm release pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kagent
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow traffic from kagent-managed agent pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: kagent
+      ports:
+        - protocol: TCP
+          port: 8000

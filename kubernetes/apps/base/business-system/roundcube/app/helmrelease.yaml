@@ -70,12 +70,13 @@ spec:
         $config['redis_hosts'] = ['redis.database-system.svc.cluster.local:6379'];
 
         // IMAP caching (caches folder lists, message headers)
+        // Keep TTL short — dsync modifies mailbox every 30s, long TTLs cause stale/ghost messages
         $config['imap_cache'] = 'redis';
-        $config['imap_cache_ttl'] = '10d';
+        $config['imap_cache_ttl'] = '1d';
 
         // Messages cache (requires IMAP QRESYNC - Migadu supports this)
         $config['messages_cache'] = true;
-        $config['messages_cache_ttl'] = '10d';
+        $config['messages_cache_ttl'] = '1d';
 
         // Preview pane - prefetches message content while browsing list
         $config['preview_pane'] = true;

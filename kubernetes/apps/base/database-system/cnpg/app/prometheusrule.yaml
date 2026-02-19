@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cnpg-cluster-health
+  namespace: database-system
+spec:
+  groups:
+    - name: cnpg.replica-health
+      rules:
+        - alert: CnpgWalArchiveBacklog
+          expr: |
+            cnpg_collector_pg_wal_archive_status{value="ready"} > 50
+          for: 15m
+          labels:
+            severity: warning
+            service: cnpg
+          annotations:
+            summary: "CNPG WAL archive backlog on {{ $labels.pod }}"
+            description: >
+              {{ $labels.pod }} in cluster {{ $labels.cluster }} has {{ $value }}
+              WAL files waiting to be archived. This may indicate object store
+              connectivity issues and can lead to runaway egress costs if replicas
+              fall back to WAL restore from the archive.
+        - alert: CnpgWalArchiveBacklogCritical
+          expr: |
+            cnpg_collector_pg_wal_archive_status{value="ready"} > 200
+          for: 10m
+          labels:
+            severity: critical
+            service: cnpg
+          annotations:
+            summary: "CNPG WAL archive critically backlogged on {{ $labels.pod }}"
+            description: >
+              {{ $labels.pod }} in cluster {{ $labels.cluster }} has {{ $value }}
+              WAL files waiting to be archived. Archive destination is likely
+              unreachable. Replicas may be hammering the object store with restore
+              requests, causing significant egress costs.
+        - alert: CnpgInstanceDown
+          expr: |
+            cnpg_collector_up == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: cnpg
+          annotations:
+            summary: "CNPG instance {{ $labels.pod }} is down"
+            description: >
+              PostgreSQL instance {{ $labels.pod }} in cluster {{ $labels.cluster }}
+              has been down for more than 5 minutes.
+    - name: cnpg.pod-restarts
+      rules:
+        - alert: CnpgPodRestartStorm
+          expr: |
+            increase(kube_pod_container_status_restarts_total{container="postgres", namespace=~"business-system.*"}[1h]) > 5
+          for: 5m
+          labels:
+            severity: warning
+            service: cnpg
+          annotations:
+            summary: "CNPG pod {{ $labels.pod }} restarting frequently"
+            description: >
+              {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted
+              {{ $value | humanize }} times in the last hour. A crash-looping replica
+              can generate thousands of object store requests per hour, causing
+              significant egress costs.
+        - alert: CnpgPodRestartStormCritical
+          expr: |
+            increase(kube_pod_container_status_restarts_total{container="postgres", namespace=~"business-system.*"}[1h]) > 20
+          for: 5m
+          labels:
+            severity: critical
+            service: cnpg
+          annotations:
+            summary: "CNPG pod {{ $labels.pod }} in crash loop storm"
+            description: >
+              {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted
+              {{ $value | humanize }} times in the last hour. This is likely a
+              timeline mismatch causing continuous WAL restore attempts from the
+              object store. Delete the pod and its PVCs to force a fresh
+              pg_basebackup from the primary.

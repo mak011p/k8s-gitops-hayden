@@ -51,6 +51,14 @@
       ignoreUnstable: false,
     },
     {
+      // Pin MariaDB to 10.11 LTS for Magento 2.4.7 compatibility (supports 10.2-10.11 only)
+      // MariaDB 12.x breaks setup:upgrade — see docs/MAGENTO-PRODUCTION-MIGRATION.md Issue #2
+      description: "Pin MariaDB to 10.11.x for Magento compatibility",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["mariadb"],
+      allowedVersions: "/^10\\.11\\./",
+    },
+    {
       // Custom versioning for label-generator with date-based tags (YYYYMMDD-sha)
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/mak011p/label-generator"],

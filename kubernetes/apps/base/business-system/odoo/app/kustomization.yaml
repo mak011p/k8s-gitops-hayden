@@ -6,7 +6,7 @@ kind: Kustomization
 resources:
   - configmap.yaml
   - externalsecret-ghcr.yaml
-  - externalsecret-backup.yaml
+  - secret-cnpg-minio.enc.age.yaml
   - secret-odoo-app.enc.age.yaml
   - secret-odoo-pg-superuser.enc.age.yaml
   - secret-odoo-pg-app.enc.age.yaml

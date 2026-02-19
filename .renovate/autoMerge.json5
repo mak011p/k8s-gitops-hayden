@@ -16,6 +16,13 @@
       automergeType: "pr",
       matchUpdateTypes: ["patch"],
       ignoreTests: true
+    },
+    {
+      description: "Disable automerge for production Odoo image (require manual merge)",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
+      matchFileNames: ["kubernetes/apps/base/business-system/odoo/**"],
+      automerge: false
     }
   ]
 }

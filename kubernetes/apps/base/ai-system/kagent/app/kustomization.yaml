@@ -8,10 +8,24 @@ resources:
   - helmrelease.yaml
   - ocirepository.yaml
   - httproute.yaml
+  - backendtrafficpolicy.yaml
   - securitypolicy.yaml
   - modelconfig.yaml
   - agent-flux-troubleshooter.yaml
+  - agent-odoo-assistant.yaml
   - secret-kagent-values.enc.age.yaml
+  # PostgreSQL MCP server for Odoo database read-only access
+  - postgres-mcp-deployment.yaml
+  - postgres-mcp-service.yaml
+  - postgres-mcp-remotemcpserver.yaml
+  - secret-postgres-mcp.enc.age.yaml
+  # Odoo XML-RPC MCP server
+  - odoo-mcp-deployment.yaml
+  - odoo-mcp-service.yaml
+  - odoo-mcp-remotemcpserver.yaml
+  - secret-odoo-mcp.enc.age.yaml
+  # Network isolation for MCP servers
+  - networkpolicy.yaml
 
 configMapGenerator:
   - name: kagent-values

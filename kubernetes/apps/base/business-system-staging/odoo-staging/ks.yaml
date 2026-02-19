@@ -10,10 +10,10 @@ spec:
     provider: sops
   interval: 30m
   retryInterval: 1m
-  timeout: 5m
+  timeout: 15m
   path: "./apps/base/business-system-staging/odoo-staging/app"
   prune: true
-  wait: false
+  wait: true
   sourceRef:
     kind: OCIRepository
     name: flux-system
@@ -27,5 +27,3 @@ spec:
       namespace: external-secrets
     - name: reflector
       namespace: kube-system
-    - name: odoo
-      namespace: business-system

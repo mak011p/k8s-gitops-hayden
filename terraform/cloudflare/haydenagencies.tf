@@ -231,6 +231,181 @@ resource "cloudflare_zone_settings_override" "haydenagencies" {
   }
 }
 
+# ==============================================
+# DNS Records - Email Authentication
+# ==============================================
+# IMPORTANT: The existing manual SPF and MX records in Cloudflare must be
+# imported into Terraform state OR deleted before applying, to avoid duplicates.
+#
+# Import commands (run once before terraform apply):
+#   terraform import cloudflare_record.haydenagencies_spf <zone_id>/<record_id>
+#   terraform import cloudflare_record.haydenagencies_mx_primary <zone_id>/<record_id>
+#   ... (repeat for each MX record)
+#
+# To find record IDs:
+#   curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+#     "https://api.cloudflare.com/client/v4/zones/012445366374fc5a3f865cc809e459e0/dns_records?type=TXT&name=haydenagencies.com.au" | jq '.result[] | {id, content}'
+#   curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+#     "https://api.cloudflare.com/client/v4/zones/012445366374fc5a3f865cc809e459e0/dns_records?type=MX" | jq '.result[] | {id, content, priority}'
+# ==============================================
+
+# Google site verification (existing)
+resource "cloudflare_record" "haydenagencies_google_verify_1" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "@"
+  content = "google-site-verification=em-7Bk9uutkzFwrufBgu_9cLjpa7WFQ_VaVOQ8-FpXo"
+  type    = "TXT"
+  ttl     = 3600
+  comment = "Google site verification"
+}
+
+resource "cloudflare_record" "haydenagencies_google_verify_2" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "@"
+  content = "google-site-verification=lB8iUqgQdshovh_76XdHdWB6XhGmQv1eAi1y_RZ0Rjw"
+  type    = "TXT"
+  ttl     = 3600
+  comment = "Google site verification (secondary)"
+}
+
+# MX Records - Google Workspace
+resource "cloudflare_record" "haydenagencies_mx_primary" {
+  zone_id  = local.haydenagencies_zone_id
+  name     = "@"
+  content  = "aspmx.l.google.com"
+  type     = "MX"
+  priority = 10
+  ttl      = 3600
+  comment  = "Google Workspace primary MX"
+}
+
+resource "cloudflare_record" "haydenagencies_mx_alt1" {
+  zone_id  = local.haydenagencies_zone_id
+  name     = "@"
+  content  = "alt1.aspmx.l.google.com"
+  type     = "MX"
+  priority = 20
+  ttl      = 3600
+  comment  = "Google Workspace alt1 MX"
+}
+
+resource "cloudflare_record" "haydenagencies_mx_alt2" {
+  zone_id  = local.haydenagencies_zone_id
+  name     = "@"
+  content  = "alt2.aspmx.l.google.com"
+  type     = "MX"
+  priority = 20
+  ttl      = 3600
+  comment  = "Google Workspace alt2 MX"
+}
+
+resource "cloudflare_record" "haydenagencies_mx_alt3" {
+  zone_id  = local.haydenagencies_zone_id
+  name     = "@"
+  content  = "alt3.aspmx.l.google.com"
+  type     = "MX"
+  priority = 30
+  ttl      = 3600
+  comment  = "Google Workspace alt3 MX"
+}
+
+resource "cloudflare_record" "haydenagencies_mx_alt4" {
+  zone_id  = local.haydenagencies_zone_id
+  name     = "@"
+  content  = "alt4.aspmx.l.google.com"
+  type     = "MX"
+  priority = 30
+  ttl      = 3600
+  comment  = "Google Workspace alt4 MX"
+}
+
+# SPF Record
+# Authorizes: SendGrid dedicated IP, SendGrid shared pool, Google Workspace, Migadu
+resource "cloudflare_record" "haydenagencies_spf" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "@"
+  content = "v=spf1 ip4:168.245.39.222 include:sendgrid.net include:_spf.google.com include:spf.migadu.com ~all"
+  type    = "TXT"
+  ttl     = 3600
+  comment = "SPF - SendGrid (168.245.39.222), Google Workspace, Migadu"
+}
+
+# DMARC Record
+# Start with p=none (monitoring) to collect reports, then tighten to quarantine/reject
+resource "cloudflare_record" "haydenagencies_dmarc" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "_dmarc"
+  content = "v=DMARC1; p=none; rua=mailto:dmarc-reports@haydenagencies.com.au; fo=1"
+  type    = "TXT"
+  ttl     = 3600
+  comment = "DMARC policy - monitoring mode (tighten to quarantine once aligned)"
+}
+
+# SendGrid Domain Authentication (DKIM + Return Path + Link Branding)
+resource "cloudflare_record" "haydenagencies_sendgrid_dkim_s1" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "s1._domainkey"
+  content = "s1.domainkey.u7591732.wl233.sendgrid.net"
+  type    = "CNAME"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid DKIM s1"
+}
+
+resource "cloudflare_record" "haydenagencies_sendgrid_dkim_s2" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "s2._domainkey"
+  content = "s2.domainkey.u7591732.wl233.sendgrid.net"
+  type    = "CNAME"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid DKIM s2"
+}
+
+resource "cloudflare_record" "haydenagencies_sendgrid_return_path" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "em8375"
+  content = "u7591732.wl233.sendgrid.net"
+  type    = "CNAME"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid return path (envelope-from alignment)"
+}
+
+# SendGrid Link Branding
+resource "cloudflare_record" "haydenagencies_sendgrid_link_url" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "url8530"
+  content = "sendgrid.net"
+  type    = "CNAME"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid link branding (tracking URLs)"
+}
+
+resource "cloudflare_record" "haydenagencies_sendgrid_link_id" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "7591732"
+  content = "sendgrid.net"
+  type    = "CNAME"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid link branding (domain verification)"
+}
+
+# SendGrid Reverse DNS (PTR) - proves dedicated IP belongs to our domain
+resource "cloudflare_record" "haydenagencies_sendgrid_rdns" {
+  zone_id = local.haydenagencies_zone_id
+  name    = "o2.ptr4780"
+  content = "168.245.39.222"
+  type    = "A"
+  ttl     = 3600
+  proxied = false
+  comment = "SendGrid reverse DNS for dedicated IP 168.245.39.222"
+}
+
+# ==============================================
+
 # NOTE: Argo Smart Routing cannot be managed via API token
 # It requires Argo subscription and special billing-level access
 # Manage via Cloudflare Dashboard instead

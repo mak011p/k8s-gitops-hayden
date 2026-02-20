@@ -23,7 +23,38 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
-    # Allow traffic from kagent-managed agent pods (odoo-assistant, flux-troubleshooter)
+    # Allow traffic from kagent-managed agent pods (odoo-assistant, flux-troubleshooter, sendgrid-assistant)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: kagent
+      ports:
+        - protocol: TCP
+          port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sendgrid-mcp-isolation
+  namespace: ai-system
+  labels:
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sendgrid-mcp
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from kagent helm release pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kagent
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow traffic from kagent-managed agent pods
     - from:
         - podSelector:
             matchLabels:

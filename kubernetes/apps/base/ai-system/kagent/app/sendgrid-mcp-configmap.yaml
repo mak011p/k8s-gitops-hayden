@@ -46,16 +46,18 @@ data:
         query: str,
         limit: int = 25,
     ) -> str:
-        """Search SendGrid email activity to find what happened to specific emails.
+        """Search SendGrid email activity (last 30 days only).
 
         The query parameter uses SendGrid query syntax. Examples:
         - to_email="user@example.com"
-        - subject="Order Confirmation"
-        - from_email="noreply@haydenagencies.com.au"
-        - last_event_time BETWEEN TIMESTAMP "2024-01-01" AND TIMESTAMP "2024-01-31"
-        - status="delivered" or status="bounce" or status="deferred"
+        - to_email="user@example.com" AND status="not_delivered"
+        - to_email="user@example.com" AND last_event_time BETWEEN TIMESTAMP "2026-01-01" AND TIMESTAMP "2026-01-31"
+        - from_email="sales@haydenagencies.com.au"
+        - status="delivered" or status="not_delivered" or status="processing"
+        - subject LIKE "%keyword%"
 
-        Combine with AND: to_email="user@example.com" AND status="bounce"
+        Note: Customer-facing transactional emails have generic subjects (no order numbers).
+        Search by to_email to find emails for a specific customer/order.
         """
         params = {"query": query, "limit": min(limit, 1000)}
         try:

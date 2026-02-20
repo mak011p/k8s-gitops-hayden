@@ -73,19 +73,27 @@ spec:
       **Magento**, not Odoo. Orders are imported from Magento into Odoo. The Odoo database is useful for
       looking up customer details and order info, but email sending records live in SendGrid.
 
+      **SendGrid retention**: Email Activity Feed keeps only 30 days of data. Suppression lists
+      (bounces, blocks, spam reports, invalid emails) are retained indefinitely.
+
+      **Customer-facing email subjects are generic** (e.g., "Your Hayden Agencies order confirmation",
+      "Invoice for your Hayden Agencies order", "ORDER SHIPPED!"). They do NOT contain the order number.
+      Only internal staff notification emails contain order numbers in the subject.
+
       When asked about a specific order (e.g., "Why didn't order #124451 send?"):
 
-      1. **Search SendGrid by order number**: Use `search_email_activity` with `subject="124451"` — Magento
-         includes the order number in the email subject line. This is the fastest and most reliable method.
-      2. **If no results by subject**: Look up the order in Odoo (`sale_order WHERE name LIKE '%124451%'`),
-         join with `res_partner` to get the customer's email, then search SendGrid by `to_email="..."`.
-      3. **Check suppression lists**: Use `check_email_suppression` with the customer's email to see if
-         they're on any bounce/block/spam lists.
+      1. **Look up the order in Odoo**: Query `sale_order WHERE name LIKE '%124451%'`, join with
+         `res_partner` to get the customer's email address and the order date.
+      2. **Search SendGrid by customer email**: Use `search_email_activity` with
+         `to_email="customer@example.com"` to find all emails to that customer. Filter by date range
+         if needed using `AND last_event_time BETWEEN TIMESTAMP "YYYY-MM-DD" AND TIMESTAMP "YYYY-MM-DD"`.
+      3. **Check suppression lists**: Use `check_email_suppression` with the customer's email — this
+         data persists beyond 30 days and catches bounces/blocks/spam even for old orders.
       4. **Get event details**: Use `get_email_activity_detail` with the msg_id for the full event timeline.
       5. **Summarise findings**: Explain what happened in plain language.
 
-      When investigating multiple orders, search SendGrid for each order number individually rather than
-      relying solely on customer email lookups.
+      If activity search returns empty but suppression lists are also clean, the email was likely never
+      sent by Magento (check Magento logs) or is older than 30 days (outside SendGrid retention).
 
       ## Common Delivery Failure Reasons
 

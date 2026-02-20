@@ -431,6 +431,7 @@ dependsOn:
 - **Chart sources**: Uses OCIRepository instead of HelmRepository
 - **Yamllint config**: Line length warning at 240 characters, 2-space indentation
 - **Renovate automation**: Auto-merge enabled for digests, ignores encrypted files
+  - **Odoo image updates create TWO PRs** (via `.renovate/groups.json5`): staging (auto-merges) and production (manual merge required). Never merge the production Odoo PR without user approval.
 - **Multi-cluster ready**: Designed with overlay pattern for multiple clusters
 - **Enterprise patterns**: Production-grade GitOps implementation showcasing CNCF ecosystem
 

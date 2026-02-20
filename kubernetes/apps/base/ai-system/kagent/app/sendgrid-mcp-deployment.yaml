@@ -44,6 +44,7 @@ spec:
                   return _orig_init(self, *args, **kwargs)
               fastmcp_mod.FastMCP.__init__ = _patched_init
               exec(open('/app/server.py').read())
+              mcp.run()
               "
           env:
             - name: UV_CACHE_DIR

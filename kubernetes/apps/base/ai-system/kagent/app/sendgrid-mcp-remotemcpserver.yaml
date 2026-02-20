@@ -1,0 +1,10 @@
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: sendgrid-mcp
+  namespace: ai-system
+spec:
+  description: SendGrid v3 API MCP server for email delivery diagnostics
+  protocol: STREAMABLE_HTTP
+  url: http://sendgrid-mcp.ai-system:8000/mcp

@@ -13,6 +13,7 @@ resources:
   - modelconfig.yaml
   - agent-flux-troubleshooter.yaml
   - agent-odoo-assistant.yaml
+  - agent-sendgrid-assistant.yaml
   - secret-kagent-values.enc.age.yaml
   # PostgreSQL MCP server for Odoo database read-only access
   - postgres-mcp-deployment.yaml
@@ -24,6 +25,12 @@ resources:
   - odoo-mcp-service.yaml
   - odoo-mcp-remotemcpserver.yaml
   - secret-odoo-mcp.enc.age.yaml
+  # SendGrid MCP server for email delivery diagnostics
+  - sendgrid-mcp-configmap.yaml
+  - sendgrid-mcp-deployment.yaml
+  - sendgrid-mcp-service.yaml
+  - sendgrid-mcp-remotemcpserver.yaml
+  - externalsecret-sendgrid.yaml
   # Network isolation for MCP servers
   - networkpolicy.yaml
 

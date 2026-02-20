@@ -43,7 +43,7 @@ spec:
   values:
     image:
       repository: chatwoot/chatwoot
-      tag: v4.11.0
+      tag: v4.11.1
       pullPolicy: IfNotPresent
 
     # Puma web server tuning - fork 2 worker processes per pod

@@ -104,6 +104,16 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: sendgrid-mcp
+          toolNames:
+            - search_email_activity
+            - get_email_activity_detail
+            - get_bounces
+            - get_blocks
+            - get_spam_reports
+            - get_invalid_emails
+            - get_global_stats
+            - get_suppression_groups
+            - check_email_suppression
         type: McpServer
       # PostgreSQL read-only tools (for order/customer lookups)
       - mcpServer:

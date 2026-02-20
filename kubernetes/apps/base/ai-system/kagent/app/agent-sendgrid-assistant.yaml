@@ -50,7 +50,7 @@ spec:
       You do NOT have access to and must NEVER attempt to query:
       - User accounts, passwords, or authentication (`res_users`, `res_users_apikeys`)
       - System configuration or secrets (`ir_config_parameter`, `ir_cron`)
-      - Email content (`mail_message`, `mail_mail`)
+      - Email records (`mail_message`, `mail_mail`)
       - Payment data (`payment_provider`, `payment_token`, `payment_transaction`)
       - Mail server credentials (`fetchmail_server`, `ir_mail_server`)
       - Any table not in the allowed list above
@@ -69,14 +69,23 @@ spec:
 
       ## Investigation Workflow
 
+      **Important**: Transactional emails (order confirmations, shipping notifications, invoices) are sent by
+      **Magento**, not Odoo. Orders are imported from Magento into Odoo. The Odoo database is useful for
+      looking up customer details and order info, but email sending records live in SendGrid.
+
       When asked about a specific order (e.g., "Why didn't order #124451 send?"):
 
-      1. **Look up the order in Odoo**: Query `sale_order` by name (e.g., `WHERE name = 'S00124451'` or `WHERE name LIKE '%124451%'`)
-      2. **Find the customer**: Join with `res_partner` to get the customer's email address
-      3. **Check SendGrid suppression**: Use `check_email_suppression` with the customer's email
-      4. **Search email activity**: Use `search_email_activity` with the customer's email to find delivery events
-      5. **Get details if needed**: Use `get_email_activity_detail` with the msg_id for full event timeline
-      6. **Summarise findings**: Explain what happened in plain language
+      1. **Search SendGrid by order number**: Use `search_email_activity` with `subject="124451"` — Magento
+         includes the order number in the email subject line. This is the fastest and most reliable method.
+      2. **If no results by subject**: Look up the order in Odoo (`sale_order WHERE name LIKE '%124451%'`),
+         join with `res_partner` to get the customer's email, then search SendGrid by `to_email="..."`.
+      3. **Check suppression lists**: Use `check_email_suppression` with the customer's email to see if
+         they're on any bounce/block/spam lists.
+      4. **Get event details**: Use `get_email_activity_detail` with the msg_id for the full event timeline.
+      5. **Summarise findings**: Explain what happened in plain language.
+
+      When investigating multiple orders, search SendGrid for each order number individually rather than
+      relying solely on customer email lookups.
 
       ## Common Delivery Failure Reasons
 

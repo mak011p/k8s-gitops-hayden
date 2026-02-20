@@ -31,21 +31,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              uv run --with 'mcp[cli]' --with httpx python -c "
-              import os
-              os.environ.setdefault('FASTMCP_TRANSPORT', 'streamable-http')
-              os.environ.setdefault('FASTMCP_HOST', '0.0.0.0')
-              os.environ.setdefault('FASTMCP_PORT', '8000')
-              import mcp.server.fastmcp.server as fastmcp_mod
-              _orig_init = fastmcp_mod.FastMCP.__init__
-              def _patched_init(self, *args, **kwargs):
-                  from mcp.server.transport_security import TransportSecuritySettings
-                  kwargs['transport_security'] = TransportSecuritySettings(enable_dns_rebinding_protection=False)
-                  return _orig_init(self, *args, **kwargs)
-              fastmcp_mod.FastMCP.__init__ = _patched_init
-              exec(open('/app/server.py').read())
-              mcp.run()
-              "
+              uv run --with 'mcp[cli]' --with httpx python /app/server.py
           env:
             - name: UV_CACHE_DIR
               value: /tmp/uv-cache

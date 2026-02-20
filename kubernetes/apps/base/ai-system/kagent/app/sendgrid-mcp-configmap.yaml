@@ -15,6 +15,7 @@ data:
 
     import httpx
     from mcp.server.fastmcp import FastMCP
+    from mcp.server.transport_security import TransportSecuritySettings
 
     SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
     BASE_URL = "https://api.sendgrid.com"
@@ -23,7 +24,14 @@ data:
         "Content-Type": "application/json",
     }
 
-    mcp = FastMCP("sendgrid-mcp")
+    mcp = FastMCP(
+        "sendgrid-mcp",
+        host="0.0.0.0",
+        port=8000,
+        transport_security=TransportSecuritySettings(
+            enable_dns_rebinding_protection=False,
+        ),
+    )
 
 
     async def _get(path: str, params: Optional[dict] = None) -> dict:
@@ -291,4 +299,4 @@ data:
 
 
     if __name__ == "__main__":
-        mcp.run()
+        mcp.run(transport="streamable-http")

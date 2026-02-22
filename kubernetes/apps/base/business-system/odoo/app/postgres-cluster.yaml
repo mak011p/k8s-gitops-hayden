@@ -15,6 +15,17 @@ spec:
   enableSuperuserAccess: true
   superuserSecret:
     name: odoo-pg-superuser
+  managed:
+    roles:
+      - name: kagent_readonly
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+        connectionLimit: 5
+        passwordSecret:
+          name: odoo-pg-kagent-readonly
   monitoring:
     enablePodMonitor: true
   bootstrap:

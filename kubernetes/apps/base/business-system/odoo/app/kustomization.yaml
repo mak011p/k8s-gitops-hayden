@@ -10,6 +10,7 @@ resources:
   - secret-odoo-app.enc.age.yaml
   - secret-odoo-pg-superuser.enc.age.yaml
   - secret-odoo-pg-app.enc.age.yaml
+  - secret-odoo-pg-kagent-readonly.enc.age.yaml
   - helmrelease.yaml
   - ocirepository.yaml
   - postgres-cluster.yaml

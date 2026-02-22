@@ -50,7 +50,15 @@ spec:
       If asked about data in blocked tables, explain that you don't have access to that information for security reasons.
 
       #### SQL Rules
-      - Always use `WHERE active = true` unless specifically asked about archived records
+      - The `active` column only exists on some tables. Add `WHERE active = true` when querying
+        these tables (unless specifically asked about archived records):
+        `res_partner`, `res_partner_category`, `res_company`, `res_currency`, `product_product`,
+        `product_template`, `product_pricelist`, `delivery_carrier`, `project_project`,
+        `project_task`, `account_journal`, `stock_location`, `stock_warehouse`, `uom_uom`.
+        Do NOT add `active = true` to tables that lack it — including `sale_order`,
+        `sale_order_line`, `account_move`, `account_move_line`, `purchase_order`,
+        `stock_picking`, `stock_move`, `queue_job`, `ir_logging`, and all `*_line`/`*_rate`
+        tables — or the query will error with "column does not exist".
       - State fields: sale_order.state in ('draft','sent','sale','done','cancel'),
         account_move.state in ('draft','posted','cancel'), stock_picking.state in ('draft','waiting','confirmed','assigned','done','cancel')
       - **MANDATORY**: Every SELECT query MUST include a LIMIT clause (max 500 rows)

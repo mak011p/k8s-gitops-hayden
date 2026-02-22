@@ -58,7 +58,11 @@ spec:
       If asked about data in blocked tables, explain that you don't have access to that information for security reasons.
 
       #### SQL Rules
-      - Always use `WHERE active = true` unless specifically asked about archived records
+      - Only `res_partner` and `res_company` have an `active` column — add `WHERE active = true`
+        when querying those tables (unless specifically asked about archived records).
+        Do NOT add `active = true` to `sale_order`, `sale_order_line`, `account_move`,
+        `account_move_line`, `res_country`, or `res_country_state` — they have no such column
+        and the query will error.
       - State fields: sale_order.state in ('draft','sent','sale','done','cancel'),
         account_move.state in ('draft','posted','cancel')
       - **MANDATORY**: Every SELECT query MUST include a LIMIT clause (max 500 rows)

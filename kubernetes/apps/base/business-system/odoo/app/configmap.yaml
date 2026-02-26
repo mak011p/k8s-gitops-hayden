@@ -50,6 +50,7 @@ data:
     # Deployment settings
     proxy_mode = True
     list_db = False
+    without_demo = all
 
     # Queue Job Configuration
     [queue_job]

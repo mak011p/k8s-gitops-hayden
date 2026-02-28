@@ -58,7 +58,7 @@ spec:
                 addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
                 data_dir = /var/lib/odoo
                 EOF
-                exec click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}"
+                exec click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" --update-all
             env:
               - name: POSTGRES_USER
                 valueFrom:

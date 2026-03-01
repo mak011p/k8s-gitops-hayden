@@ -65,7 +65,9 @@ spec:
                 CUSTOM_ADDONS=$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
                   -exec dirname {} \; | xargs -n1 basename | sort | paste -sd,)
                 echo "Installing/upgrading custom addons: $${CUSTOM_ADDONS}"
-                exec odoo -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${CUSTOM_ADDONS}" --stop-after-init --no-http
+                # Increase recursion limit for mail.thread._track_prepare during module install
+                exec python3 -c "import sys; sys.setrecursionlimit(5000); from odoo.cli import main; main()" \
+                  -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${CUSTOM_ADDONS}" --stop-after-init --no-http
             env:
               - name: POSTGRES_USER
                 valueFrom:

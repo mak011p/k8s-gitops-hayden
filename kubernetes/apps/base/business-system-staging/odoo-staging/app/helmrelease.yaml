@@ -55,16 +55,21 @@ spec:
                 ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons"
                 DB_HOST="odoo-pg-staging-rw.business-system-staging.svc.cluster.local"
 
-                cat > /tmp/upgrade.conf << EOF
-                [options]
-                db_host = ${DB_HOST}
-                db_port = 5432
-                db_user = $${POSTGRES_USER}
-                db_password = $${POSTGRES_PASSWORD}
-                addons_path = ${ADDONS_PATH}
-                data_dir = /var/lib/odoo
-                EOF
-                sed -i 's/^[[:space:]]*//' /tmp/upgrade.conf
+                python3 -c "
+                import configparser, os
+                cfg = configparser.ConfigParser()
+                cfg['options'] = {
+                    'db_host': '${DB_HOST}',
+                    'db_port': '5432',
+                    'db_user': os.environ['POSTGRES_USER'],
+                    'db_password': os.environ['POSTGRES_PASSWORD'],
+                    'addons_path': '${ADDONS_PATH}',
+                    'data_dir': '/var/lib/odoo',
+                }
+                with open('/tmp/upgrade.conf', 'w') as f:
+                    cfg.write(f)
+                "
+                echo "Generated config:"; cat /tmp/upgrade.conf
 
                 # --- Step 1: Detect and install NEW modules only ---
                 # Find all custom addon names on the filesystem

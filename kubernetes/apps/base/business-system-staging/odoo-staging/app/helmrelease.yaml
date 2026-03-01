@@ -11,7 +11,7 @@ spec:
     kind: OCIRepository
     name: odoo-staging
   install:
-    timeout: 10m
+    timeout: 15m
     replace: true
     crds: CreateReplace
     createNamespace: true
@@ -19,7 +19,7 @@ spec:
       name: RetryOnFailure
       retryInterval: 5m
   upgrade:
-    timeout: 10m
+    timeout: 15m
     remediation:
       remediateLastFailure: true
       retries: 3
@@ -50,24 +50,58 @@ spec:
             command: ["sh", "-c"]
             args:
               - |
+                set -e
+
+                ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons"
+                DB_HOST="odoo-pg-staging-rw.business-system-staging.svc.cluster.local"
+
                 cat > /tmp/upgrade.conf << EOF
                 [options]
-                db_host = odoo-pg-staging-rw.business-system-staging.svc.cluster.local
+                db_host = ${DB_HOST}
                 db_port = 5432
                 db_user = $${POSTGRES_USER}
                 db_password = $${POSTGRES_PASSWORD}
-                addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
+                addons_path = ${ADDONS_PATH}
                 data_dir = /var/lib/odoo
                 EOF
 
-                # Auto-install new + upgrade all custom addons (staging only)
-                # odoo -i is idempotent: installs new modules, upgrades existing ones
-                CUSTOM_ADDONS=$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
-                  -exec dirname {} \; | xargs -n1 basename | sort | paste -sd,)
-                echo "Installing/upgrading custom addons: $${CUSTOM_ADDONS}"
-                # Increase recursion limit for mail.thread._track_prepare during module install
-                exec python3 -c "import sys; sys.setrecursionlimit(5000); from odoo.cli import main; main()" \
-                  -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${CUSTOM_ADDONS}" --stop-after-init --no-http
+                # --- Step 1: Detect and install NEW modules only ---
+                # Find all custom addon names on the filesystem
+                FS_ADDONS=$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
+                  -exec dirname {} \; | xargs -n1 basename | sort)
+
+                # Query DB for already-known modules (installed or uninstalled)
+                DB_ADDONS=$(python3 -c "
+                import psycopg2
+                conn = psycopg2.connect(host='${DB_HOST}', port=5432,
+                    user='$${POSTGRES_USER}', password='$${POSTGRES_PASSWORD}',
+                    dbname='$${POSTGRES_DB}')
+                cr = conn.cursor()
+                cr.execute(\"SELECT name FROM ir_module_module\")
+                print('\n'.join(r[0] for r in cr.fetchall()))
+                conn.close()
+                " 2>/dev/null || echo "")
+
+                # Find modules on filesystem but not in DB = truly new
+                NEW_ADDONS=""
+                for mod in ${FS_ADDONS}; do
+                  if ! echo "$${DB_ADDONS}" | grep -qx "$${mod}"; then
+                    NEW_ADDONS="$${NEW_ADDONS:+$${NEW_ADDONS},}$${mod}"
+                  fi
+                done
+
+                if [ -n "$${NEW_ADDONS}" ]; then
+                  echo "Installing NEW modules: $${NEW_ADDONS}"
+                  python3 -c "import sys; sys.setrecursionlimit(5000); from odoo.cli import main; main()" \
+                    -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${NEW_ADDONS}" --stop-after-init --no-http
+                else
+                  echo "No new modules to install."
+                fi
+
+                # --- Step 2: Upgrade changed modules (checksum-based) ---
+                echo "Running click-odoo-update (checksum-based upgrade)..."
+                click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}"
+                echo "Init complete."
             env:
               - name: POSTGRES_USER
                 valueFrom:

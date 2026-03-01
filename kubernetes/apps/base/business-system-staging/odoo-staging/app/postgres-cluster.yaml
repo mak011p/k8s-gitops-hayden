@@ -35,7 +35,7 @@ spec:
         wal:
           maxParallel: 4
   storage:
-    size: 20Gi
+    size: 40Gi
     storageClass: ceph-block
   walStorage:
     size: 10Gi

@@ -11,7 +11,7 @@ spec:
     kind: OCIRepository
     name: odoo-staging
   install:
-    timeout: 15m
+    timeout: 10m
     replace: true
     crds: CreateReplace
     createNamespace: true
@@ -19,7 +19,7 @@ spec:
       name: RetryOnFailure
       retryInterval: 5m
   upgrade:
-    timeout: 15m
+    timeout: 10m
     remediation:
       remediateLastFailure: true
       retries: 3
@@ -42,95 +42,6 @@ spec:
       *app :
         replicas: 1
         strategy: Recreate
-        initContainers:
-          auto-upgrade:
-            image:
-              repository: ghcr.io/hayden-agencies/odoo
-              tag: 18.0.20260301.0600-fd489bb@sha256:302a0a0b82bd4c9faf183a17f0f8d23cb231c268de151b9078ffb67bc88fc613
-            command: ["sh", "-c"]
-            args:
-              - |
-                set -e
-
-                python3 -c "
-                import configparser, os
-                cfg = configparser.ConfigParser()
-                cfg['options'] = {
-                    'db_host': os.environ['DB_HOST'],
-                    'db_port': '5432',
-                    'db_user': os.environ['POSTGRES_USER'],
-                    'db_password': os.environ['POSTGRES_PASSWORD'],
-                    'addons_path': os.environ['ADDONS_PATH'],
-                    'data_dir': '/var/lib/odoo',
-                }
-                with open('/tmp/upgrade.conf', 'w') as f:
-                    cfg.write(f)
-                "
-
-                # --- Step 1: Detect and install NEW modules only ---
-                FS_ADDONS=$$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
-                  -exec dirname {} \; | xargs -n1 basename | sort)
-
-                DB_ADDONS=$$(python3 -c "
-                import psycopg2, os
-                conn = psycopg2.connect(host=os.environ['DB_HOST'], port=5432,
-                    user=os.environ['POSTGRES_USER'], password=os.environ['POSTGRES_PASSWORD'],
-                    dbname=os.environ['POSTGRES_DB'])
-                cr = conn.cursor()
-                cr.execute(\"SELECT name FROM ir_module_module\")
-                print('\n'.join(r[0] for r in cr.fetchall()))
-                conn.close()
-                " 2>/dev/null || echo "")
-
-                NEW_ADDONS=""
-                for mod in $${FS_ADDONS}; do
-                  if ! echo "$${DB_ADDONS}" | grep -qx "$${mod}"; then
-                    NEW_ADDONS="$${NEW_ADDONS:+$${NEW_ADDONS},}$${mod}"
-                  fi
-                done
-
-                if [ -n "$${NEW_ADDONS}" ]; then
-                  echo "Installing NEW modules: $${NEW_ADDONS}"
-                  python3 -c "import sys; sys.setrecursionlimit(5000); from odoo.cli import main; main()" \
-                    -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${NEW_ADDONS}" --stop-after-init --no-http
-                else
-                  echo "No new modules to install."
-                fi
-
-                # --- Step 2: Upgrade changed modules (checksum-based) ---
-                echo "Running click-odoo-update (checksum-based upgrade)..."
-                click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}"
-                echo "Init complete."
-            env:
-              - name: DB_HOST
-                value: odoo-pg-staging-rw.business-system-staging.svc.cluster.local
-              - name: ADDONS_PATH
-                value: /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
-              - name: POSTGRES_USER
-                valueFrom:
-                  secretKeyRef:
-                    name: odoo-pg-app
-                    key: username
-              - name: POSTGRES_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: odoo-pg-app
-                    key: password
-              - name: POSTGRES_DB
-                valueFrom:
-                  secretKeyRef:
-                    name: odoo-pg-app
-                    key: dbname
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 250m
-                memory: 1Gi
-              limits:
-                memory: 4Gi
         containers:
           app:
             image:

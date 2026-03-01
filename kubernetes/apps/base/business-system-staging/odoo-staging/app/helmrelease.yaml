@@ -58,7 +58,13 @@ spec:
                 addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
                 data_dir = /var/lib/odoo
                 EOF
-                exec click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" --update-all
+
+                # Auto-install new + upgrade all custom addons (staging only)
+                # odoo -i is idempotent: installs new modules, upgrades existing ones
+                CUSTOM_ADDONS=$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
+                  -exec dirname {} \; | xargs -n1 basename | sort | paste -sd,)
+                echo "Installing/upgrading custom addons: $${CUSTOM_ADDONS}"
+                exec odoo -c /tmp/upgrade.conf -d "$${POSTGRES_DB}" -i "$${CUSTOM_ADDONS}" --stop-after-init --no-http
             env:
               - name: POSTGRES_USER
                 valueFrom:

@@ -52,45 +52,38 @@ spec:
               - |
                 set -e
 
-                ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons"
-                DB_HOST="odoo-pg-staging-rw.business-system-staging.svc.cluster.local"
-
                 python3 -c "
                 import configparser, os
                 cfg = configparser.ConfigParser()
                 cfg['options'] = {
-                    'db_host': '${DB_HOST}',
+                    'db_host': os.environ['DB_HOST'],
                     'db_port': '5432',
                     'db_user': os.environ['POSTGRES_USER'],
                     'db_password': os.environ['POSTGRES_PASSWORD'],
-                    'addons_path': '${ADDONS_PATH}',
+                    'addons_path': os.environ['ADDONS_PATH'],
                     'data_dir': '/var/lib/odoo',
                 }
                 with open('/tmp/upgrade.conf', 'w') as f:
                     cfg.write(f)
                 "
-                echo "Generated config:"; cat /tmp/upgrade.conf
 
                 # --- Step 1: Detect and install NEW modules only ---
-                # Find all custom addon names on the filesystem
-                FS_ADDONS=$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
+                FS_ADDONS=$$(find /mnt/extra-addons/custom -maxdepth 2 -name '__manifest__.py' \
                   -exec dirname {} \; | xargs -n1 basename | sort)
 
-                # Query DB for already-known modules (installed or uninstalled)
-                DB_ADDONS=$(python3 -c "
-                import psycopg2
-                conn = psycopg2.connect(host='${DB_HOST}', port=5432,
-                    user='$${POSTGRES_USER}', password='$${POSTGRES_PASSWORD}',
-                    dbname='$${POSTGRES_DB}')
+                DB_ADDONS=$$(python3 -c "
+                import psycopg2, os
+                conn = psycopg2.connect(host=os.environ['DB_HOST'], port=5432,
+                    user=os.environ['POSTGRES_USER'], password=os.environ['POSTGRES_PASSWORD'],
+                    dbname=os.environ['POSTGRES_DB'])
                 cr = conn.cursor()
                 cr.execute(\"SELECT name FROM ir_module_module\")
                 print('\n'.join(r[0] for r in cr.fetchall()))
                 conn.close()
                 " 2>/dev/null || echo "")
 
-                # Find modules on filesystem but not in DB = truly new
                 NEW_ADDONS=""
-                for mod in ${FS_ADDONS}; do
+                for mod in $${FS_ADDONS}; do
                   if ! echo "$${DB_ADDONS}" | grep -qx "$${mod}"; then
                     NEW_ADDONS="$${NEW_ADDONS:+$${NEW_ADDONS},}$${mod}"
                   fi
@@ -109,6 +102,10 @@ spec:
                 click-odoo-update -c /tmp/upgrade.conf -d "$${POSTGRES_DB}"
                 echo "Init complete."
             env:
+              - name: DB_HOST
+                value: odoo-pg-staging-rw.business-system-staging.svc.cluster.local
+              - name: ADDONS_PATH
+                value: /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/custom,/mnt/extra-addons/vendor-oca,/mnt/extra-addons/vendor-ventor,/mnt/enterprise-addons
               - name: POSTGRES_USER
                 valueFrom:
                   secretKeyRef:

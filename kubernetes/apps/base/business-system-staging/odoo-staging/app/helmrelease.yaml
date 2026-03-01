@@ -64,6 +64,7 @@ spec:
                 addons_path = ${ADDONS_PATH}
                 data_dir = /var/lib/odoo
                 EOF
+                sed -i 's/^[[:space:]]*//' /tmp/upgrade.conf
 
                 # --- Step 1: Detect and install NEW modules only ---
                 # Find all custom addon names on the filesystem

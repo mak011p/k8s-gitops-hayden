@@ -3,8 +3,9 @@
 # This creates:
 # - Pub/Sub topic for budget alert notifications
 # - Cloud Function (Gen2) that disables project billing when cost >= 100% of budget
-# - Billing budget at $200 AUD/month with alerts at 50%, 80%, 100%
+# - Billing budget at $350 AUD/month with alerts at 50%, 80%, 100%
 # - IAM binding so the Cloud Function SA can disable billing
+# - BigQuery dataset for billing export (US multi-region, required by GCP)
 #
 # IMPORTANT: If this function triggers, ALL GCP services will stop.
 # Re-enable billing manually in the GCP Console to restore services.
@@ -21,6 +22,7 @@ resource "google_project_service" "billing_guard" {
     "run.googleapis.com",
     "eventarc.googleapis.com",
     "billingbudgets.googleapis.com",
+    "bigquery.googleapis.com",
   ])
 
   project = var.project_id
@@ -94,6 +96,12 @@ def stop_billing(data, context):
     if ratio >= BUDGET_THRESHOLD:
         print(f"THRESHOLD EXCEEDED ({ratio:.2%} >= {BUDGET_THRESHOLD:.0%}). DISABLING BILLING.")
         billing = discovery.build("cloudbilling", "v1", cache_discovery=False)
+        # Idempotency guard: skip if billing is already disabled (prevents redundant API calls
+        # during Pub/Sub message bursts, e.g. after billing is re-enabled by admin)
+        current_info = billing.projects().getBillingInfo(name=f"projects/{PROJECT_ID}").execute()
+        if not current_info.get("billingEnabled", False):
+            print("Billing already disabled. No action.")
+            return
         billing_info = (
             billing.projects()
             .updateBillingInfo(
@@ -212,4 +220,20 @@ resource "google_billing_budget" "monthly_cap" {
   all_updates_rule {
     pubsub_topic = google_pubsub_topic.billing_alerts.id
   }
+}
+
+# -----------------------------------------------------------------------------
+# BigQuery Dataset for Billing Export
+# GCP billing export requires a multi-region dataset (US or EU).
+# Connect in GCP Console: Billing → Export → Standard usage cost → Edit Settings
+# → Project: hayden-agencies-infra, Dataset: gcp_billing_export
+# -----------------------------------------------------------------------------
+
+resource "google_bigquery_dataset" "billing_export" {
+  dataset_id  = "gcp_billing_export"
+  project     = var.project_id
+  location    = "US"
+  description = "GCP billing export data — connect in GCP Console Billing → Export"
+
+  delete_contents_on_destroy = false
 }

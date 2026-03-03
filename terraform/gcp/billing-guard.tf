@@ -3,7 +3,7 @@
 # This creates:
 # - Pub/Sub topic for budget alert notifications
 # - Cloud Function (Gen2) that disables project billing when cost >= 100% of budget
-# - Billing budget at $350 AUD/month with alerts at 50%, 80%, 100%
+# - Billing budget at $200 AUD/month with alerts at 50%, 80%, 100%
 # - IAM binding so the Cloud Function SA can disable billing
 # - BigQuery dataset for billing export (US multi-region, required by GCP)
 #
@@ -189,7 +189,7 @@ data "google_compute_default_service_account" "default" {
 
 resource "google_billing_budget" "monthly_cap" {
   billing_account = var.billing_account
-  display_name    = "GCS Cost Cap - Kill at 350AUD"
+  display_name    = "GCS Cost Cap - Kill at 200AUD"
 
   budget_filter {
     projects = ["projects/${var.project_id}"]
@@ -198,7 +198,7 @@ resource "google_billing_budget" "monthly_cap" {
   amount {
     specified_amount {
       currency_code = "AUD"
-      units         = "350"
+      units         = "200"
     }
   }
 

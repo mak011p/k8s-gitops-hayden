@@ -54,7 +54,7 @@ jobs:
           # renovate: datasource=github-releases depName=aquasecurity/trivy
           TRIVY_VERSION=v0.69.1
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+            | sudo -E sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
           trivy --version
 
       - name: Run Trivy IaC scan (SARIF)

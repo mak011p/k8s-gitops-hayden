@@ -2,11 +2,11 @@
 -- Run this ONCE after CNPG creates the role via managed.roles
 --
 -- Usage:
---   kubectl exec -it odoo-pg-staging-1 -n business-system-staging -c postgres -- \
+--   kubectl exec -it odoo-pg-1 -n business-system -c postgres -- \
 --     psql -U postgres -d prod -f /dev/stdin < pg-kagent-grants.sql
 --
 -- Or inline:
---   kubectl exec -it odoo-pg-staging-1 -n business-system-staging -c postgres -- \
+--   kubectl exec -it odoo-pg-1 -n business-system -c postgres -- \
 --     psql -U postgres -d prod -c "$(cat pg-kagent-grants.sql)"
 
 -- Anti-extraction: role-level resource limits

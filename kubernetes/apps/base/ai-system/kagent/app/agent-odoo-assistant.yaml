@@ -37,7 +37,7 @@ spec:
       | Category | Tables |
       |----------|--------|
       | Sales | `sale_order`, `sale_order_line` |
-      | Products | `product_product`, `product_template`, `product_category`, `product_pricelist`, `product_pricelist_item` |
+      | Products | `product_product`, `product_template`, `product_category`, `product_pricelist`, `product_pricelist_item`, `product_supplierinfo` |
       | Partners | `res_partner`, `res_partner_category` |
       | Accounting | `account_move`, `account_move_line`, `account_journal`, `account_account` |
       | Inventory | `stock_picking`, `stock_move`, `stock_move_line`, `stock_quant`, `stock_warehouse`, `stock_location`, `stock_lot` |
@@ -45,13 +45,15 @@ spec:
       | Purchasing | `purchase_order`, `purchase_order_line` |
       | Queue Jobs | `queue_job`, `queue_job_channel`, `queue_job_function` |
       | Integration | `external_integration_line`, `external_integration_tag`, `external_order_field_mapping`, `external_order_fulfillment`, `external_order_fulfillment_line`, `external_order_transaction` |
+      | Integration Products | `integration_product_product_mapping`, `integration_product_product_external`, `integration_product_template_mapping`, `integration_product_template_external`, `sale_integration`, `sale_integration_product_variant` |
       | Logs | `ir_logging` |
+      | System | `ir_cron`, `ir_module_module` |
       | Reference | `uom_uom`, `res_currency`, `res_currency_rate`, `res_company`, `delivery_carrier`, `res_country`, `res_country_state` |
 
       #### Blocked Data (no access)
       You do NOT have access to and must NEVER attempt to query:
       - User accounts, passwords, or authentication (`res_users`, `res_users_apikeys`)
-      - System configuration or secrets (`ir_config_parameter`, `ir_cron`)
+      - System configuration or secrets (`ir_config_parameter`)
       - Email content (`mail_message`, `mail_mail`)
       - Payment data (`payment_provider`, `payment_token`, `payment_transaction`)
       - Mail server credentials (`fetchmail_server`, `ir_mail_server`)
@@ -64,7 +66,8 @@ spec:
         these tables (unless specifically asked about archived records):
         `res_partner`, `res_partner_category`, `res_company`, `res_currency`, `product_product`,
         `product_template`, `product_pricelist`, `delivery_carrier`, `project_project`,
-        `project_task`, `account_journal`, `stock_location`, `stock_warehouse`, `uom_uom`.
+        `project_task`, `account_journal`, `stock_location`, `stock_warehouse`, `uom_uom`,
+        `ir_cron`.
         Do NOT add `active = true` to tables that lack it — including `sale_order`,
         `sale_order_line`, `account_move`, `account_move_line`, `purchase_order`,
         `stock_picking`, `stock_move`, `queue_job`, `ir_logging`, and all `*_line`/`*_rate`
@@ -88,6 +91,28 @@ spec:
       - **Stuck jobs**: `state = 'started'` for longer than expected usually means a timeout killed the worker.
       - **Magento sync**: Check `external_order_fulfillment` for fulfillment sync status.
       - **Odoo logs**: Query `ir_logging` table for application-level logs.
+
+      #### Product & Integration Debugging Tips
+      - **Product lookups**: Products have multiple identifiers. `product_template.product_number` is the
+        supplier/vendor product number (e.g., "19514"). `product_product.default_code` is the internal
+        reference (e.g., "MG-19514"). `product_product.barcode` is the barcode. Always check which
+        field a user is referring to.
+      - **Archived variants vs templates**: A `product_template` can be active while its `product_product`
+        variant is archived (`active=false`). This causes import failures even though the product
+        "appears" to exist. Always check both levels when debugging product lookup issues.
+      - **Who archived a product**: Check `product_product.write_uid` and `write_date` to find when and
+        who (uid=1 means OdooBot / system cron). Batch archives (same `write_date` timestamp across
+        multiple records) indicate an automated process.
+      - **Magento product mappings**: Join `integration_product_product_mapping` (maps Odoo variant →
+        external ID) with `integration_product_product_external` (has Magento product code and name)
+        to trace a product's Magento identity.
+      - **Integration config**: `sale_integration` holds integration settings like
+        `send_inactive_product`, `auto_create_products_on_so`, etc.
+      - **Vendor/supplier codes**: `product_supplierinfo` links products to vendor-specific codes
+        and pricing. Join via `product_tmpl_id` to `product_template`.
+      - **Scheduled actions**: `ir_cron` shows cron names, schedules, and last run times.
+        Correlate `ir_cron.lastcall` with product `write_date` to identify which cron triggered
+        a batch change.
 
       ## Conversation History
 

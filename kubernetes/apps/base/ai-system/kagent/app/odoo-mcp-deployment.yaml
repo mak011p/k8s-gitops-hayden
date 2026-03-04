@@ -55,7 +55,7 @@ spec:
             - name: HOME
               value: /tmp
             - name: ODOO_URL
-              value: http://odoo-staging.business-system-staging.svc.cluster.local:8071
+              value: http://odoo.business-system.svc.cluster.local:8071
             - name: ODOO_DB
               value: prod
             - name: ODOO_USER

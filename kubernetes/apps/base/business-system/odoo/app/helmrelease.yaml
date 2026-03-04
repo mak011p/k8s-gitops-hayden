@@ -168,7 +168,6 @@ spec:
               app.kubernetes.io/name: odoo
       annotations:
         # Velero backup hooks
-        backup.velero.io/backup-volumes: filestore
         pre.hook.backup.velero.io/container: app
         pre.hook.backup.velero.io/command: '["/bin/sh", "-c", "echo Starting Velero backup"]'
         post.hook.backup.velero.io/container: app

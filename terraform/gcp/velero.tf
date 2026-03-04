@@ -27,10 +27,10 @@ resource "google_storage_bucket" "velero" {
     default_kms_key_name = google_kms_crypto_key.backup_encryption.id
   }
 
-  # Downgrade to Nearline after 14 days
+  # Downgrade to Nearline after 31 days
   lifecycle_rule {
     condition {
-      age = 14
+      age = 31
     }
     action {
       type          = "SetStorageClass"

@@ -1,0 +1,16 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: odoo-pg-dr-weekly
+  namespace: business-system
+spec:
+  # Weekly backup: Sunday at 05:00 Melbourne time (AEDT)
+  # Offset from primary (03:00 AEDT) to avoid overlap
+  # 05:00 AEDT = 18:00 UTC Saturday (UTC+11 in summer)
+  # CNPG uses 6-field cron: second minute hour day-of-month month day-of-week
+  schedule: "0 0 18 * * SAT"
+  backupOwnerReference: self
+  cluster:
+    name: odoo-pg-dr
+  immediate: true

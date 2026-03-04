@@ -47,12 +47,14 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Trivy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           # renovate: datasource=github-releases depName=aquasecurity/trivy
-          TRIVY_VERSION=v0.69.1
+          TRIVY_VERSION=v0.69.3
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sudo sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
+            | sudo -E sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
           trivy --version
 
       - name: Run Trivy IaC scan (SARIF)

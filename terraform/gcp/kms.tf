@@ -1,6 +1,7 @@
 # Shared KMS Infrastructure for GCS Bucket Encryption
 #
 # This key ring and key are used by all backup buckets:
+# - hayden-cnpg-backups
 # - hayden-magento2-backups
 # - hayden-velero-backups
 
@@ -19,9 +20,10 @@ resource "google_kms_key_ring" "backups" {
 }
 
 resource "google_kms_crypto_key" "backup_encryption" {
-  name     = "backup-encryption"
-  key_ring = google_kms_key_ring.backups.id
-  purpose  = "ENCRYPT_DECRYPT"
+  name            = "backup-encryption"
+  key_ring        = google_kms_key_ring.backups.id
+  purpose         = "ENCRYPT_DECRYPT"
+  rotation_period = "7776000s" # 90 days
 
   lifecycle {
     prevent_destroy = true

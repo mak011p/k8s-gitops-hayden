@@ -52,7 +52,7 @@ spec:
   backup:
     retentionPolicy: "7d"
     barmanObjectStore:
-      # Primary: TrueNAS MinIO (LAN). DR: TrueNAS Cloud Sync → GCS
+      # Primary: TrueNAS MinIO (LAN). Off-site DR: chatwoot-pg-dr replica → GCS
       destinationPath: s3://cnpg-chatwoot/
       endpointURL: http://192.168.50.17:9000
       s3Credentials:

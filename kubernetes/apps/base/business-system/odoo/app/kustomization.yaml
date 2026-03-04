@@ -19,6 +19,9 @@ resources:
   - prometheusrule.yaml
   - probe.yaml
   - scheduledbackup.yaml
+  - externalsecret-cnpg-gcs.yaml
+  - postgres-cluster-dr.yaml
+  - scheduledbackup-dr.yaml
   - httproute.yaml
   - securitypolicy.yaml
   - backendtrafficpolicy.yaml

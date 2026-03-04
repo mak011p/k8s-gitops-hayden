@@ -1,0 +1,96 @@
+---
+# CNPG Off-Site DR Replica for Chatwoot PostgreSQL
+#
+# Architecture:
+#   chatwoot-pg (primary, 3 instances) → WAL → MinIO (TrueNAS, LAN)
+#     ↓ WAL read (LAN, free)
+#   chatwoot-pg-dr (replica, 1 instance, read-only)
+#     ↓ WAL archive (upload-only, cheap)
+#   GCS: gs://hayden-cnpg-backups/chatwoot/
+#
+# This cluster is read-only. To promote for DR:
+#   kubectl patch cluster chatwoot-pg-dr -n business-system --type merge \
+#     -p '{"spec":{"replica":{"enabled":false}}}'
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: chatwoot-pg-dr
+  namespace: business-system
+spec:
+  instances: 1
+  primaryUpdateStrategy: unsupervised
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.7-202512080807-system-bookworm
+  enableSuperuserAccess: false
+  superuserSecret:
+    name: chatwoot-pg-superuser
+  monitoring:
+    enablePodMonitor: true
+
+  # Bootstrap: initial recovery from MinIO (primary cluster's archive)
+  bootstrap:
+    recovery:
+      source: chatwoot-pg-minio
+
+  # Replica mode: continuously replay WAL from MinIO
+  replica:
+    enabled: true
+    source: chatwoot-pg-minio
+
+  # DR cluster archives its own WAL + base backups to GCS
+  backup:
+    retentionPolicy: "14d"
+    barmanObjectStore:
+      destinationPath: gs://hayden-cnpg-backups/chatwoot/
+      googleCredentials:
+        applicationCredentials:
+          name: cnpg-gcs-credentials
+          key: gcsCredentials
+      wal:
+        compression: gzip
+        maxParallel: 2
+      data:
+        compression: gzip
+
+  # Source: primary cluster's MinIO archive (LAN)
+  externalClusters:
+    - name: chatwoot-pg-minio
+      barmanObjectStore:
+        serverName: chatwoot-pg
+        destinationPath: s3://cnpg-chatwoot/
+        endpointURL: http://192.168.50.17:9000
+        s3Credentials:
+          accessKeyId:
+            name: cnpg-minio-credentials
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: cnpg-minio-credentials
+            key: SECRET_ACCESS_KEY
+        wal:
+          maxParallel: 4
+
+  storage:
+    size: 20Gi
+    storageClass: ceph-block
+  walStorage:
+    size: 5Gi
+    storageClass: ceph-block
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: 128MB
+      effective_cache_size: 512MB
+      maintenance_work_mem: 64MB
+      checkpoint_completion_target: "0.9"
+      wal_buffers: 8MB
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      work_mem: 2MB
+      min_wal_size: 256MB
+      max_wal_size: 1GB

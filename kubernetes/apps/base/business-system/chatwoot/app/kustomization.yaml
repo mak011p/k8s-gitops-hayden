@@ -11,6 +11,8 @@ resources:
   - secret-chatwoot-pg-superuser.enc.age.yaml
   - postgres-cluster.yaml
   - scheduledbackup.yaml
+  - postgres-cluster-dr.yaml
+  - scheduledbackup-dr.yaml
   - helmrepository.yaml
   - helmrelease.yaml
   - httproute.yaml

@@ -31,21 +31,19 @@ spec:
             - /bin/sh
             - -c
             - |
-              uvx --from mcp-server-odoo --with 'mcp>=1.8,<1.26' python -c "
-              import os
-              os.environ.setdefault('ODOO_MCP_TRANSPORT', 'streamable-http')
-              os.environ.setdefault('ODOO_MCP_HOST', '0.0.0.0')
-              os.environ.setdefault('ODOO_MCP_PORT', '8000')
-              # Patch FastMCP to disable DNS rebinding protection for internal k8s traffic
+              uvx --from mcp-server-odoo --with 'mcp[cli]>=1.8,<1.26' python -c "
+              from mcp.server.transport_security import TransportSecuritySettings
               import mcp.server.fastmcp.server as fastmcp_mod
               _orig_init = fastmcp_mod.FastMCP.__init__
               def _patched_init(self, *args, **kwargs):
-                  from mcp.server.transport_security import TransportSecuritySettings
                   kwargs['transport_security'] = TransportSecuritySettings(enable_dns_rebinding_protection=False)
                   return _orig_init(self, *args, **kwargs)
               fastmcp_mod.FastMCP.__init__ = _patched_init
-              from mcp_server_odoo.__main__ import main
-              main()
+              from mcp_server_odoo.server import OdooMCPServer
+              server = OdooMCPServer()
+              server.app.settings.host = '0.0.0.0'
+              server.app.settings.port = 8000
+              server.app.run(transport='sse')
               "
           env:
             - name: UV_CACHE_DIR

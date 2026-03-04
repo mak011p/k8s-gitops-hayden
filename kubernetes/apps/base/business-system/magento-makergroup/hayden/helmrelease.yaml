@@ -211,7 +211,6 @@ spec:
             matchLabels:
               app.kubernetes.io/name: hayden
       annotations:
-        backup.velero.io/backup-volumes: media,var
         pre.hook.backup.velero.io/container: php
         pre.hook.backup.velero.io/command: '["/bin/sh", "-c", "bin/magento maintenance:enable"]'
         post.hook.backup.velero.io/container: php

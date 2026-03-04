@@ -9,7 +9,7 @@ machine:
   network:
     hostname: worker1
     interfaces:
-      - interface: enp1s0f1
+      - interface: enp1s0f1np1
         addresses:
           - 192.168.50.21/24
         routes:

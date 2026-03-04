@@ -60,7 +60,7 @@ jobs:
 
 
       - name: Renovate
-        uses: renovatebot/github-action@d65ef9e20512193cc070238b49c3873a361cd50c # v46.1.1
+        uses: renovatebot/github-action@7b4b65bf31e07d4e3e51708d07700fb41bc03166 # v46.1.3
         env:
           LOG_LEVEL: "${{ inputs.logLevel || 'debug' }}"
           RENOVATE_DRY_RUN: "${{ inputs.dryRun }}"

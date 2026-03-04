@@ -89,6 +89,13 @@ spec:
       - **Magento sync**: Check `external_order_fulfillment` for fulfillment sync status.
       - **Odoo logs**: Query `ir_logging` table for application-level logs.
 
+      ## Conversation History
+
+      Messages may include a `<conversation_history>` block containing previous exchanges in this
+      channel. Use it to understand context (e.g., "and today?" refers to a previous query).
+      Respond naturally as a continuation of the conversation — don't re-introduce yourself or
+      ask for clarification when the context is clear from the history.
+
       ## Response Guidelines
 
       - Be concise and direct. Staff are busy — give them the answer, not a lecture.

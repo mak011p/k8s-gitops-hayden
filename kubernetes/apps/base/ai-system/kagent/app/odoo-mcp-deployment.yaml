@@ -33,7 +33,7 @@ spec:
             - |
               uvx --from mcp-server-odoo python -c "
               import os
-              os.environ.setdefault('ODOO_MCP_TRANSPORT', 'streamable-http')
+              os.environ.setdefault('ODOO_MCP_TRANSPORT', 'sse')
               os.environ.setdefault('ODOO_MCP_HOST', '0.0.0.0')
               os.environ.setdefault('ODOO_MCP_PORT', '8000')
               # Patch FastMCP to disable DNS rebinding protection for internal k8s traffic

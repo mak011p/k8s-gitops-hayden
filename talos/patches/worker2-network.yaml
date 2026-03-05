@@ -4,11 +4,12 @@ machine:
     image: factory.talos.dev/installer/c9078f9419961640c712a8bf2bb9174933dfcf1da383fd8ea2b7dc21493f8bac:v1.11.5
     wipe: true
     diskSelector:
-      size: "<= 1100GB"
+      size: '<= 600GB'
+      type: ssd
   network:
     hostname: worker2
     interfaces:
-      - interface: enp11s0
+      - interface: enp1s0f1np1
         addresses:
           - 192.168.50.22/24
         routes:

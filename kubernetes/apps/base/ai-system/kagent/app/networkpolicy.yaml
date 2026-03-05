@@ -1,6 +1,10 @@
 ---
 # NetworkPolicy to restrict access to MCP servers
 # Only kagent pods can communicate with MCP servers
+# NOTE: Cilium enforces default-deny on ALL directions once a pod is
+# policy-selected, even if policyTypes only lists Ingress. Therefore we
+# must include Egress with explicit allow rules for each MCP server's
+# backend dependencies (Odoo HTTP, PostgreSQL, SendGrid API, DNS).
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -14,6 +18,7 @@ spec:
       app.kubernetes.io/name: odoo-mcp
   policyTypes:
     - Ingress
+    - Egress
   ingress:
     # Allow traffic from kagent helm release pods (controller, ui, etc)
     - from:
@@ -31,6 +36,21 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
+  egress:
+    # DNS resolution
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Odoo XML-RPC (business-system namespace)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: business-system
+      ports:
+        - protocol: TCP
+          port: 8071
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -45,6 +65,7 @@ spec:
       app.kubernetes.io/name: sendgrid-mcp
   policyTypes:
     - Ingress
+    - Egress
   ingress:
     # Allow traffic from kagent helm release pods
     - from:
@@ -62,6 +83,17 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
+  egress:
+    # DNS resolution
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # SendGrid API (HTTPS)
+    - ports:
+        - protocol: TCP
+          port: 443
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -76,6 +108,7 @@ spec:
       app.kubernetes.io/name: postgres-mcp
   policyTypes:
     - Ingress
+    - Egress
   ingress:
     # Allow traffic from kagent helm release pods
     - from:
@@ -93,3 +126,18 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
+  egress:
+    # DNS resolution
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # PostgreSQL (business-system namespace)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: business-system
+      ports:
+        - protocol: TCP
+          port: 5432

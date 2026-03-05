@@ -1,10 +1,10 @@
 ---
 # NetworkPolicy to restrict access to MCP servers
 # Only kagent pods can communicate with MCP servers
-# NOTE: Cilium enforces default-deny on ALL directions once a pod is
-# policy-selected, even if policyTypes only lists Ingress. Therefore we
-# must include Egress with explicit allow rules for each MCP server's
-# backend dependencies (Odoo HTTP, PostgreSQL, SendGrid API, DNS).
+# Cilium enforces default-deny on egress once a pod is policy-selected,
+# even when policyTypes only lists Ingress (differs from K8s spec).
+# We must include explicit Egress rules for each MCP server's backend
+# dependencies (Odoo HTTP, PostgreSQL, SendGrid API, DNS).
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

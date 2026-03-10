@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Odoo: Promote to Production"
+
+# Triggered by Flux notification controller when odoo-staging HelmRelease reconciles successfully.
+# The githubdispatch provider sends a repository_dispatch event with the HelmRelease details.
+on:
+  repository_dispatch:
+    types:
+      - "HelmRelease/*"
+
+concurrency:
+  group: odoo-production-promote
+  cancel-in-progress: true
+
+jobs:
+  promote:
+    name: Auto-merge Odoo Production PR
+    runs-on: ubuntu-latest
+    # Only act on odoo-staging HelmRelease success events
+    if: |
+      contains(github.event.client_payload.involvedObject.name, 'odoo-staging') &&
+      github.event.client_payload.severity == 'info'
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2
+        id: app-token
+        with:
+          app-id: "${{ secrets.BOT_APP_ID }}"
+          private-key: "${{ secrets.BOT_APP_PRIVATE_KEY }}"
+
+      - name: Find and merge Odoo production PR
+        env:
+          GH_TOKEN: "${{ steps.app-token.outputs.token }}"
+        run: |
+          echo "::notice::Odoo staging reconciliation succeeded, looking for production PR..."
+
+          # Find open Renovate PR for odoo-production
+          PR_NUMBER=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state open \
+            --head "renovate/odoo-production" \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::notice::No open Odoo production PR found — nothing to merge."
+            exit 0
+          fi
+
+          echo "::notice::Found Odoo production PR #${PR_NUMBER}"
+
+          # Wait for CI checks to pass (up to 10 minutes)
+          echo "Waiting for CI checks on PR #${PR_NUMBER}..."
+          if gh pr checks "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --watch \
+            --fail-fast \
+            --timeout 600; then
+            echo "::notice::CI checks passed, merging PR #${PR_NUMBER}..."
+            gh pr merge "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --squash \
+              --delete-branch \
+              --admin
+            echo "::notice::Odoo production PR #${PR_NUMBER} merged successfully!"
+          else
+            echo "::error::CI checks failed on PR #${PR_NUMBER} — not merging."
+            exit 1
+          fi

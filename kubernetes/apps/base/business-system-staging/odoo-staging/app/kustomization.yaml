@@ -16,3 +16,5 @@ resources:
   - httproute.yaml
   - securitypolicy.yaml
   - backendtrafficpolicy.yaml
+  - provider-dispatch.yaml
+  - alert-dispatch.yaml

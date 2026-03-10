@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/notification.toolkit.fluxcd.io/alert_v1beta3.json
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: odoo-staging-dispatch
+  namespace: business-system-staging
+spec:
+  summary: "Odoo staging reconciliation - triggers production auto-merge"
+  providerRef:
+    name: github-dispatch
+  eventSeverity: info
+  eventSources:
+    - kind: HelmRelease
+      name: odoo-staging
+      namespace: business-system-staging
+  exclusionList:
+    - ".*upgrade retries exhausted.*"
+    - ".*is not ready.*"

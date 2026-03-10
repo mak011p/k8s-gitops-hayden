@@ -430,8 +430,8 @@ dependsOn:
 - **Bootstrap method**: Uses Flux Operator (not traditional `flux bootstrap`)
 - **Chart sources**: Uses OCIRepository instead of HelmRepository
 - **Yamllint config**: Line length warning at 240 characters, 2-space indentation
-- **Renovate automation**: Auto-merge enabled for digests, ignores encrypted files
-  - **Odoo image updates create TWO PRs** (via `.renovate/groups.json5`): staging (auto-merges) and production (manual merge required). Never merge the production Odoo PR without user approval.
+- **Renovate automation**: Auto-merge enabled for digests, ignores encrypted files. Runs every 15 min.
+  - **Odoo image updates** (via `.renovate/groups.json5`): staging auto-merges immediately via branch push. Production PR is created immediately but merged by the `odoo-production-promote` workflow only after staging HelmRelease reconciles successfully (via Flux `githubdispatch` alert).
 - **Multi-cluster ready**: Designed with overlay pattern for multiple clusters
 - **Enterprise patterns**: Production-grade GitOps implementation showcasing CNCF ecosystem
 

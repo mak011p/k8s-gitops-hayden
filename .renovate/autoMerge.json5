@@ -18,7 +18,7 @@
       ignoreTests: true
     },
     {
-      description: "Disable automerge for production Odoo image (require manual merge)",
+      description: "Odoo production - merged by promote workflow, not Renovate automerge",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
       matchFileNames: ["kubernetes/apps/base/business-system/odoo/**"],

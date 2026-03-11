@@ -207,3 +207,25 @@ resource "cloudflare_record" "dropdrape_pop3s" {
     target   = "pop.migadu.com"
   }
 }
+
+# ==============================================
+# DNS Records - Web Traffic (same server as auntalma)
+# ==============================================
+
+resource "cloudflare_record" "dropdrape_web" {
+  zone_id = local.dropdrape_zone_id
+  name    = "@"
+  content = "external.${var.domain}"
+  type    = "CNAME"
+  proxied = true
+  comment = "Magento store via K8s cluster (same instance as auntalma)"
+}
+
+resource "cloudflare_record" "dropdrape_www" {
+  zone_id = local.dropdrape_zone_id
+  name    = "www"
+  content = "external.${var.domain}"
+  type    = "CNAME"
+  proxied = true
+  comment = "Magento store www redirect"
+}

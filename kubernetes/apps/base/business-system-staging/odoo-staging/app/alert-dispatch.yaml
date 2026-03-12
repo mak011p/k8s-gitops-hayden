@@ -6,7 +6,8 @@ metadata:
   name: odoo-staging-dispatch
   namespace: business-system-staging
 spec:
-  summary: "Odoo staging reconciliation - triggers production auto-merge"
+  eventMetadata:
+    summary: "Odoo staging reconciliation - triggers production auto-merge"
   providerRef:
     name: github-dispatch
   eventSeverity: info

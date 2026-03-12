@@ -103,9 +103,8 @@
       matchPackageNames: ["ghcr.io/hayden-agencies/odoo"],
       matchFileNames: ["kubernetes/apps/base/business-system-staging/**"],
       automerge: true,
-      automergeType: "branch",
+      automergeType: "pr",
       ignoreTests: true,
-      internalChecksFilter: "none",
       group: {
         commitMessageTopic: "{{{groupName}}} image",
       },

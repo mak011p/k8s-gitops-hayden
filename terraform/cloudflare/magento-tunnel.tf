@@ -34,38 +34,27 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "magento_vps" {
   config {
     ingress_rule {
       hostname = var.domain
-      service  = "https://localhost:443"
-      origin_request {
-        no_tls_verify = true
-      }
+      service  = "http://103.21.130.236:80"
     }
     ingress_rule {
       hostname = "www.${var.domain}"
-      service  = "https://localhost:443"
-      origin_request {
-        no_tls_verify = true
-      }
+      service  = "http://103.21.130.236:80"
     }
     ingress_rule {
       hostname = "staging.${var.domain}"
-      service  = "https://localhost:443"
+      service  = "https://103.21.130.236:443"
       origin_request {
-        no_tls_verify = true
+        no_tls_verify      = true
+        origin_server_name = "staging.${var.domain}"
       }
     }
     ingress_rule {
       hostname = "cdn.${var.domain}"
-      service  = "https://localhost:443"
-      origin_request {
-        no_tls_verify = true
-      }
+      service  = "http://103.21.130.236:80"
     }
     ingress_rule {
       hostname = "dev.${var.domain}"
-      service  = "https://localhost:443"
-      origin_request {
-        no_tls_verify = true
-      }
+      service  = "http://103.21.130.236:80"
     }
     # Catch-all
     ingress_rule {

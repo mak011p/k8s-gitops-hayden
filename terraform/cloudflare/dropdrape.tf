@@ -209,23 +209,23 @@ resource "cloudflare_record" "dropdrape_pop3s" {
 }
 
 # ==============================================
-# DNS Records - Web Traffic (same server as auntalma)
+# DNS Records - Web Traffic (via Cloudflare Tunnel)
 # ==============================================
 
 resource "cloudflare_record" "dropdrape_web" {
   zone_id = local.dropdrape_zone_id
   name    = "@"
-  content = "external.${var.domain}"
+  content = cloudflare_zero_trust_tunnel_cloudflared.auntalma_vps.cname
   type    = "CNAME"
   proxied = true
-  comment = "Magento store via K8s cluster (same instance as auntalma)"
+  comment = "Magento store via Cloudflare Tunnel"
 }
 
 resource "cloudflare_record" "dropdrape_www" {
   zone_id = local.dropdrape_zone_id
   name    = "www"
-  content = "external.${var.domain}"
+  content = cloudflare_zero_trust_tunnel_cloudflared.auntalma_vps.cname
   type    = "CNAME"
   proxied = true
-  comment = "Magento store www redirect"
+  comment = "Magento store www via Cloudflare Tunnel"
 }

@@ -43,6 +43,10 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    # PyPI (HTTPS) — uvx downloads mcp-server-odoo at startup
+    - ports:
+        - protocol: TCP
+          port: 443
     # Odoo XML-RPC (business-system namespace)
     - to:
         - namespaceSelector:

@@ -50,6 +50,18 @@ jobs:
 
           echo "::notice::Found Odoo production PR #${PR_NUMBER}"
 
+          # Update PR branch if behind master (branch protection requires up-to-date)
+          MERGE_STATE=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}" --jq '.mergeable_state')
+          echo "PR mergeable_state: ${MERGE_STATE}"
+
+          if [ "$MERGE_STATE" = "behind" ]; then
+            echo "::notice::PR branch is behind master, updating..."
+            gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/update-branch" \
+              -X PUT -f update_method="merge" || true
+            # Give GitHub a moment to register the update
+            sleep 5
+          fi
+
           # Wait for CI checks to pass (up to 10 minutes)
           echo "Waiting for CI checks on PR #${PR_NUMBER}..."
           if gh pr checks "$PR_NUMBER" \

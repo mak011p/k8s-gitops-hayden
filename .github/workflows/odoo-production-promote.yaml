@@ -17,6 +17,7 @@ jobs:
   promote:
     name: Auto-merge Odoo Production PR
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # Only act on odoo-staging HelmRelease success events
     if: |
       contains(github.event.client_payload.involvedObject.name, 'odoo-staging') &&
@@ -50,35 +51,31 @@ jobs:
 
           echo "::notice::Found Odoo production PR #${PR_NUMBER}"
 
-          # Always attempt to update the PR branch — branch protection requires
-          # it to be up-to-date, and mergeable_state can be "unknown" if GitHub
-          # hasn't computed it yet. The update-branch call is a no-op if already
-          # current, so it's safe to call unconditionally.
+          # Always update the PR branch — branch protection requires it to be
+          # up-to-date, and the call is a no-op if already current.
           echo "::notice::Ensuring PR branch is up-to-date with master..."
           gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/update-branch" \
             -X PUT -f update_method="merge" 2>&1 || true
-          # Give GitHub time to register the merge commit and trigger CI
-          sleep 10
 
-          # Wait for CI checks to pass (poll every 15s for up to 10 minutes)
-          echo "Waiting for CI checks on PR #${PR_NUMBER}..."
-          ATTEMPTS=0
-          MAX_ATTEMPTS=40
-          while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-            ATTEMPTS=$((ATTEMPTS + 1))
-            if gh pr checks "$PR_NUMBER" --repo "${{ github.repository }}" --fail-fast 2>/dev/null; then
-              echo "::notice::CI checks passed, merging PR #${PR_NUMBER}..."
-              gh pr merge "$PR_NUMBER" \
-                --repo "${{ github.repository }}" \
-                --squash \
-                --delete-branch \
-                --admin
-              echo "::notice::Odoo production PR #${PR_NUMBER} merged successfully!"
-              exit 0
-            fi
-            echo "Checks not passing yet (attempt ${ATTEMPTS}/${MAX_ATTEMPTS}), waiting 15s..."
-            sleep 15
-          done
+          # Wait for checks to settle after the branch update
+          echo "Waiting 30s for CI checks to start after branch update..."
+          sleep 30
 
-          echo "::error::CI checks did not pass within 10 minutes on PR #${PR_NUMBER} — not merging."
-          exit 1
+          # Use --watch to block until all checks complete.
+          # --watch exits 0 when all pass, non-zero otherwise.
+          echo "Watching CI checks on PR #${PR_NUMBER}..."
+          if gh pr checks "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --watch \
+            --fail-fast; then
+            echo "::notice::CI checks passed, merging PR #${PR_NUMBER}..."
+            gh pr merge "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --squash \
+              --delete-branch \
+              --admin
+            echo "::notice::Odoo production PR #${PR_NUMBER} merged successfully!"
+          else
+            echo "::error::CI checks failed on PR #${PR_NUMBER} — not merging."
+            exit 1
+          fi

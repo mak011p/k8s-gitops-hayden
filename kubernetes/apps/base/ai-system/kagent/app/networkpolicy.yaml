@@ -1,147 +1,157 @@
 ---
-# NetworkPolicy to restrict access to MCP servers
-# Only kagent pods can communicate with MCP servers
-# Cilium enforces default-deny on egress once a pod is policy-selected,
-# even when policyTypes only lists Ingress (differs from K8s spec).
-# We must include explicit Egress rules for each MCP server's backend
-# dependencies (Odoo HTTP, PostgreSQL, SendGrid API, DNS).
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# CiliumNetworkPolicy to restrict access to MCP servers.
+# Uses Cilium-native policies to avoid the conntrack UDP race condition
+# that causes ~45% DNS packet loss with vanilla Kubernetes NetworkPolicies.
+# See: https://github.com/cilium/cilium/issues/24844
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: odoo-mcp-isolation
   namespace: ai-system
   labels:
     app.kubernetes.io/component: security
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: odoo-mcp
-  policyTypes:
-    - Ingress
-    - Egress
   ingress:
     # Allow traffic from kagent helm release pods (controller, ui, etc)
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/instance: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
     # Allow traffic from kagent-managed agent pods (odoo-assistant, flux-troubleshooter, sendgrid-assistant)
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/part-of: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/part-of: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
   egress:
-    # DNS resolution
-    - ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
+    # DNS resolution — target kube-dns directly via identity
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
     # PyPI (HTTPS) — uvx downloads mcp-server-odoo at startup
-    - ports:
-        - protocol: TCP
-          port: 443
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Odoo XML-RPC (business-system namespace)
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: business-system
-      ports:
-        - protocol: TCP
-          port: 8071
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+      toPorts:
+        - ports:
+            - port: "8071"
+              protocol: TCP
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: sendgrid-mcp-isolation
   namespace: ai-system
   labels:
     app.kubernetes.io/component: security
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: sendgrid-mcp
-  policyTypes:
-    - Ingress
-    - Egress
   ingress:
     # Allow traffic from kagent helm release pods
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/instance: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
     # Allow traffic from kagent-managed agent pods
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/part-of: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/part-of: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
   egress:
-    # DNS resolution
-    - ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
+    # DNS resolution — target kube-dns directly via identity
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
     # SendGrid API (HTTPS)
-    - ports:
-        - protocol: TCP
-          port: 443
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: postgres-mcp-isolation
   namespace: ai-system
   labels:
     app.kubernetes.io/component: security
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: postgres-mcp
-  policyTypes:
-    - Ingress
-    - Egress
   ingress:
     # Allow traffic from kagent helm release pods
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/instance: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
     # Allow traffic from kagent-managed agent pods
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/part-of: kagent
-      ports:
-        - protocol: TCP
-          port: 8000
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/part-of: kagent
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
   egress:
-    # DNS resolution
-    - ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
+    # DNS resolution — target kube-dns directly via identity
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
     # PostgreSQL (business-system namespace)
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: business-system
-      ports:
-        - protocol: TCP
-          port: 5432
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP

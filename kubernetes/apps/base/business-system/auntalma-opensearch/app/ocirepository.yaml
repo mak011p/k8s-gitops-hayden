@@ -8,4 +8,4 @@ spec:
   interval: 30m
   url: oci://registry-1.docker.io/bitnamicharts/opensearch
   ref:
-    tag: 1.9.4
+    tag: 2.0.10

@@ -22,8 +22,8 @@ data:
      *   MAGENTO_SESSION_REDIS_DB (5), MAGENTO_CACHE_REDIS_HOST,
      *   MAGENTO_CACHE_REDIS_PORT (6379), MAGENTO_CACHE_REDIS_DB (6),
      *   MAGENTO_PAGE_CACHE_REDIS_HOST, MAGENTO_PAGE_CACHE_REDIS_PORT (6379),
-     *   MAGENTO_PAGE_CACHE_REDIS_DB (1), MAGENTO_ES_HOST, MAGENTO_ES_PORT (9200),
-     *   MAGENTO_AMQP_HOST, MAGENTO_AMQP_PORT (5672),
+     *   MAGENTO_PAGE_CACHE_REDIS_DB (1), MAGENTO_OPENSEARCH_HOST,
+     *   MAGENTO_OPENSEARCH_PORT (9200), MAGENTO_AMQP_HOST, MAGENTO_AMQP_PORT (5672),
      *   MAGENTO_AMQP_USER, MAGENTO_AMQP_PASSWORD
      */
 
@@ -151,12 +151,12 @@ data:
             'default' => [
                 'catalog' => [
                     'search' => [
-                        'engine' => 'elasticsearch7',
-                        'elasticsearch7_server_hostname' => getenv('MAGENTO_ES_HOST') ?: 'localhost',
-                        'elasticsearch7_server_port' => getenv('MAGENTO_ES_PORT') ?: '9200',
-                        'elasticsearch7_index_prefix' => getenv('MAGENTO_ES_INDEX_PREFIX') ?: 'magento2',
-                        'elasticsearch7_enable_auth' => '0',
-                        'elasticsearch7_server_timeout' => '15',
+                        'engine' => 'opensearch',
+                        'opensearch_server_hostname' => getenv('MAGENTO_OPENSEARCH_HOST') ?: 'localhost',
+                        'opensearch_server_port' => getenv('MAGENTO_OPENSEARCH_PORT') ?: '9200',
+                        'opensearch_index_prefix' => getenv('MAGENTO_OPENSEARCH_INDEX_PREFIX') ?: 'magento2',
+                        'opensearch_enable_auth' => '0',
+                        'opensearch_server_timeout' => '15',
                     ],
                 ],
             ],

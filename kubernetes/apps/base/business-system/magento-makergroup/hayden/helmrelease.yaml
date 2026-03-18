@@ -49,7 +49,8 @@ spec:
             env:
               # Database
               - name: MAGENTO_DB_HOST
-                value: hayden-mariadb-primary              - name: MAGENTO_DB_PORT
+                value: hayden-mariadb-primary
+              - name: MAGENTO_DB_PORT
                 value: "3306"
               - name: MAGENTO_DB_NAME
                 value: magento
@@ -62,7 +63,8 @@ spec:
                     key: password
               # Redis Sentinel - Sessions (DB 5)
               - name: MAGENTO_SESSION_REDIS_HOST
-                value: hayden-redis              - name: MAGENTO_SESSION_REDIS_PORT
+                value: hayden-redis
+              - name: MAGENTO_SESSION_REDIS_PORT
                 value: "26379"
               - name: MAGENTO_SESSION_REDIS_DB
                 value: "5"
@@ -72,7 +74,8 @@ spec:
                 value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
               # Redis Sentinel - Cache (DB 6)
               - name: MAGENTO_CACHE_REDIS_HOST
-                value: hayden-redis              - name: MAGENTO_CACHE_REDIS_PORT
+                value: hayden-redis
+              - name: MAGENTO_CACHE_REDIS_PORT
                 value: "26379"
               - name: MAGENTO_CACHE_REDIS_DB
                 value: "6"
@@ -82,7 +85,8 @@ spec:
                 value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
               # Redis Sentinel - Page Cache (DB 1)
               - name: MAGENTO_PAGE_CACHE_REDIS_HOST
-                value: hayden-redis              - name: MAGENTO_PAGE_CACHE_REDIS_PORT
+                value: hayden-redis
+              - name: MAGENTO_PAGE_CACHE_REDIS_PORT
                 value: "26379"
               - name: MAGENTO_PAGE_CACHE_REDIS_DB
                 value: "1"
@@ -90,13 +94,15 @@ spec:
                 value: mymaster
               - name: MAGENTO_PAGE_CACHE_REDIS_SENTINEL_SERVERS
                 value: hayden-redis-node-0.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-1.hayden-redis-headless.business-system.svc.cluster.local:26379,hayden-redis-node-2.hayden-redis-headless.business-system.svc.cluster.local:26379
-              # Elasticsearch (ECK operator)
-              - name: MAGENTO_ES_HOST
-                value: hayden-elasticsearch-es-http              - name: MAGENTO_ES_PORT
+              # OpenSearch
+              - name: MAGENTO_OPENSEARCH_HOST
+                value: hayden-opensearch
+              - name: MAGENTO_OPENSEARCH_PORT
                 value: "9200"
               # RabbitMQ (RabbitMQ Cluster Operator)
               - name: MAGENTO_AMQP_HOST
-                value: hayden-rabbitmq              - name: MAGENTO_AMQP_PORT
+                value: hayden-rabbitmq
+              - name: MAGENTO_AMQP_PORT
                 value: "5672"
               - name: MAGENTO_AMQP_USER
                 valueFrom:

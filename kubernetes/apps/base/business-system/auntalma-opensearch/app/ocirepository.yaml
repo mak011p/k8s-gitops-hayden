@@ -1,0 +1,11 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: bitnami-opensearch
+  namespace: business-system
+spec:
+  interval: 30m
+  url: oci://registry-1.docker.io/bitnamicharts/opensearch
+  ref:
+    tag: 1.9.0

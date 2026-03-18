@@ -45,7 +45,7 @@ spec:
       namespace: business-system
     - name: mariadb-operator
       namespace: database-system
-    - name: auntalma-elasticsearch
+    - name: auntalma-opensearch
       namespace: business-system
     - name: auntalma-rabbitmq
       namespace: business-system
@@ -81,7 +81,7 @@ spec:
       namespace: business-system
     - name: mariadb-operator
       namespace: database-system
-    - name: hayden-elasticsearch
+    - name: hayden-opensearch
       namespace: business-system
     - name: hayden-rabbitmq
       namespace: business-system

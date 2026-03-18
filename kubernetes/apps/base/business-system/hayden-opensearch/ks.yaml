@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: hayden-elasticsearch
+  name: hayden-opensearch
   namespace: business-system
 spec:
   decryption:
@@ -11,14 +11,9 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 10m
-  path: "./apps/base/business-system/hayden-elasticsearch/app"
+  path: "./apps/base/business-system/hayden-opensearch/app"
   prune: true
-  wait: false  # Temporarily disabled - ECK health check needs investigation
-  # healthChecks:
-  #   - apiVersion: elasticsearch.k8s.elastic.co/v1
-  #     kind: Elasticsearch
-  #     name: hayden-elasticsearch
-  #     namespace: business-system
+  wait: true
   sourceRef:
     kind: OCIRepository
     name: flux-system

@@ -1,11 +1,9 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: OCIRepository
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
 metadata:
-  name: bitnami-opensearch
+  name: opensearch-charts
   namespace: business-system
 spec:
   interval: 30m
-  url: oci://registry-1.docker.io/bitnamicharts/opensearch
-  ref:
-    tag: 1.9.4
+  url: https://opensearch-project.github.io/helm-charts/

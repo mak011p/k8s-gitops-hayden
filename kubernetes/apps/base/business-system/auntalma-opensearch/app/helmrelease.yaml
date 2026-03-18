@@ -84,6 +84,16 @@ spec:
         namespace: business-system
         interval: 30s
 
+    # Disable mmap (avoids needing vm.max_map_count sysctl)
+    extraConfig:
+      node:
+        store:
+          allow_mmap: false
+
+    # Disable sysctl init container (os-shell image removed from Docker Hub)
+    sysctlImage:
+      enabled: false
+
     # Security - disabled for internal cluster use
     security:
       enabled: false

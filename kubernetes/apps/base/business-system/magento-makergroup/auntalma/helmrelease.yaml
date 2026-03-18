@@ -46,6 +46,7 @@ spec:
             image:
               repository: ghcr.io/hayden-agencies/magento2-makergroup
               tag: latest
+              pullPolicy: Always
             command: ["sh", "-c", "cp -a /var/www/html/pub/static/. /static-out/"]
             securityContext:
               allowPrivilegeEscalation: false
@@ -57,6 +58,7 @@ spec:
             image:
               repository: ghcr.io/hayden-agencies/magento2-makergroup
               tag: latest
+              pullPolicy: Always
             env:
               # Database
               - name: MAGENTO_DB_HOST

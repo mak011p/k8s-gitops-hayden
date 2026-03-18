@@ -184,6 +184,34 @@ upgrade:
 - **Pod security labels**: Applied to all namespaces
 - **Immutable OS**: Talos Linux minimal attack surface
 
+### NetworkPolicy — Use CiliumNetworkPolicy, NOT Kubernetes NetworkPolicy
+
+**Never use vanilla Kubernetes `NetworkPolicy` resources in this cluster.** Always use `CiliumNetworkPolicy` (`cilium.io/v2`) instead.
+
+Cilium enforces K8s NetworkPolicies via eBPF conntrack, which has a known UDP race condition that causes **~45% DNS packet loss** on policy-selected pods. This manifests as intermittent `Temporary failure in name resolution` errors. Pods without NetworkPolicies are unaffected (0% failure).
+
+**Key rules for CiliumNetworkPolicy:**
+- Target kube-dns directly for DNS egress using identity labels, not open port 53:
+  ```yaml
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+  ```
+- Use `toEntities: [world]` for external HTTPS egress instead of bare port rules
+- Use `toEndpoints` with `io.kubernetes.pod.namespace` labels for cross-namespace access
+- Port numbers must be quoted strings (`"8000"` not `8000`)
+- No `policyTypes` field — CiliumNetworkPolicy infers from presence of `ingress`/`egress` blocks
+
+See: https://github.com/cilium/cilium/issues/24844
+
 ## Development Workflow
 
 ### Bootstrap New Cluster

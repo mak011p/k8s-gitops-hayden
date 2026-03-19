@@ -1,5 +1,5 @@
 ---
-# CiliumNetworkPolicy for hayden Magento pods
+# CiliumNetworkPolicy for hayden Magento pods — ingress only
 # Vanilla K8s NetworkPolicy causes DNS packet loss on Cilium (eBPF conntrack race)
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -27,61 +27,4 @@ spec:
       toPorts:
         - ports:
             - port: "8080"
-              protocol: TCP
-  egress:
-    # DNS
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: kube-system
-            k8s-app: kube-dns
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
-    # MariaDB
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: business-system
-            app.kubernetes.io/instance: hayden-mariadb
-      toPorts:
-        - ports:
-            - port: "3306"
-              protocol: TCP
-    # Redis
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: business-system
-            app.kubernetes.io/instance: hayden-redis
-      toPorts:
-        - ports:
-            - port: "6379"
-              protocol: TCP
-            - port: "26379"
-              protocol: TCP
-    # OpenSearch
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: business-system
-            app.kubernetes.io/instance: hayden-opensearch
-      toPorts:
-        - ports:
-            - port: "9200"
-              protocol: TCP
-    # RabbitMQ
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: business-system
-            app.kubernetes.io/instance: hayden-rabbitmq
-      toPorts:
-        - ports:
-            - port: "5672"
-              protocol: TCP
-    # External HTTPS (Algolia, Stripe, payment gateways, etc.)
-    - toEntities:
-        - world
-      toPorts:
-        - ports:
-            - port: "443"
               protocol: TCP

@@ -29,7 +29,7 @@ spec:
       replPasswordSecretKeyRef:
         name: auntalma-mariadb-superuser
         key: password
-    syncBinlog: true
+    syncBinlog: 1
 
   # 3-node cluster (1 primary + 2 replicas)
   replicas: 3

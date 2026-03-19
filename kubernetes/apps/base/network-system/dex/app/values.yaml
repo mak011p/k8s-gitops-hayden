@@ -70,6 +70,8 @@ config:
         - 'https://n8n.${CLUSTER_DOMAIN}/oauth2/callback'
         - 'https://ai.${CLUSTER_DOMAIN}/oauth2/callback'
         - 'https://webmail.${CLUSTER_DOMAIN}/oauth2/callback'
+        - 'https://www.auntalma.com.au/oauth2/callback'
+        - 'https://auntalma.${CLUSTER_DOMAIN}/oauth2/callback'
     - id: grafana
       name: 'grafana'
       secret: '${DEX_GRAFANA_SECRET}'

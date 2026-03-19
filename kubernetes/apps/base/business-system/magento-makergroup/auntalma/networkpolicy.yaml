@@ -1,37 +1,85 @@
 ---
-# Magento Auntalma app pods - restrict egress to known dependencies
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
+# CiliumNetworkPolicy for auntalma Magento pods
+# Vanilla K8s NetworkPolicy causes DNS packet loss on Cilium (eBPF conntrack race)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
 metadata:
   name: auntalma-app
   namespace: business-system
 spec:
-  podSelector:
+  endpointSelector:
     matchLabels:
       app.kubernetes.io/name: auntalma
-  # NOTE: Egress enforcement disabled — Cilium transparent DNS proxy + K8s
-  # NetworkPolicy port-53 egress rule causes intermittent DNS failures on
-  # some nodes (works on worker1, fails on worker3 with same policy).
-  # TODO: Replace with CiliumNetworkPolicy for reliable egress controls.
-  policyTypes:
-    - Ingress
   ingress:
-    # Envoy Gateway proxy pods (in network-system, not envoy-gateway-system)
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: network-system
-          podSelector:
-            matchLabels:
-              gateway.envoyproxy.io/owning-gateway-name: envoy-external
-      ports:
-        - port: 8080
-          protocol: TCP
+    # Envoy Gateway proxy pods
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: network-system
+            gateway.envoyproxy.io/owning-gateway-name: envoy-external
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     # Prometheus metrics scraping
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: observability
-      ports:
-        - port: 8080
-          protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # MariaDB
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+            app.kubernetes.io/instance: auntalma-mariadb
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+    # Redis
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+            app.kubernetes.io/instance: auntalma-redis
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    # OpenSearch
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+            app.kubernetes.io/instance: hayden-opensearch
+      toPorts:
+        - ports:
+            - port: "9200"
+              protocol: TCP
+    # RabbitMQ
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: business-system
+            app.kubernetes.io/instance: auntalma-rabbitmq
+      toPorts:
+        - ports:
+            - port: "5672"
+              protocol: TCP
+    # External HTTPS (Algolia, Stripe, payment gateways, etc.)
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

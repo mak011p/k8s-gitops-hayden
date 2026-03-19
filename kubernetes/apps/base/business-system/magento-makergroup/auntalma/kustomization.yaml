@@ -13,6 +13,7 @@ resources:
   # Database
   - mariadb-cluster.yaml
   - scheduledbackup.yaml
+  - pitr.yaml
   # Redis cache
   - redis-statefulset.yaml
   # Storage

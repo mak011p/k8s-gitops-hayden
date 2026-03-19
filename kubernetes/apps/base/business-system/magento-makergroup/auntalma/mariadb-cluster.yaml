@@ -20,6 +20,10 @@ spec:
     type: ReplicasFirstPrimaryLast
     autoUpdateDataPlane: true
 
+  # PITR — continuous binlog archival to GCS for point-in-time recovery
+  pointInTimeRecoveryRef:
+    name: auntalma-mariadb-pitr
+
   # Primary-replica replication (replaces Galera)
   # - Better write performance (no certification overhead)
   # - Compatible with Magento reindex (MEMORY tables, bulk DDL)

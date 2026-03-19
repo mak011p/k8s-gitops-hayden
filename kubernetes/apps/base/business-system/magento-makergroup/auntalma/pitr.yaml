@@ -1,0 +1,31 @@
+---
+# Point-in-Time Recovery — continuous binlog archival to GCS
+# Enables restore to any point in time between physical backups
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: PointInTimeRecovery
+metadata:
+  name: auntalma-mariadb-pitr
+  namespace: business-system
+spec:
+  # Reference to the PhysicalBackup that provides base snapshots
+  physicalBackupRef:
+    name: auntalma-mariadb-daily
+  # Binlog archive storage — same GCS bucket, different prefix
+  storage:
+    s3:
+      bucket: hayden-magento2-backups
+      prefix: auntalma/mariadb-binlogs
+      endpoint: storage.googleapis.com
+      region: australia-southeast1
+      accessKeyIdSecretKeyRef:
+        name: auntalma-objstore
+        key: accessKeyId
+      secretAccessKeySecretKeyRef:
+        name: auntalma-objstore
+        key: secretAccessKey
+  # Compress binlogs before uploading
+  compression: gzip
+  # Max time to archive a batch of binlogs
+  archiveTimeout: 1h
+  # Fail restore if binlog timeline has gaps (safer)
+  strictMode: true

@@ -30,7 +30,8 @@ resources:
   - securitypolicy.yaml
   - cronjob.yaml
   # Resilience
-  - networkpolicy.yaml
+  # networkpolicy.yaml — disabled: CiliumNetworkPolicy (even ingress-only) triggers
+  # Cilium eBPF conntrack UDP race causing ~20s DNS delays on health_check.php
   - pdb.yaml
   - hpa.yaml
   # Observability

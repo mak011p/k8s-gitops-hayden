@@ -15,6 +15,11 @@ spec:
     key: password
     generate: false
 
+  # Auto-update data-plane (agent/init containers) on operator upgrade
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+    autoUpdateDataPlane: true
+
   # Primary-replica replication (replaces Galera)
   # - Better write performance (no certification overhead)
   # - Compatible with Magento reindex (MEMORY tables, bulk DDL)

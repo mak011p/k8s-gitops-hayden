@@ -16,6 +16,11 @@ spec:
     key: password
     generate: false
 
+  # Auto-update data-plane (agent/init containers) on operator upgrade
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+    autoUpdateDataPlane: true
+
   # Galera cluster with 3 replicas for HA
   galera:
     enabled: true
@@ -25,7 +30,6 @@ spec:
     sst: mariabackup
     replicaThreads: 1
     agent:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
       gracefulShutdownTimeout: 5s
     recovery:
       enabled: true
@@ -34,8 +38,7 @@ spec:
       clusterBootstrapTimeout: 10m
       podRecoveryTimeout: 5m
       podSyncTimeout: 5m
-    initContainer:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
+    initContainer: {}
     config:
       reuseStorageVolume: false
     initJob:

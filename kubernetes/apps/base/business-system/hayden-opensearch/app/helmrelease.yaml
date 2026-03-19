@@ -87,6 +87,10 @@ spec:
     service:
       type: ClusterIP
 
+    # Disable vanilla NetworkPolicies (use CiliumNetworkPolicy instead)
+    networkPolicy:
+      create: false
+
     # ServiceMonitor for Prometheus
     serviceMonitor:
       enabled: false

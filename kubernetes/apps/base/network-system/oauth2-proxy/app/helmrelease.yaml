@@ -58,7 +58,7 @@ spec:
         provider = "oidc"
         oidc_issuer_url = "https://dex.${CLUSTER_DOMAIN}"
         auth_logging = true
-        cookie_domains = ".${CLUSTER_DOMAIN}"
+        cookie_domains = [".${CLUSTER_DOMAIN}", ".auntalma.com.au"]
         cookie_httponly = true
         cookie_name = "_hayden_agencies_oauth"
         cookie_refresh = "1h"

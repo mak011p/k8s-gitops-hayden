@@ -1,26 +1,26 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s.mariadb.com/backup_v1alpha1.json
+# Daily physical backup using mariabackup (faster than logical dumps)
+# Physical backups are required for future PITR when operator is upgraded
 apiVersion: k8s.mariadb.com/v1alpha1
-kind: Backup
+kind: PhysicalBackup
 metadata:
-  name: auntalma-mariadb-weekly
+  name: auntalma-mariadb-daily
   namespace: business-system
 spec:
   mariaDbRef:
     name: auntalma-mariadb
-  # Weekly backup: Sunday at 04:00 Melbourne time (AEDT)
-  # 04:00 AEDT = 17:00 UTC Saturday (UTC+11 in summer)
+  # Daily backup: 04:00 Melbourne time (AEDT)
+  # 04:00 AEDT = 17:00 UTC (UTC+11 in summer)
   schedule:
-    cron: "0 17 * * SAT"
+    cron: "0 17 * * *"
     suspend: false
-  # Maximum retention period for backups (4 weeks = 672 hours)
-  maxRetention: "672h"
-  # Storage configuration
+  # Maximum retention period for backups (30 days)
+  maxRetention: "720h"
+  # Storage configuration — GCS via S3-compatible API
   storage:
-    # Use S3-compatible storage (GCS)
     s3:
       bucket: hayden-magento2-backups
-      prefix: auntalma/mariadb
+      prefix: auntalma/mariadb-physical
       endpoint: storage.googleapis.com
       region: australia-southeast1
       accessKeyIdSecretKeyRef:

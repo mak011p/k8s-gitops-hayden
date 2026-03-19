@@ -7,7 +7,6 @@ metadata:
   namespace: business-system
 spec:
   # MariaDB 10.6 — matches production; supported by Magento 2.4.8-p3 (10.2-10.6, 11.4)
-  # 10.11 is NOT in the supported list for 2.4.8-p3 and causes indexer failures
   image: mariadb:10.6
 
   # Root password from secret
@@ -16,34 +15,23 @@ spec:
     key: password
     generate: false
 
-  # Galera cluster with 3 replicas for HA
-  galera:
+  # Primary-replica replication (replaces Galera)
+  # - Better write performance (no certification overhead)
+  # - Compatible with Magento reindex (MEMORY tables, bulk DDL)
+  # - Enables PITR via binlog archival
+  # - SemiSync for near-zero RPO on failover
+  replication:
     enabled: true
     primary:
       podIndex: 0
       autoFailover: true
-    sst: mariabackup
-    replicaThreads: 1
-    agent:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
-      gracefulShutdownTimeout: 5s
-    recovery:
-      enabled: true
-      minClusterSize: 50%
-      clusterHealthyTimeout: 3m
-      clusterBootstrapTimeout: 10m
-      podRecoveryTimeout: 5m
-      podSyncTimeout: 5m
-    initContainer:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
-    config:
-      reuseStorageVolume: false
-    initJob:
-      metadata:
-        labels:
-          sidecar.istio.io/inject: "false"
+    replica:
+      replPasswordSecretKeyRef:
+        name: auntalma-mariadb-superuser
+        key: password
+    syncBinlog: true
 
-  # 3-node cluster
+  # 3-node cluster (1 primary + 2 replicas)
   replicas: 3
 
   # Pod template
@@ -94,6 +82,7 @@ spec:
     innodb_autoinc_lock_mode=2
     innodb_buffer_pool_size=1G
     max_allowed_packet=256M
+    max_binlog_size=256M
     character-set-server=utf8mb4
     collation-server=utf8mb4_unicode_ci
     log_bin_trust_function_creators=1

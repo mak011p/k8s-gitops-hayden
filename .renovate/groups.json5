@@ -97,6 +97,19 @@
       minimumGroupSize: 2,
     },
     {
+      description: "Magento - auto-merge image updates (both hayden and auntalma use same image)",
+      groupName: "magento",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/hayden-agencies/magento2-makergroup"],
+      matchFileNames: ["kubernetes/apps/base/business-system/magento-makergroup/**"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: true,
+      group: {
+        commitMessageTopic: "{{{groupName}}} image",
+      },
+    },
+    {
       description: "Odoo Staging - auto-merge immediately for validation before production",
       groupName: "odoo-staging",
       matchDatasources: ["docker"],

@@ -11,11 +11,12 @@ spec:
       sectionName: https
   hostnames:
     - "auntalma.haydenagencies.com.au"
+    - "www.auntalma.com.au"
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /admin_hayden/
+            value: /almaadmin/
       backendRefs:
         - name: auntalma
           port: 8080

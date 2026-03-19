@@ -117,7 +117,7 @@ spec:
               - name: MAGENTO_MODE
                 value: production
               - name: MAGENTO_ADMIN_URL
-                value: admin_hayden
+                value: almaadmin
               # Store selection
               - name: MAGE_RUN_CODE
                 value: base

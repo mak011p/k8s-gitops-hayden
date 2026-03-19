@@ -215,17 +215,17 @@ resource "cloudflare_record" "dropdrape_pop3s" {
 resource "cloudflare_record" "dropdrape_web" {
   zone_id = local.dropdrape_zone_id
   name    = "@"
-  content = cloudflare_zero_trust_tunnel_cloudflared.auntalma_vps.cname
+  content = "external.haydenagencies.com.au"
   type    = "CNAME"
   proxied = true
-  comment = "Magento store via Cloudflare Tunnel"
+  comment = "Magento store via K8s cluster Cloudflare Tunnel"
 }
 
 resource "cloudflare_record" "dropdrape_www" {
   zone_id = local.dropdrape_zone_id
   name    = "www"
-  content = cloudflare_zero_trust_tunnel_cloudflared.auntalma_vps.cname
+  content = "external.haydenagencies.com.au"
   type    = "CNAME"
   proxied = true
-  comment = "Magento store www via Cloudflare Tunnel"
+  comment = "Magento store www via K8s cluster Cloudflare Tunnel"
 }

@@ -45,8 +45,7 @@ spec:
           php:
             image:
               repository: ghcr.io/hayden-agencies/magento2-makergroup
-              tag: latest
-              pullPolicy: Always
+              tag: 20260318-b1e9a3c  # 2.4.8-p3
             env:
               # Database
               - name: MAGENTO_DB_HOST

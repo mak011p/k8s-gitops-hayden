@@ -20,6 +20,32 @@ ingress:
     originRequest:
       proxyType: socks
 
+  # Magento production domains (auntalma.com.au + dropdrape.com.au)
+  - hostname: "auntalma.com.au"
+    service: https://envoy-external.network-system.svc.cluster.local
+    originRequest:
+      originServerName: external.${CLUSTER_DOMAIN}
+      connectTimeout: 30s
+      http2Origin: true
+  - hostname: "www.auntalma.com.au"
+    service: https://envoy-external.network-system.svc.cluster.local
+    originRequest:
+      originServerName: external.${CLUSTER_DOMAIN}
+      connectTimeout: 30s
+      http2Origin: true
+  - hostname: "dropdrape.com.au"
+    service: https://envoy-external.network-system.svc.cluster.local
+    originRequest:
+      originServerName: external.${CLUSTER_DOMAIN}
+      connectTimeout: 30s
+      http2Origin: true
+  - hostname: "www.dropdrape.com.au"
+    service: https://envoy-external.network-system.svc.cluster.local
+    originRequest:
+      originServerName: external.${CLUSTER_DOMAIN}
+      connectTimeout: 30s
+      http2Origin: true
+
   # Route all external services through Envoy Gateway
   - hostname: "*.${CLUSTER_DOMAIN}"
     service: https://envoy-external.network-system.svc.cluster.local

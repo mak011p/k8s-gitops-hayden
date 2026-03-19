@@ -14,6 +14,10 @@ spec:
       sectionName: https
   hostnames:
     - "auntalma.haydenagencies.com.au"
+    - "auntalma.com.au"
+    - "www.auntalma.com.au"
+    - "dropdrape.com.au"
+    - "www.dropdrape.com.au"
   rules:
     - matches:
         - path:

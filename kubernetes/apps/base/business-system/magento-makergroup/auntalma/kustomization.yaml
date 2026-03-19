@@ -13,7 +13,7 @@ resources:
   # Database
   - mariadb-cluster.yaml
   - scheduledbackup.yaml
-  - pitr.yaml
+  # pitr.yaml — disabled until TrueNAS MinIO is configured (GCS egress cost risk)
   # Redis cache
   - redis-statefulset.yaml
   # Storage

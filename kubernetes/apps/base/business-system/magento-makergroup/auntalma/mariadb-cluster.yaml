@@ -20,9 +20,11 @@ spec:
     type: ReplicasFirstPrimaryLast
     autoUpdateDataPlane: true
 
-  # PITR — continuous binlog archival to GCS for point-in-time recovery
-  pointInTimeRecoveryRef:
-    name: auntalma-mariadb-pitr
+  # PITR — disabled until TrueNAS MinIO bucket is configured
+  # Continuous binlog archival to GCS risks cost blowouts on errors
+  # TODO: Enable after creating MinIO bucket on TrueNAS (match Odoo pattern)
+  # pointInTimeRecoveryRef:
+  #   name: auntalma-mariadb-pitr
 
   # Primary-replica replication (replaces Galera)
   # - Better write performance (no certification overhead)

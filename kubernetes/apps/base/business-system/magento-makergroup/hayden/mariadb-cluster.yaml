@@ -25,7 +25,7 @@ spec:
     sst: mariabackup
     replicaThreads: 1
     agent:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
+      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:26.3.0
       gracefulShutdownTimeout: 5s
     recovery:
       enabled: true
@@ -35,7 +35,7 @@ spec:
       podRecoveryTimeout: 5m
       podSyncTimeout: 5m
     initContainer:
-      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:25.10.4
+      image: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator:26.3.0
     config:
       reuseStorageVolume: false
     initJob:

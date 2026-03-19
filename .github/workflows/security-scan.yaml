@@ -52,7 +52,7 @@ jobs:
         run: |
           set -o pipefail
           # renovate: datasource=github-releases depName=aquasecurity/trivy
-          TRIVY_VERSION=v0.69.3
+          TRIVY_VERSION=v0.69.4
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
             | sudo -E sh -s -- -b /usr/local/bin "${TRIVY_VERSION}"
           trivy --version

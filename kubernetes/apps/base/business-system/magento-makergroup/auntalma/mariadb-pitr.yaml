@@ -15,7 +15,7 @@ spec:
   compression: gzip
   storage:
     s3:
-      bucket: mariadb-binlog
+      bucket: cnpg-mariadb-binlog
       prefix: auntalma/base/
       endpoint: 192.168.50.17:9000
       accessKeyIdSecretKeyRef:
@@ -38,7 +38,7 @@ spec:
   archiveTimeout: 5m
   storage:
     s3:
-      bucket: mariadb-binlog
+      bucket: cnpg-mariadb-binlog
       prefix: auntalma/binlog/
       endpoint: 192.168.50.17:9000
       accessKeyIdSecretKeyRef:

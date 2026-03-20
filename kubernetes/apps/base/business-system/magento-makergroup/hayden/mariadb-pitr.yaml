@@ -11,7 +11,7 @@ spec:
   schedule:
     cron: "0 3 * * *"
     immediate: true
-  maxRetention: 7d
+  maxRetention: 168h
   compression: gzip
   storage:
     s3:

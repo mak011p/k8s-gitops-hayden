@@ -12,8 +12,8 @@ resources:
   - secret-mariadb-superuser.enc.age.yaml
   # Database
   - mariadb-cluster.yaml
+  - mariadb-pitr.yaml
   - scheduledbackup.yaml
-  # pitr.yaml — disabled until TrueNAS MinIO is configured (GCS egress cost risk)
   # Redis cache
   - redis-statefulset.yaml
   # Storage

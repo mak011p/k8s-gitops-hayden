@@ -12,6 +12,7 @@ resources:
   - secret-mariadb-superuser.enc.age.yaml
   # Database
   - mariadb-cluster.yaml
+  - mariadb-pitr.yaml
   - scheduledbackup.yaml
   # Redis Sentinel (Bitnami Helm chart)
   - redis-ocirepository.yaml

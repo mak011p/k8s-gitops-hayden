@@ -21,32 +21,27 @@ spec:
     type: ReplicasFirstPrimaryLast
     autoUpdateDataPlane: true
 
-  # Galera cluster with 3 replicas for HA
-  galera:
+  # PITR — binlog archival to TrueNAS MinIO (s3://mariadb-binlog/hayden/)
+  pointInTimeRecoveryRef:
+    name: hayden-mariadb-pitr
+
+  # Primary-replica replication (replaces Galera)
+  # - Better write performance (no certification overhead)
+  # - Compatible with Magento reindex (MEMORY tables, bulk DDL)
+  # - Enables PITR via binlog archival
+  # - SemiSync for near-zero RPO on failover
+  replication:
     enabled: true
     primary:
       podIndex: 0
       autoFailover: true
-    sst: mariabackup
-    replicaThreads: 1
-    agent:
-      gracefulShutdownTimeout: 5s
-    recovery:
-      enabled: true
-      minClusterSize: 50%
-      clusterHealthyTimeout: 3m
-      clusterBootstrapTimeout: 10m
-      podRecoveryTimeout: 5m
-      podSyncTimeout: 5m
-    initContainer: {}
-    config:
-      reuseStorageVolume: false
-    initJob:
-      metadata:
-        labels:
-          sidecar.istio.io/inject: "false"
+    replica:
+      replPasswordSecretKeyRef:
+        name: hayden-mariadb-superuser
+        key: password
+    syncBinlog: 1
 
-  # 3-node cluster
+  # 3-node cluster (1 primary + 2 replicas)
   replicas: 3
 
   # Pod template
@@ -97,6 +92,7 @@ spec:
     innodb_autoinc_lock_mode=2
     innodb_buffer_pool_size=1G
     max_allowed_packet=256M
+    max_binlog_size=256M
     character-set-server=utf8mb4
     collation-server=utf8mb4_unicode_ci
     log_bin_trust_function_creators=1

@@ -1,26 +1,43 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s.mariadb.com/pointintimerecovery_v1alpha1.json
+# PhysicalBackup — base backup for PITR (Mariabackup to TrueNAS MinIO)
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: PhysicalBackup
+metadata:
+  name: hayden-mariadb-backup
+  namespace: business-system
+spec:
+  mariaDbRef:
+    name: hayden-mariadb
+  schedule: "0 3 * * *"
+  maxRetention: 7d
+  compression: gzip
+  storage:
+    s3:
+      bucket: mariadb-binlog
+      prefix: hayden/base/
+      endpoint: 192.168.50.17:9000
+      accessKeyIdSecretKeyRef:
+        name: cnpg-minio-credentials
+        key: ACCESS_KEY_ID
+      secretAccessKeySecretKeyRef:
+        name: cnpg-minio-credentials
+        key: SECRET_ACCESS_KEY
+---
+# PointInTimeRecovery — continuous binlog archival on top of base backup
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: PointInTimeRecovery
 metadata:
   name: hayden-mariadb-pitr
   namespace: business-system
 spec:
-  # MariaDB instance to archive binlogs from
-  mariaDbRef:
-    name: hayden-mariadb
-
-  # Compress binlogs before uploading
+  physicalBackupRef:
+    name: hayden-mariadb-backup
   compression: gzip
-
-  # Archive binlogs every 5 minutes (balance between RPO and overhead)
   archiveTimeout: 5m
-
-  # S3-compatible storage (TrueNAS MinIO on LAN)
   storage:
     s3:
       bucket: mariadb-binlog
-      prefix: hayden/
+      prefix: hayden/binlog/
       endpoint: 192.168.50.17:9000
       accessKeyIdSecretKeyRef:
         name: cnpg-minio-credentials

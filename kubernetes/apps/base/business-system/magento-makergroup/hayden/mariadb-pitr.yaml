@@ -8,7 +8,9 @@ metadata:
 spec:
   mariaDbRef:
     name: hayden-mariadb
-  schedule: "0 3 * * *"
+  schedule:
+    cron: "0 3 * * *"
+    immediate: true
   maxRetention: 7d
   compression: gzip
   storage:

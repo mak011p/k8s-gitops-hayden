@@ -1,0 +1,70 @@
+---
+# Hourly mirror of MariaDB PITR data from MinIO (TrueNAS) to GCS (off-site DR)
+# Uses mc mirror (client-side sync) because GCS doesn't support S3 versioning
+# required for MinIO's native bucket replication.
+# No --remove flag: append-only DR — source deletions don't propagate to GCS.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: minio-gcs-mirror
+  namespace: business-system
+spec:
+  schedule: "15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            sidecar.istio.io/inject: "false"
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: mc-mirror
+              image: minio/mc:RELEASE.2025-04-08T15-10-58Z
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  mc alias set minio http://192.168.50.17:9000 "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+                  mc alias set gcs https://storage.googleapis.com "$GCS_ACCESS_KEY" "$GCS_SECRET_KEY" --api s3v4
+                  echo "Starting mirror at $(date -u)"
+                  mc mirror --overwrite --newer-than "2h" \
+                    minio/cnpg-mariadb-binlog \
+                    gcs/hayden-magento2-backups/minio-replica/
+                  echo "Mirror complete at $(date -u)"
+              env:
+                - name: MINIO_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: cnpg-minio-credentials
+                      key: ACCESS_KEY_ID
+                - name: MINIO_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: cnpg-minio-credentials
+                      key: SECRET_ACCESS_KEY
+                - name: GCS_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-objstore
+                      key: accessKeyId
+                - name: GCS_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: auntalma-objstore
+                      key: secretAccessKey
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi

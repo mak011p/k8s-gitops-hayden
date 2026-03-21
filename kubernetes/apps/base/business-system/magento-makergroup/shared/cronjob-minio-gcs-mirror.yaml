@@ -36,7 +36,7 @@ spec:
               image: minio/mc:latest
               securityContext:
                 allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: false
+                readOnlyRootFilesystem: true
                 capabilities:
                   drop: ["ALL"]
               command:
@@ -52,6 +52,8 @@ spec:
                     gcs/hayden-magento2-backups/minio-replica/
                   echo "Mirror complete at $(date -u)"
               env:
+                - name: HOME
+                  value: "/"
                 - name: MINIO_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
@@ -72,9 +74,19 @@ spec:
                     secretKeyRef:
                       name: auntalma-objstore
                       key: secretAccessKey
+              volumeMounts:
+                - name: mc-config
+                  mountPath: /.mc
+                - name: tmp
+                  mountPath: /tmp
               resources:
                 requests:
                   cpu: 50m
                   memory: 128Mi
                 limits:
                   memory: 256Mi
+          volumes:
+            - name: mc-config
+              emptyDir: {}
+            - name: tmp
+              emptyDir: {}

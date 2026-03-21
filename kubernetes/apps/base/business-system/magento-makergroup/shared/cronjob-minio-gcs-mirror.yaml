@@ -26,9 +26,19 @@ spec:
             sidecar.istio.io/inject: "false"
         spec:
           restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
           containers:
             - name: mc-mirror
-              image: minio/mc:RELEASE.2025-04-08T15-10-58Z
+              image: minio/mc:latest
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities:
+                  drop: ["ALL"]
               command:
                 - /bin/sh
                 - -c

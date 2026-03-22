@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# DR overlay — minimal set of services for disaster recovery
+# Single-node K3s/Talos cluster, no Rook-Ceph, no monitoring, no security tooling
+# All rook-ceph-cluster dependencies removed; storage class patched to local-path
+
+resources:
+  # --- Storage class alias (ceph-block → local-path provisioner) ---
+  - patches/storageclass-alias.yaml
+
+  # --- Namespaces ---
+  - namespaces.yaml
+
+  # --- Core infrastructure (order matters for dependencies) ---
+  # Flux
+  - ../../base/flux-system/flux-instance/ks.yaml
+  - ../../base/flux-system/repositories
+
+  # Secrets
+  - ../../base/external-secrets/external-secrets/ks.yaml
+  - ../../base/external-secrets/onepassword/ks.yaml
+
+  # Networking
+  - ../../base/network-system/cert-manager/ks.yaml
+  - ../../base/network-system/cloudflare-tunnel/ks.yaml
+  - ../../base/network-system/envoy-gateway/ks.yaml
+  - ../../base/network-system/external-dns/ks.yaml
+  - ../../base/network-system/oauth2-proxy/ks.yaml
+  - ../../base/network-system/dex/ks.yaml
+
+  # kube-system essentials
+  - ../../base/kube-system/metrics-server/ks.yaml
+
+  # --- Database operators ---
+  - ../../base/database-system/cnpg/ks.yaml
+  - ../../base/database-system/mariadb-operator/crds/ks.yaml
+  - ../../base/database-system/mariadb-operator/app/ks.yaml
+
+  # --- Business services (DR-specific ks.yaml — no rook-ceph deps) ---
+  - dr-ks/business-opensearch.yaml
+  - dr-ks/business-rabbitmq.yaml
+  - dr-ks/business-magento.yaml
+  - dr-ks/business-odoo.yaml

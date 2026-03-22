@@ -1,0 +1,12 @@
+---
+# Create a StorageClass named "ceph-block" that uses local-path provisioner
+# This avoids patching every HelmRelease/MariaDB/CNPG resource that references ceph-block
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rancher.io/local-path
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

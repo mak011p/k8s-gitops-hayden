@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unifi-alerts
+spec:
+  groups:
+    - name: unifi.rules
+      rules:
+        - alert: UniFiDeviceOffline
+          expr: unifipoller_device_adopted == 1 and unifipoller_device_uptime_seconds == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "UniFi device {{ $labels.name }} is offline"
+            description: "Adopted device {{ $labels.name }} ({{ $labels.type }}) appears offline."
+
+        - alert: UniFiHighClientCount
+          expr: sum by (site_name) (unifipoller_client_count) > 100
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High client count on site {{ $labels.site_name }}"
+            description: "{{ $value }} clients connected. Check for rogue devices."
+
+        - alert: UniFiAPHighChannelUtilization
+          expr: unifipoller_device_channel_utilization > 80
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High WiFi channel utilization on {{ $labels.name }}"
+            description: "Channel utilization at {{ $value }}%. Consider channel changes or adding APs."
+
+        - alert: UnPollerDown
+          expr: up{job="unpoller"} == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "UnPoller is down"
+            description: "Cannot scrape UnPoller metrics. Check UniFi controller connectivity."

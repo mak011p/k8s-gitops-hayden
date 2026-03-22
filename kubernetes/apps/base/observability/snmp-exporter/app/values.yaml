@@ -1,0 +1,39 @@
+fullnameOverride: snmp-exporter
+
+extraConfigmapMounts:
+  - name: snmp-config
+    mountPath: /etc/snmp_exporter/snmp.yml
+    subPath: snmp.yml
+    configMap: snmp-exporter-config
+
+serviceMonitor:
+  enabled: true
+  namespace: observability
+  params:
+    - name: ups-1
+      target: <UPS1_IP>
+      module:
+        - apcups
+      labels:
+        device: ups-1
+        device_type: ups
+        model: apc-srt3000rmxli
+    - name: ups-2
+      target: <UPS2_IP>
+      module:
+        - apcups_env
+      labels:
+        device: ups-2
+        device_type: ups
+        model: apc-srt3000rmxli
+    - name: ats-1
+      target: <ATS_IP>
+      module:
+        - apcats
+      labels:
+        device: ats-1
+        device_type: ats
+        model: apc-ap7721
+
+extraArgs:
+  - --config.file=/etc/snmp_exporter/snmp.yml

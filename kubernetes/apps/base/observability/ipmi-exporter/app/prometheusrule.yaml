@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ipmi-alerts
+spec:
+  groups:
+    - name: ipmi.rules
+      rules:
+        - alert: IPMIHighCPUTemperature
+          expr: ipmi_temperature_celsius{name=~".*CPU.*|.*Tctl.*"} > 85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU temperature on {{ $labels.instance }}"
+            description: "CPU temp is {{ $value }}°C on {{ $labels.instance }}. Check cooling."
+
+        - alert: IPMICriticalCPUTemperature
+          expr: ipmi_temperature_celsius{name=~".*CPU.*|.*Tctl.*"} > 95
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical CPU temperature on {{ $labels.instance }}"
+            description: "CPU temp is {{ $value }}°C. Thermal throttling or shutdown imminent."
+
+        - alert: IPMIHighSystemTemperature
+          expr: ipmi_temperature_celsius{name=~".*System.*|.*Board.*|.*Ambient.*"} > 45
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High system temperature on {{ $labels.instance }}"
+            description: "System temp is {{ $value }}°C. Check airflow and cooling."
+
+        - alert: IPMIFanFailure
+          expr: ipmi_fan_speed_rpm > 0 and ipmi_fan_speed_rpm < 200
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Fan failure detected on {{ $labels.instance }}"
+            description: "Fan {{ $labels.name }} running at {{ $value }} RPM. Possible failure."
+
+        - alert: IPMIHighPowerConsumption
+          expr: ipmi_dcmi_power_consumption_watts > 400
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High power consumption on {{ $labels.instance }}"
+            description: "Node consuming {{ $value }}W. Check for abnormal load."
+
+        - alert: IPMISELCriticalEvent
+          expr: increase(ipmi_sel_entries_count[1h]) > 5
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Rapid SEL entries on {{ $labels.instance }}"
+            description: "{{ $value }} new SEL entries in last hour. Check BMC event log."
+
+        - alert: IPMITargetDown
+          expr: up{job="ipmi-exporter"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "BMC {{ $labels.instance }} is unreachable"
+            description: "Cannot reach IPMI target. Check BMC network configuration."

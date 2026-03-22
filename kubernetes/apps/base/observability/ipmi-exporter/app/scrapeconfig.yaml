@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: ipmi-exporter
+spec:
+  scrapeInterval: 60s
+  scrapeTimeout: 30s
+  staticConfigs:
+    - targets:
+        # ASRock B650D4U-2L2T/BCM BMC IPs (worker nodes)
+        - <WORKER1_BMC_IP>
+        - <WORKER2_BMC_IP>
+        - <WORKER3_BMC_IP>
+        # Gigabyte MC13-LE3 BMC IP (TrueNAS)
+        - <TRUENAS_BMC_IP>
+      labels:
+        job: ipmi-exporter
+  metricsPath: /ipmi
+  params:
+    module:
+      - default
+  relabelings:
+    - sourceLabels: [__address__]
+      targetLabel: __param_target
+    - sourceLabels: [__param_target]
+      targetLabel: instance
+    - targetLabel: __address__
+      replacement: ipmi-exporter.observability.svc.cluster.local:9290

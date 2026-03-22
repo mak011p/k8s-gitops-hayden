@@ -452,6 +452,7 @@ dependsOn:
 
 ## Important Notes
 
+- **NEVER apply manifests directly to the cluster** with `kubectl apply`, `kubectl edit`, or `kubectl rollout restart`. This is a GitOps-managed cluster — ALL changes must be committed to the repo and deployed via FluxCD reconciliation. Direct `kubectl apply` bypasses GitOps, causes drift, and will be overwritten on the next Flux reconcile. The only exceptions are one-off debugging commands (`kubectl exec`, `kubectl logs`, `kubectl get`).
 - **Cluster ID**: "cluster-00" is the default cluster identifier
 - **Branch**: `master` is the primary branch (auto-reconciled by FluxCD)
 - **Talos configs**: Stored encrypted in `talos/generated/`

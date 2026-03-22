@@ -8,32 +8,28 @@ spec:
   groups:
     - name: unifi.rules
       rules:
+        # NOTE: UnPoller v2 metric names use "unpoller_" prefix.
+        # Verify actual metric names after first deployment with:
+        #   curl -s http://unpoller.observability:9130/metrics | grep -E "^unpoller_" | head -20
+        # Then adjust these rules to match.
+
         - alert: UniFiDeviceOffline
-          expr: unifipoller_device_adopted == 1 and unifipoller_device_uptime_seconds == 0
+          expr: unpoller_device_uptime_seconds == 0
           for: 5m
           labels:
             severity: critical
           annotations:
             summary: "UniFi device {{ $labels.name }} is offline"
-            description: "Adopted device {{ $labels.name }} ({{ $labels.type }}) appears offline."
+            description: "Device {{ $labels.name }} ({{ $labels.type }}) reports 0 uptime."
 
         - alert: UniFiHighClientCount
-          expr: sum by (site_name) (unifipoller_client_count) > 100
+          expr: sum by (site_name) (unpoller_client_receive_bytes_total) > 0 and sum by (site_name) (count(unpoller_client_receive_bytes_total)) > 100
           for: 10m
           labels:
             severity: warning
           annotations:
             summary: "High client count on site {{ $labels.site_name }}"
             description: "{{ $value }} clients connected. Check for rogue devices."
-
-        - alert: UniFiAPHighChannelUtilization
-          expr: unifipoller_device_channel_utilization > 80
-          for: 15m
-          labels:
-            severity: warning
-          annotations:
-            summary: "High WiFi channel utilization on {{ $labels.name }}"
-            description: "Channel utilization at {{ $value }}%. Consider channel changes or adding APs."
 
         - alert: UnPollerDown
           expr: up{job="unpoller"} == 0

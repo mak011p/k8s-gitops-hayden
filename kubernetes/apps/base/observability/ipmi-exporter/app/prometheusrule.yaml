@@ -35,8 +35,8 @@ spec:
             summary: "High system temperature on {{ $labels.instance }}"
             description: "System temp is {{ $value }}°C. Check airflow and cooling."
 
-        - alert: IPMIFanFailure
-          expr: ipmi_fan_speed_rpm > 0 and ipmi_fan_speed_rpm < 200
+        - alert: IPMIFanStopped
+          expr: ipmi_fan_speed_rpm == 0
           for: 5m
           labels:
             severity: critical

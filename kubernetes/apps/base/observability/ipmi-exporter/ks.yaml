@@ -22,3 +22,7 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: ipmi-exporter-secrets

@@ -1,0 +1,42 @@
+---
+# DR: OpenSearch for auntalma — no rook-ceph dependency, uses local-path
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: auntalma-opensearch
+  namespace: business-system
+spec:
+  decryption:
+    provider: sops
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/auntalma-opensearch/app"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: business-system
+---
+# DR: OpenSearch for hayden — no rook-ceph dependency, uses local-path
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: hayden-opensearch
+  namespace: business-system
+spec:
+  decryption:
+    provider: sops
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  path: "./apps/base/business-system/hayden-opensearch/app"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: OCIRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: business-system

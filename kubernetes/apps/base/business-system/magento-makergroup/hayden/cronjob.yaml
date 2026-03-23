@@ -30,7 +30,7 @@ spec:
             - name: ghcr-pull
           containers:
             - name: cron
-              image: ghcr.io/hayden-agencies/magento2-makergroup:20260318-b1e9a3c  # 2.4.8-p3
+              image: ghcr.io/hayden-agencies/magento2-makergroup:20260323-a940383  # 2.4.8-p3
               workingDir: /var/www/html
               command: ["/bin/sh", "-c", "php bin/magento cron:run 2>&1"]
               env:

@@ -17,6 +17,18 @@ spec:
         app.kubernetes.io/name: postgres-mcp
     spec:
       enableServiceLinks: false
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 10.96.0.10
+        searches:
+          - ai-system.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "2"
+          - name: use-vc
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000

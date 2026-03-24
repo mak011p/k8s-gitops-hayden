@@ -51,6 +51,13 @@ resource "cloudflare_list" "whitelisted_ips" {
     value {
       ip = "121.200.5.240"
     }
+    comment = "Thomas work IP"
+  }
+
+  item {
+    value {
+      ip = "121.200.6.97"
+    }
     comment = "Thomas home IP"
   }
 }

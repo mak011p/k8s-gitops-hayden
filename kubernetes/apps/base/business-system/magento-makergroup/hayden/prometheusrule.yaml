@@ -61,6 +61,36 @@ spec:
               MariaDB {{ $labels.instance }} is using {{ $value | humanizePercentage }} of max connections.
               Consider increasing max_connections or investigating connection leaks.
 
+    - name: hayden.cron
+      rules:
+        - alert: HaydenCronJobFailing
+          expr: |
+            kube_job_status_failed{namespace="business-system", job_name=~"hayden-magento-cron-.*"} > 0
+          for: 15m
+          labels:
+            severity: warning
+            service: hayden
+          annotations:
+            summary: "Hayden Magento cron job is failing"
+            description: >
+              CronJob hayden-magento-cron has failed pods for >15 minutes.
+              Check init container validation logs and cron:run output.
+              Failing cron causes indexer backlogs and stale catalog data.
+
+        - alert: HaydenCronJobNotRunning
+          expr: |
+            time() - kube_cronjob_status_last_successful_time{namespace="business-system", cronjob="hayden-magento-cron"} > 1800
+          for: 5m
+          labels:
+            severity: critical
+            service: hayden
+          annotations:
+            summary: "Hayden Magento cron hasn't succeeded in 30 minutes"
+            description: >
+              CronJob hayden-magento-cron has not completed successfully for >30 minutes.
+              Indexers, email, sitemap, and currency updates are not processing.
+              Check CronJob pods, init container logs, and DB connectivity.
+
     - name: hayden.magento
       rules:
         - alert: HaydenPodNotReady

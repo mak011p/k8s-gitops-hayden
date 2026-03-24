@@ -11,7 +11,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      backoffLimit: 1
+      backoffLimit: 0
       activeDeadlineSeconds: 300
       template:
         metadata:
@@ -28,6 +28,75 @@ spec:
             seccompProfile: { type: RuntimeDefault }
           imagePullSecrets:
             - name: ghcr-pull
+          initContainers:
+            - name: validate-cli
+              image: ghcr.io/hayden-agencies/magento2-makergroup:20260318-b1e9a3c  # 2.4.8-p3
+              workingDir: /var/www/html
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  # Validate Magento CLI is functional before running cron
+                  php bin/magento list cron 2>&1 | grep -q "cron:run"
+                  if [ $? -ne 0 ]; then
+                    echo "FATAL: Magento CLI broken - cron:run command not available"
+                    exit 1
+                  fi
+                  php bin/magento setup:db:status >/dev/null 2>&1
+                  if [ $? -ne 0 ] && [ $? -ne 2 ]; then
+                    echo "FATAL: Database unreachable"
+                    exit 1
+                  fi
+                  echo "CLI validation passed"
+              env:
+                - name: MAGENTO_DB_HOST
+                  value: hayden-mariadb-primary.business-system.svc.cluster.local
+                - name: MAGENTO_DB_PORT
+                  value: "3306"
+                - name: MAGENTO_DB_NAME
+                  value: magento
+                - name: MAGENTO_DB_USER
+                  value: magento
+                - name: MAGENTO_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: hayden-mariadb-app
+                      key: password
+                - name: MAGENTO_CACHE_REDIS_HOST
+                  value: hayden-redis-master.business-system.svc.cluster.local
+                - name: MAGENTO_CACHE_REDIS_PORT
+                  value: "6379"
+                - name: MAGENTO_CACHE_REDIS_DB
+                  value: "6"
+                - name: MAGENTO_OPENSEARCH_HOST
+                  value: hayden-opensearch.business-system.svc.cluster.local
+                - name: MAGENTO_OPENSEARCH_PORT
+                  value: "9200"
+                - name: MAGENTO_MODE
+                  value: production
+                - name: MAGENTO_CRYPT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hayden-magento-app
+                      key: crypt-key
+              volumeMounts:
+                - name: media
+                  mountPath: /var/www/html/pub/media
+                - name: var
+                  mountPath: /var/www/html/var
+                - name: env-php
+                  mountPath: /var/www/html/app/etc/env.php
+                  subPath: env.php
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities: { drop: ["ALL"] }
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 256Mi
+                limits:
+                  memory: 512Mi
           containers:
             - name: cron
               image: ghcr.io/hayden-agencies/magento2-makergroup:20260324-9cdb58e  # 2.4.8-p3

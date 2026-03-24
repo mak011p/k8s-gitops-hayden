@@ -61,6 +61,36 @@ spec:
               MariaDB {{ $labels.instance }} is using {{ $value | humanizePercentage }} of max connections.
               Consider increasing max_connections or investigating connection leaks.
 
+    - name: auntalma.cron
+      rules:
+        - alert: AuntalmaCronJobFailing
+          expr: |
+            kube_job_status_failed{namespace="business-system", job_name=~"auntalma-magento-cron-.*"} > 0
+          for: 15m
+          labels:
+            severity: warning
+            service: auntalma
+          annotations:
+            summary: "Auntalma Magento cron job is failing"
+            description: >
+              CronJob auntalma-magento-cron has failed pods for >15 minutes.
+              Check init container validation logs and cron:run output.
+              Failing cron causes indexer backlogs and stale catalog data.
+
+        - alert: AuntalmaCronJobNotRunning
+          expr: |
+            time() - kube_cronjob_status_last_successful_time{namespace="business-system", cronjob="auntalma-magento-cron"} > 1800
+          for: 5m
+          labels:
+            severity: critical
+            service: auntalma
+          annotations:
+            summary: "Auntalma Magento cron hasn't succeeded in 30 minutes"
+            description: >
+              CronJob auntalma-magento-cron has not completed successfully for >30 minutes.
+              Indexers, email, sitemap, and currency updates are not processing.
+              Check CronJob pods, init container logs, and DB connectivity.
+
     - name: auntalma.magento
       rules:
         - alert: AuntalmaPodNotReady

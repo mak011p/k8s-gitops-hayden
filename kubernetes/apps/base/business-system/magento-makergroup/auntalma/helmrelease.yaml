@@ -45,7 +45,7 @@ spec:
           static-copy:
             image:
               repository: ghcr.io/hayden-agencies/magento2-makergroup
-              tag: 20260323-a940383  # 2.4.8-p3
+              tag: 20260324-9cdb58e  # 2.4.8-p3
             command: ["sh", "-c", "cp -a /var/www/html/pub/static/. /static-out/"]
             securityContext:
               allowPrivilegeEscalation: false
@@ -56,7 +56,7 @@ spec:
           php:
             image:
               repository: ghcr.io/hayden-agencies/magento2-makergroup
-              tag: 20260323-a940383  # 2.4.8-p3
+              tag: 20260324-9cdb58e  # 2.4.8-p3
             env:
               # Database
               - name: MAGENTO_DB_HOST

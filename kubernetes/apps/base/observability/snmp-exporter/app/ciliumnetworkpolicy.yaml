@@ -6,7 +6,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: snmp-exporter
+      app.kubernetes.io/name: prometheus-snmp-exporter
   egress:
     # Allow DNS resolution
     - toEndpoints:

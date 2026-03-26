@@ -8,7 +8,6 @@ resources:
   - ocirepository.yaml
   - prometheusrule.yaml
   - grafanadashboard.yaml
-  - secret.enc.age.yaml
   - resources/snmp-config.yaml
 
 configMapGenerator:

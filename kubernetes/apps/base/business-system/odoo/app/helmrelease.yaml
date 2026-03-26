@@ -167,6 +167,7 @@ spec:
             matchLabels:
               app.kubernetes.io/name: odoo
       annotations:
+        configmap/odoo-config: "1d60a21c"
         # Velero backup hooks
         pre.hook.backup.velero.io/container: app
         pre.hook.backup.velero.io/command: '["/bin/sh", "-c", "echo Starting Velero backup"]'

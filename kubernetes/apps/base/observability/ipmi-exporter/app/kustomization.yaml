@@ -8,4 +8,5 @@ resources:
   - scrapeconfig.yaml
   - prometheusrule.yaml
   - grafanadashboard.yaml
+  - ciliumnetworkpolicy.yaml
   - resources/ipmi-config.yaml

@@ -8,6 +8,7 @@ resources:
   - ocirepository.yaml
   - prometheusrule.yaml
   - grafanadashboard.yaml
+  - ciliumnetworkpolicy.yaml
   - resources/snmp-config.yaml
 
 configMapGenerator:

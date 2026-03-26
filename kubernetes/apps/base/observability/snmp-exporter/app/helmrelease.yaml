@@ -38,3 +38,19 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: snmp-exporter-values
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: snmp-exporter
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: snmp-exporter
+              spec:
+                template:
+                  spec:
+                    hostNetwork: true
+                    dnsPolicy: ClusterFirstWithHostNet

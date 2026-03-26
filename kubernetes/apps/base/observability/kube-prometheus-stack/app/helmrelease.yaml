@@ -45,6 +45,15 @@ spec:
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
       alertmanagerSpec:
+        replicas: 2
+        podAntiAffinity: hard
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: alertmanager
         externalUrl: https://alert-manager.${CLUSTER_DOMAIN}
         storage:
           volumeClaimTemplate:
@@ -69,6 +78,8 @@ spec:
       ## Settings affecting prometheusSpec
       ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
       prometheusSpec:
+        replicas: 2
+        replicaExternalLabelName: prometheus_replica
         priorityClassName: platform-cluster-critical
         # REQUIRED: Cilium Hubble metrics are exposed via OpenMetrics. Prometheus Operator requires the `exemplar-storage` feature to be enabled to scrape OpenMetrics.
         # https://docs.cilium.io/en/stable/observability/metrics/#openmetrics
@@ -82,6 +93,13 @@ spec:
         scrapeInterval: 1m
         externalUrl: https://prometheus.${CLUSTER_DOMAIN}
         podAntiAffinity: hard
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: prometheus
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false
         podMonitorSelectorNilUsesHelmValues: false

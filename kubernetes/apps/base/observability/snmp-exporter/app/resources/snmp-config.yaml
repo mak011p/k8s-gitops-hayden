@@ -6,7 +6,7 @@ metadata:
 data:
   snmp.yml: |
     auths:
-      apc_v2:
+      public_v2:
         community: "${SNMP_COMMUNITY}"
         security_level: noAuthNoPriv
         auth_protocol: MD5

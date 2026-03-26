@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ipmi-exporter-config
+data:
+  ipmi-exporter.yaml: |
+    modules:
+      default:
+        # IPMI over LAN (RMCP+) - no local freeipmi needed
+        user: "${IPMI_USER}"
+        pass: "${IPMI_PASS}"
+        driver: "LAN_2_0"
+        privilege: "user"
+        timeout: 10000
+        collectors:
+          - bmc
+          - ipmi
+          - dcmi
+          - sel
+        exclude_sensor_ids: []

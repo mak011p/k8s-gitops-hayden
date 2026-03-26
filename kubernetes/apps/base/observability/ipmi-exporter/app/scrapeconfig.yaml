@@ -13,14 +13,16 @@ spec:
         - 192.168.50.19
         - 192.168.50.253
         - 192.168.50.18
+      labels:
+        job: ipmi-exporter
+        __param_module: default
+    - targets:
         # Gigabyte MC13-LE3 BMC IP (TrueNAS)
         - 192.168.50.12
       labels:
         job: ipmi-exporter
+        __param_module: truenas
   metricsPath: /ipmi
-  params:
-    module:
-      - default
   relabelings:
     - sourceLabels: [__address__]
       targetLabel: __param_target

@@ -22,7 +22,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: observability
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: snmp-exporter-secrets

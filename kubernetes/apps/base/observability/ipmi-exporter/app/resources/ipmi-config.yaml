@@ -7,9 +7,22 @@ data:
   ipmi-exporter.yaml: |
     modules:
       default:
-        # IPMI over LAN (RMCP+) - no local freeipmi needed
+        # IPMI over LAN (RMCP+) - ASRock B650D4U worker nodes
         user: "${IPMI_USER}"
         pass: "${IPMI_PASS}"
+        driver: "LAN_2_0"
+        privilege: "user"
+        timeout: 10000
+        collectors:
+          - bmc
+          - ipmi
+          - dcmi
+          - sel
+        exclude_sensor_ids: []
+      truenas:
+        # Gigabyte MC13-LE3 TrueNAS BMC
+        user: "${IPMI_TRUENAS_USER}"
+        pass: "${IPMI_TRUENAS_PASS}"
         driver: "LAN_2_0"
         privilege: "user"
         timeout: 10000

@@ -18,15 +18,14 @@ serviceMonitor:
         device: ups-1
         device_type: ups
         model: apc-srt3000rmxli
-    # TODO: UPS 2 SNMP disabled - needs super user access to enable SNMPv1
-    # - name: ups-2
-    #   target: 192.168.50.14
-    #   module:
-    #     - apcups_env
-    #   labels:
-    #     device: ups-2
-    #     device_type: ups
-    #     model: apc-srt3000rmxli
+    - name: ups-2
+      target: 192.168.50.14
+      module:
+        - apcups
+      labels:
+        device: ups-2
+        device_type: ups
+        model: apc-srt3000rmxli
     # TODO: ATS needs RJ12 serial cable to configure IP
     # - name: ats-1
     #   target: 192.168.50.15

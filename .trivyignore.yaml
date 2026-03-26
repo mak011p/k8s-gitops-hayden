@@ -32,6 +32,16 @@ misconfigurations:
       password passthrough to Migadu IMAP. No actual secrets are stored in the
       ConfigMap - credentials are provided by users at login time.
 
+  # IPMI exporter config - 'pass' field is a ${IPMI_PASS} substitution variable
+  # Risk accepted: actual credentials injected via Flux post-build substitution from Secret
+  - id: AVD-KSV-0109
+    paths:
+      - apps/base/observability/ipmi-exporter/app/resources/ipmi-config.yaml
+    statement: |
+      IPMI exporter configuration uses ${IPMI_PASS} variable substitution.
+      No actual secrets are stored - credentials are injected at runtime
+      via Flux post-build substitution from an encrypted Secret.
+
   # Dovecot IMAP proxy - needs writable filesystem for internal state
   # Risk accepted: runs with dropped capabilities, no privilege escalation
   - id: AVD-KSV-0014

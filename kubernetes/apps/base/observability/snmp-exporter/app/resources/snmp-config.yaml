@@ -15,26 +15,20 @@ data:
 
     modules:
       # APC UPS module - SRT3000RMXLI via AP9631 network card
-      # PowerNet-MIB OIDs for UPS monitoring
       apcups:
         walk:
-          - 1.3.6.1.4.1.318.1.1.1.2       # upsBasicBattery
-          - 1.3.6.1.4.1.318.1.1.1.3       # upsBasicInput
-          - 1.3.6.1.4.1.318.1.1.1.4       # upsBasicOutput
-          - 1.3.6.1.4.1.318.1.1.1.1.1     # upsBasicIdentModel
-          - 1.3.6.1.4.1.318.1.1.1.1.2     # upsBasicIdentName
+          - 1.3.6.1.4.1.318.1.1.1.2.1     # upsBasicBatteryStatus
+          - 1.3.6.1.4.1.318.1.1.1.2.2     # upsAdvBatteryRunTimeRemaining
           - 1.3.6.1.4.1.318.1.1.1.2.3.1   # upsHighPrecBatteryCapacity
           - 1.3.6.1.4.1.318.1.1.1.2.11    # upsHighPrecBatteryTemperature
-          - 1.3.6.1.4.1.318.1.1.1.4.3.1   # upsHighPrecOutputLoad
-          - 1.3.6.1.4.1.318.1.1.1.4.2.1   # upsHighPrecOutputVoltage
-          - 1.3.6.1.4.1.318.1.1.1.3.3.1   # upsHighPrecInputVoltage
-          - 1.3.6.1.4.1.318.1.1.1.2.2     # upsAdvBatteryRunTimeRemaining
-          - 1.3.6.1.4.1.318.1.1.1.2.1     # upsBasicBatteryStatus
-          - 1.3.6.1.4.1.318.1.1.1.4.1     # upsBasicOutputStatus
           - 1.3.6.1.4.1.318.1.1.1.3.2.1   # upsHighPrecInputFrequency
+          - 1.3.6.1.4.1.318.1.1.1.3.3.1   # upsHighPrecInputVoltage
+          - 1.3.6.1.4.1.318.1.1.1.4.1     # upsBasicOutputStatus
+          - 1.3.6.1.4.1.318.1.1.1.4.2.1   # upsHighPrecOutputVoltage
           - 1.3.6.1.4.1.318.1.1.1.4.2.4   # upsHighPrecOutputCurrent
+          - 1.3.6.1.4.1.318.1.1.1.4.2.6   # upsHighPrecOutputPower
           - 1.3.6.1.4.1.318.1.1.1.4.2.8   # upsHighPrecOutputEfficiency
-          - 1.3.6.1.4.1.318.1.1.1.4.2.6   # upsHighPrecOutputPower (watts)
+          - 1.3.6.1.4.1.318.1.1.1.4.3.1   # upsHighPrecOutputLoad
         metrics:
           - name: upsBasicBatteryStatus
             oid: 1.3.6.1.4.1.318.1.1.1.2.1
@@ -88,25 +82,19 @@ data:
       # APC UPS module with environmental sensors (humidity probe)
       apcups_env:
         walk:
-          - 1.3.6.1.4.1.318.1.1.1.2       # upsBasicBattery
-          - 1.3.6.1.4.1.318.1.1.1.3       # upsBasicInput
-          - 1.3.6.1.4.1.318.1.1.1.4       # upsBasicOutput
-          - 1.3.6.1.4.1.318.1.1.1.1.1     # upsBasicIdentModel
-          - 1.3.6.1.4.1.318.1.1.1.1.2     # upsBasicIdentName
+          - 1.3.6.1.4.1.318.1.1.1.2.1     # upsBasicBatteryStatus
+          - 1.3.6.1.4.1.318.1.1.1.2.2     # upsAdvBatteryRunTimeRemaining
           - 1.3.6.1.4.1.318.1.1.1.2.3.1   # upsHighPrecBatteryCapacity
           - 1.3.6.1.4.1.318.1.1.1.2.11    # upsHighPrecBatteryTemperature
-          - 1.3.6.1.4.1.318.1.1.1.4.3.1   # upsHighPrecOutputLoad
-          - 1.3.6.1.4.1.318.1.1.1.4.2.1   # upsHighPrecOutputVoltage
-          - 1.3.6.1.4.1.318.1.1.1.3.3.1   # upsHighPrecInputVoltage
-          - 1.3.6.1.4.1.318.1.1.1.2.2     # upsAdvBatteryRunTimeRemaining
-          - 1.3.6.1.4.1.318.1.1.1.2.1     # upsBasicBatteryStatus
-          - 1.3.6.1.4.1.318.1.1.1.4.1     # upsBasicOutputStatus
           - 1.3.6.1.4.1.318.1.1.1.3.2.1   # upsHighPrecInputFrequency
+          - 1.3.6.1.4.1.318.1.1.1.3.3.1   # upsHighPrecInputVoltage
+          - 1.3.6.1.4.1.318.1.1.1.4.1     # upsBasicOutputStatus
+          - 1.3.6.1.4.1.318.1.1.1.4.2.1   # upsHighPrecOutputVoltage
           - 1.3.6.1.4.1.318.1.1.1.4.2.4   # upsHighPrecOutputCurrent
-          - 1.3.6.1.4.1.318.1.1.1.4.2.8   # upsHighPrecOutputEfficiency
           - 1.3.6.1.4.1.318.1.1.1.4.2.6   # upsHighPrecOutputPower
-          # Environmental monitoring (AP9631 probe)
-          - 1.3.6.1.4.1.318.1.1.10.2.3.2  # uioSensorStatusTable
+          - 1.3.6.1.4.1.318.1.1.1.4.2.8   # upsHighPrecOutputEfficiency
+          - 1.3.6.1.4.1.318.1.1.1.4.3.1   # upsHighPrecOutputLoad
+          - 1.3.6.1.4.1.318.1.1.10.2.3.2  # uioSensorStatusTable (env sensors)
         metrics:
           - name: upsBasicBatteryStatus
             oid: 1.3.6.1.4.1.318.1.1.1.2.1
@@ -156,7 +144,6 @@ data:
             oid: 1.3.6.1.4.1.318.1.1.1.4.2.8
             type: gauge
             help: "Output efficiency in tenths of percent"
-          # Environmental sensors
           - name: uioSensorStatusTemperature
             oid: 1.3.6.1.4.1.318.1.1.10.2.3.2.1.4
             type: gauge
@@ -187,10 +174,8 @@ data:
       # APC Automatic Transfer Switch - AP7721
       apcats:
         walk:
-          - 1.3.6.1.4.1.318.1.1.8.5.1     # atsIdentModelNumber
-          - 1.3.6.1.4.1.318.1.1.8.5.2     # atsIdentSerialNumber
           - 1.3.6.1.4.1.318.1.1.8.1       # atsStatusSelectedSource
-          - 1.3.6.1.4.1.318.1.1.8.5.3.3   # atsInputVoltage (source A & B)
+          - 1.3.6.1.4.1.318.1.1.8.5.3.3   # atsInputVoltage
           - 1.3.6.1.4.1.318.1.1.8.5.3.2   # atsInputFrequency
           - 1.3.6.1.4.1.318.1.1.8.5.4.2   # atsOutputCurrent
           - 1.3.6.1.4.1.318.1.1.8.5.4.3   # atsOutputPower

@@ -1,8 +1,5 @@
 fullnameOverride: snmp-exporter
 
-hostNetwork: true
-dnsPolicy: ClusterFirstWithHostNet
-
 extraConfigmapMounts:
   - name: snmp-config
     mountPath: /etc/snmp_exporter/snmp.yml
@@ -12,6 +9,7 @@ extraConfigmapMounts:
 serviceMonitor:
   enabled: true
   namespace: observability
+  scrapeTimeout: 30s
   params:
     - name: ups-1
       target: 192.168.50.16

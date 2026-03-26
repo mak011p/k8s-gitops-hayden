@@ -94,3 +94,8 @@ spec:
           - path: /config/ipmi-exporter.yaml
             subPath: ipmi-exporter.yaml
             readOnly: true
+      tmp:
+        type: emptyDir
+        medium: Memory
+        globalMounts:
+          - path: /tmp

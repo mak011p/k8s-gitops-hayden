@@ -10,11 +10,11 @@ spec:
   staticConfigs:
     - targets:
         # ASRock B650D4U-2L2T/BCM BMC IPs (worker nodes)
-        - <WORKER1_BMC_IP>
-        - <WORKER2_BMC_IP>
-        - <WORKER3_BMC_IP>
+        - 192.168.50.19
+        - 192.168.50.253
+        - 192.168.50.18
         # Gigabyte MC13-LE3 BMC IP (TrueNAS)
-        - <TRUENAS_BMC_IP>
+        - 192.168.50.12
       labels:
         job: ipmi-exporter
   metricsPath: /ipmi

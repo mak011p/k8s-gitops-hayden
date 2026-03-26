@@ -77,9 +77,7 @@ spec:
                 memory: 128Mi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsNonRoot: false
         seccompProfile: { type: RuntimeDefault }
     service:
       app:

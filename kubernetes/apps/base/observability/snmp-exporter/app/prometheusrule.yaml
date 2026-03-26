@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ups-alerts
+spec:
+  groups:
+    - name: ups.rules
+      rules:
+        - alert: UPSOnBattery
+          expr: upsBasicOutputStatus == 3
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "UPS {{ $labels.device }} is running on battery power"
+            description: "UPS has switched to battery. Check mains power immediately."
+
+        - alert: UPSBatteryLow
+          expr: upsHighPrecBatteryCapacity / 10 < 25
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "UPS {{ $labels.device }} battery below 25%"
+            description: "Battery capacity is {{ $value }}%. Initiate graceful shutdown if mains not restored."
+
+        - alert: UPSBatteryReplacementNeeded
+          expr: upsBasicBatteryStatus == 4
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "UPS {{ $labels.device }} battery in fault condition"
+            description: "Battery status indicates fault. Schedule replacement."
+
+        - alert: UPSHighLoad
+          expr: upsHighPrecOutputLoad / 10 > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "UPS {{ $labels.device }} output load above 80%"
+            description: "Output load is {{ $value }}%. Consider load redistribution."
+
+        - alert: UPSHighTemperature
+          expr: upsHighPrecBatteryTemperature / 10 > 40
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "UPS {{ $labels.device }} battery temperature above 40°C"
+            description: "Battery temperature is {{ $value }}°C. Check cooling."
+
+        - alert: UPSLowRuntime
+          expr: upsAdvBatteryRunTimeRemaining / 100 < 300
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "UPS {{ $labels.device }} has less than 5 minutes runtime remaining"
+            description: "Estimated runtime is {{ $value }}s. Graceful shutdown may be needed."
+
+        - alert: RackHumidityHigh
+          expr: uioSensorStatusHumidity / 10 > 60
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Rack humidity above 60% RH on {{ $labels.sensor_name }}"
+            description: "Humidity is {{ $value }}% RH. Check HVAC."
+
+        - alert: RackTemperatureHigh
+          expr: uioSensorStatusTemperature / 10 > 35
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Rack temperature above 35°C on {{ $labels.sensor_name }}"
+            description: "Ambient temperature is {{ $value }}°C. Check cooling."
+
+        - alert: ATSSourceSwitchover
+          expr: changes(atsStatusSelectedSource[5m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "ATS {{ $labels.device }} switched input source"
+            description: "The ATS has switched active input sources. Check power feeds."
+
+        - alert: SNMPTargetDown
+          expr: up{job="snmp-exporter"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "SNMP target {{ $labels.instance }} is unreachable"
+            description: "Cannot reach SNMP target. Check network connectivity and SNMP configuration."

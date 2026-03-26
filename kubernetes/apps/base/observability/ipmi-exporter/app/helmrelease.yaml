@@ -1,0 +1,98 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ipmi-exporter
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  install:
+    timeout: 10m
+    replace: true
+    crds: CreateReplace
+    createNamespace: true
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 5m
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+      retries: 3
+      strategy: rollback
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+  rollback:
+    recreate: true
+    force: true
+    cleanupOnFail: true
+  uninstall:
+    keepHistory: false
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: observability
+  values:
+    controllers:
+      ipmi-exporter:
+        replicas: 1
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/prometheus-community/ipmi-exporter
+              tag: v1.9.0
+            args:
+              - --config.file=/config/ipmi-exporter.yaml
+              - --web.listen-address=:9290
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /metrics
+                    port: &port 9290
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: ipmi-exporter
+        ports:
+          metrics:
+            primary: true
+            port: *port
+    persistence:
+      config:
+        type: configMap
+        name: ipmi-exporter-config
+        globalMounts:
+          - path: /config/ipmi-exporter.yaml
+            subPath: ipmi-exporter.yaml
+            readOnly: true

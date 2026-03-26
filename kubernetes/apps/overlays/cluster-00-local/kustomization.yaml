@@ -34,5 +34,8 @@ resources:
   - ../../base/observability/thanos-compactor/ks.yaml
   - ../../base/observability/thanos-store/ks.yaml
   - ../../base/observability/thanos-query/ks.yaml
+  - ../../base/observability/snmp-exporter/ks.yaml
+  - ../../base/observability/ipmi-exporter/ks.yaml
+  - ../../base/observability/unpoller/ks.yaml
   - ../../base/security-system/kyverno/ks.yaml
   - ../../base/security-system/kubescape/ks.yaml

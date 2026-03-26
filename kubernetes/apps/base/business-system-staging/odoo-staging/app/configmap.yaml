@@ -48,4 +48,4 @@ data:
 
     # Queue Job Configuration (reduced for staging)
     [queue_job]
-    channels = root:8,root.sale_order:6,root.product_template:2,root.inventory:2
+    channels = root:8,root.sale_order:6,root.product_template:2,root.inventory:2,root.intercompany_markup:2

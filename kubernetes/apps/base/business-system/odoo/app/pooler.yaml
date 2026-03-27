@@ -11,6 +11,7 @@ spec:
   type: rw
   template:
     spec:
+      containers: []
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

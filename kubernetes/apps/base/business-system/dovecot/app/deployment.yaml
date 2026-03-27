@@ -34,7 +34,7 @@ spec:
               mountPath: /run/dovecot
       containers:
         - name: dovecot
-          image: dovecot/dovecot:2.3.21
+          image: dovecot/dovecot:2.4.3
           command:
             - /bin/sh
             - -c
@@ -107,7 +107,7 @@ spec:
                 - NET_BIND_SERVICE
         # Sidecar for background mailbox sync
         - name: sync
-          image: dovecot/dovecot:2.3.21
+          image: dovecot/dovecot:2.4.3
           command:
             - /bin/sh
             - -c

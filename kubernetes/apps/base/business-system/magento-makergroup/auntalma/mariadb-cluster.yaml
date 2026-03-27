@@ -87,7 +87,6 @@ spec:
     [mariadb]
     bind-address=*
     default_storage_engine=InnoDB
-    log_bin=mariadb-bin
     binlog_format=ROW
     innodb_autoinc_lock_mode=2
     innodb_buffer_pool_size=1G

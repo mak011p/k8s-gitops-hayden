@@ -36,3 +36,38 @@ spec:
       memory: 128Mi
     limits:
       memory: 512Mi
+---
+# Daily physical backup using mariabackup to GCS (offsite copy)
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: PhysicalBackup
+metadata:
+  name: hayden-mariadb-daily
+  namespace: business-system
+spec:
+  mariaDbRef:
+    name: hayden-mariadb
+  # Daily backup: 04:00 Melbourne time (AEDT)
+  # 04:00 AEDT = 17:00 UTC (UTC+11 in summer)
+  schedule:
+    cron: "0 17 * * *"
+    suspend: false
+  # Maximum retention period for backups (30 days)
+  maxRetention: "720h"
+  storage:
+    s3:
+      bucket: hayden-magento2-backups
+      prefix: hayden/mariadb-physical
+      endpoint: storage.googleapis.com
+      region: australia-southeast1
+      accessKeyIdSecretKeyRef:
+        name: hayden-objstore
+        key: accessKeyId
+      secretAccessKeySecretKeyRef:
+        name: hayden-objstore
+        key: secretAccessKey
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi

@@ -11,6 +11,8 @@ spec:
   type: rw
   template:
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers: []
       topologySpreadConstraints:
         - maxSkew: 1

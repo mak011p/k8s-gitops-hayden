@@ -75,3 +75,4 @@ talosconfig
 *.pub
 *.key
 *.pem
+.playwright-mcp/
